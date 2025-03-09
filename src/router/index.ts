@@ -1,4 +1,4 @@
-import MainPage from '@/views/main-page.vue'
+import MainPage from '@/views/main-page/main-page.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({

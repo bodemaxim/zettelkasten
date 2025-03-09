@@ -1,5 +1,5 @@
  <script setup lang="ts">
-  import MainPage from './views/main-page.vue';
+  import MainPage from './views/main-page/main-page.vue';
 
   </script>
 

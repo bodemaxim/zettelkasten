@@ -1,20 +1,25 @@
  <script setup lang="ts">
   import { ref, onMounted } from 'vue'
-  import { supabase } from '@/lib/supabaseClient'
+  import { getAllCards } from '@/api'
 
   const cards :any = ref([])
 
-  async function getCards() {
-    const { data } = await supabase.from('cards').select()
-    cards.value = data
+
+  const fetchCards = async () => {
+    try {
+      cards.value = await getAllCards();
+    } catch(e) {
+      console.error(e)
+    }
   }
 
   onMounted(() => {
-    getCards()
+    fetchCards()
   })
   </script>
 
   <template>
+    <h1>Мои карточки</h1>
     <ul>
       <li v-for="card in cards" :key="card.id">{{ card.title }}</li>
     </ul>
