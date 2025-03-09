@@ -1,6 +1,7 @@
  <script setup lang="ts">
   import { ref, onMounted } from 'vue'
   import { getAllCards } from '@/api'
+  import TextEditor from '@/components/text-editor/text-editor.vue';
 
   const cards :any = ref([])
 
@@ -23,4 +24,6 @@
     <ul>
       <li v-for="card in cards" :key="card.id">{{ card.title }}</li>
     </ul>
+
+    <TextEditor />
   </template>
