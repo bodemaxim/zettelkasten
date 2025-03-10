@@ -28,7 +28,8 @@ onMounted(() => {
 
 <style scoped>
 .wrapper {
-    width: 600px;
+    width: calc(100% - 20px);
+    margin: 0px auto;
 }
 
 .text-editor {
