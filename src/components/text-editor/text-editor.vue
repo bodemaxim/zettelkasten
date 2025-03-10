@@ -1,12 +1,7 @@
-<template>
-  <div class="wrapper">
-    <div ref="editor" class = "text-editor"></div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import Quill from "quill";
+import hljs from "highlight.js";
 
 const editor = ref<HTMLElement | null>(null);
 
@@ -15,16 +10,23 @@ onMounted(() => {
     new Quill(editor.value, {
       theme: 'snow',
       modules: {
+        syntax: { hljs },
         toolbar: [
-          [{ header: [1, 2, false] }],
           ['bold', 'italic', 'underline'],
-          ['image', 'blockquote', 'code-block'],
+          ['code-block', 'blockquote', 'image'],
         ]
       }
     });
   }
 });
 </script>
+
+<template>
+  <div class="wrapper">
+    <div ref="editor" class = "text-editor"></div>
+  </div>
+</template>
+
 
 <style scoped>
 .wrapper {
@@ -39,6 +41,7 @@ onMounted(() => {
 
 <style>
 @import "/node_modules/quill/dist/quill.snow.css";
+@import 'highlight.js/styles/github.css';
 
 .ql-editor {
     font-size: 18px;
