@@ -7,7 +7,7 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: 'zettelkasten',
+  base: '/zettelkasten',
   plugins: [vue(), vueJsx(), VueDevTools()],
   resolve: {
     alias: {
