@@ -1,5 +1,5 @@
  <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
+  import { ref, watch } from 'vue'
   import { getCardByUuid, getCardTitles, createCard } from '@/api'
   import useAuthUser from '@/composables/use-auth-user';
   import TextEditor from '@/components/text-editor/text-editor.vue';
@@ -44,22 +44,13 @@
     }
   }
 
-const tryInitUser  = () => {
-  if (user.value) return;
 
-  const userData = localStorage.getItem('user');
-
-  if (!userData) return;
-
-  const userParsed = JSON.parse(userData);
-  user.value = userParsed;
-  console.debug("user.value", user.value)
-};
-
-  onMounted(async () => {
-    tryInitUser();
-    if (user.value) fetchCards()
-  })
+  watch(
+      () => user.value,
+      () => {
+          fetchCards();
+      }
+  )
   </script>
 
   <template>

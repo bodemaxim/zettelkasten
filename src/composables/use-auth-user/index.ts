@@ -2,11 +2,9 @@ import { ref } from "vue";
 import { supabase } from "@/api/supabaseClient";
 import type { User } from "@supabase/supabase-js";
 
+const user = ref<User | null>(null); //TODO: уточнить разницу между помещением юзера внутри и вне фукнции.
 
 export default function useAuthUser() {
-  const user = ref<User | null>(null); //TODO: уточнить разницу между помещением юзера внутри и вне фукнции.
-
-
   const signIn = async (email: string, password: string): Promise<void> => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -20,7 +18,7 @@ export default function useAuthUser() {
     if (!data.user) return;
 
     user.value = data.user;
-    localStorage.setItem('user', JSON.stringify(data.user));
+    console.debug("user", user)
   };
 
 
