@@ -1,5 +1,5 @@
 export interface Card {
-  id: number | null,
+  uuid: string | null,
   createdAt: string,
   title: string,
   text: string,
