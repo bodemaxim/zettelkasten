@@ -24,3 +24,36 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/*Переменные цвета*/
+:root {
+  --bg-primary: #212121;
+  --bg-dark: #1a1a1a;
+  --bg-darker: #0b0721;
+  --bg-lighter: #333333;
+}
+
+:root {
+  --text-primary: #ffffff;
+  --text-beige: #c7c5b8;
+  --text-muted: #666666;
+  --text-highlight: #ffffff;
+}
+
+:root {
+  --accent-azure: #66d9ef;
+  --accent-green: #34c759;
+  --accent-blue: #3f388f;
+  --accent-yellow: #f7dc6f;
+  --accent-red: #ff2222;
+}
+
+:root {
+  --grad-dark-to-light: linear-gradient(to bottom, var(--primary-dark), var(--bg-lighter));
+  --grad-accent-to-dark: linear-gradient(to bottom, var(--primary-accent), var(--primary-dark));
+}
+
+div {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}

@@ -44,42 +44,60 @@
     }
   }
 
-
   watch(
       () => user.value,
       () => {
+          console.debug(user.value)
           fetchCards();
       }
   )
   </script>
 
   <template>
-    <SignInPage v-if="!user" />
-    <div v-else>
-      <h1>Мои карточки</h1>
-      <ul>
-        <li v-for="card in cards" :key="card.uuid" @click="viewCard(card.uuid)" class="card">{{ card.title }}</li>
-      </ul>
-      <h1>Просмотр карточки</h1>
-      <NoteCard :card="viewedCard"/>
-      <h1>Добавление карточки</h1>
-      <form id="cardForm">
-          <div>
-              <label for="title">Заголовок:</label>
-              <input type="text" id="title" name="title" v-model="newCard.title">
-          </div>
-          <div>
-              <label for="text">Текст:</label>
-              <textarea id="text" name="text" v-model="newCard.text"></textarea>
-          </div>
-          <button type="submit" @click="saveNewCard">Создать карточку</button>
-      </form>
-      <h1>Редактор</h1>
-      <TextEditor />
+    <div class="main-page">
+      <SignInPage class="signin" v-if="!user" />
+      <div v-else>
+        <h1>Мои карточки</h1>
+        <ul>
+          <li v-for="card in cards" :key="card.uuid" @click="viewCard(card.uuid)" class="card">{{ card.title }}</li>
+        </ul>
+        <h1>Просмотр карточки</h1>
+        <NoteCard :card="viewedCard"/>
+        <h1>Добавление карточки</h1>
+        <form id="cardForm">
+            <div>
+                <label for="title">Заголовок:</label>
+                <input type="text" id="title" name="title" v-model="newCard.title">
+            </div>
+            <div>
+                <label for="text">Текст:</label>
+                <textarea id="text" name="text" v-model="newCard.text"></textarea>
+            </div>
+            <button type="submit" @click="saveNewCard">Создать карточку</button>
+        </form>
+        <h1>Редактор</h1>
+        <TextEditor />
+      </div>
     </div>
   </template>
 
   <style scoped>
+  :root {
+    --bg-darkel: #333; /* Определение переменной */
+  }
+
+  .main-page {
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-darker);
+    display: flex;
+    align-items: center;
+  }
+
+  .signin {
+    margin: 0 auto;
+  }
+
   .card {
     cursor: pointer;
   }
