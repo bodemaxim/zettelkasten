@@ -1,15 +1,15 @@
-<script setup lang='ts'>
-import { onMounted, ref } from 'vue';
-import useAuthUser from '@/composables/use-auth-user';
+<script setup lang="ts">
+import { ref } from 'vue'
+import useAuthUser from '@/composables/use-auth-user'
 
-const { signIn } = useAuthUser();
+const { signIn } = useAuthUser()
 
-const email = ref('');
-const password = ref('');
+const email = ref('')
+const password = ref('')
 
 const handleSignIn = async () => {
   await signIn(email.value, password.value)
-};
+}
 </script>
 
 <template>
@@ -22,7 +22,13 @@ const handleSignIn = async () => {
       </div>
       <div class="form-group">
         <label for="password">Пароль:</label>
-        <input type="password" v-model="password" id="password" autocomplete="current-password" required />
+        <input
+          type="password"
+          v-model="password"
+          id="password"
+          autocomplete="current-password"
+          required
+        />
       </div>
       <button type="submit">войти</button>
     </form>
