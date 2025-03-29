@@ -1,41 +1,51 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import useAuthUser from '@/composables/use-auth-user'
-
-const { signIn } = useAuthUser()
+import { login, seeUser } from '@/api/auth'
+import router from '@/router'
 
 const email = ref('')
 const password = ref('')
 
 const handleSignIn = async () => {
-  await signIn(email.value, password.value)
+  await login(email.value, password.value)
+  await seeUser()
+  router.push('/notes')
 }
 </script>
 
 <template>
-  <div class="signin">
-    <h1>Войти</h1>
-    <form @submit.prevent="handleSignIn">
-      <div class="form-group">
-        <label for="email">эл. почта:</label>
-        <input type="text" v-model="email" id="email" autocomplete="username" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Пароль:</label>
-        <input
-          type="password"
-          v-model="password"
-          id="password"
-          autocomplete="current-password"
-          required
-        />
-      </div>
-      <button type="submit">войти</button>
-    </form>
+  <div class="background">
+    <div class="signin">
+      <h1>Войти</h1>
+      <form @submit.prevent="handleSignIn">
+        <div class="form-group">
+          <label for="email">эл. почта:</label>
+          <input type="text" v-model="email" id="email" autocomplete="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Пароль:</label>
+          <input
+            type="password"
+            v-model="password"
+            id="password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+        <button type="submit">войти</button>
+      </form>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.background {
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  padding: 20px;
+}
+
 .signin {
   width: 450px;
   border: 1px solid #ccc;

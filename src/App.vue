@@ -1,8 +1,5 @@
- <script setup lang="ts">
-  import MainPage from './views/main-page/main-page.vue';
+<script setup lang="ts"></script>
 
-  </script>
-
-  <template>
-    <MainPage />
-  </template>
+<template>
+  <router-view class="router-view" />
+</template>

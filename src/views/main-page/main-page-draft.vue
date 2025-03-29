@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { getCardByUuid, getCardTitles, createCard } from '@/api'
-import useAuthUser from '@/composables/use-auth-user'
 import TextEditor from '@/components/text-editor/text-editor.vue'
 import NoteCard from './components/note-card/note-card.vue'
-import SignInPage from '@/components/sign-in-page/sign-in-page.vue'
-
-const { user } = useAuthUser()
 
 const cards: any = ref([])
 const viewedCard: any | null = ref(null)
@@ -44,22 +40,12 @@ const saveNewCard = async () => {
     console.error(e)
   }
 }
-
-watch(
-  () => user.value,
-  () => {
-    console.debug(user.value)
-    fetchCards()
-  },
-  { immediate: true }
-)
 </script>
 
 <template>
   <div class="main-page">
     <!--v-if="!user"-->
-    <SignInPage class="signin" v-if="false" />
-    <div v-else>
+    <div>
       <h1>Мои карточки</h1>
       <ul class="card-list">
         <li v-for="card in cards" :key="card.uuid" @click="viewCard(card.uuid)" class="card">

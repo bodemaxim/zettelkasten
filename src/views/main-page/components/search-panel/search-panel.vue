@@ -1,27 +1,28 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import type { IQuestion } from './search-panel.types'
+import { ref, watch, onMounted } from 'vue'
+import type { CardMinimal } from '@/api/types'
 import ProgressSpinner from 'primevue/progressspinner'
 import { getCardTitles } from '@/api'
 
 const emits = defineEmits<{
-  questionView: [value: IQuestion | null]
+  cardUuid: [value: string | null]
 }>()
 
-const dataToSearch = ref<IQuestion[]>([])
+const dataToSearch = ref<CardMinimal[]>([])
 const searchQuery = ref<string>('')
-const searchResults = ref<IQuestion[]>([])
+const searchResults = ref<CardMinimal[]>([])
 const isLoading = ref<boolean>(false)
 
-//нов
-const fetchCards = async (): Promise<any> => {
+const fetchCards = async (): Promise<CardMinimal[]> => {
   isLoading.value = true
   try {
     return await getCardTitles()
   } catch (e) {
     console.error(e)
   }
+
   isLoading.value = false
+  return []
 }
 
 const initData = async (): Promise<void> => {
@@ -29,9 +30,11 @@ const initData = async (): Promise<void> => {
   searchResults.value = JSON.parse(JSON.stringify(dataToSearch.value))
 }
 
+onMounted(initData)
+
 const onSearch = async (): Promise<void> => {
   if (searchQuery.value.length === 0) {
-    emits('questionView', null)
+    emits('cardUuid', null)
     searchResults.value = JSON.parse(JSON.stringify(dataToSearch.value))
 
     return
@@ -39,7 +42,7 @@ const onSearch = async (): Promise<void> => {
 
   const ids: string[] = parseSearchQuery(searchQuery.value)
 
-  searchResults.value = dataToSearch.value.filter((item: IQuestion) => ids.includes(item.uuid))
+  searchResults.value = dataToSearch.value.filter((item: CardMinimal) => ids.includes(item.uuid))
 }
 
 const parseSearchQuery = (str: string): string[] => {
@@ -57,8 +60,9 @@ const parseSearchQuery = (str: string): string[] => {
   return result
 }
 
-const viewAnswer = (question: IQuestion) => {
-  emits('questionView', question)
+const viewCard = (card: CardMinimal) => {
+  console.log('эмит отправлен', card)
+  emits('cardUuid', card.uuid)
 }
 
 watch(
@@ -73,22 +77,15 @@ const loading = ref(false)
 
 <template>
   <div class="search-panel">
-    <form>
-      <div class="input-group mb-3 p-2">
-        <input
-          type="text"
-          class="form-control search-form"
-          placeholder="Поиск..."
-          v-model="searchQuery"
-        />
-      </div>
+    <form class="input-form">
+      <input type="text" placeholder="Поиск..." v-model="searchQuery" />
     </form>
 
     <div>
       <ProgressSpinner v-if="loading" />
       <ul class="scrollable-container" v-if="!loading && searchResults.length > 0">
         <li v-for="card in searchResults" :key="card.uuid">
-          <p @click="viewAnswer(card)" class="border rounded mt-1 mb-1 p-3 question-item">
+          <p @click="viewCard(card)" class="border rounded mt-1 mb-1 p-3 card-item">
             {{ card.title }}
           </p>
         </li>
@@ -103,25 +100,27 @@ const loading = ref(false)
   overflow: hidden;
   max-width: 100%;
   background-color: var(--bg-dark);
-  border: 2px solid red;
+  border: 2px solid var(--accent-green);
+  padding: 10px 20px;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.question-item {
+.card-item {
   margin: 0;
   padding: 0;
-  &:hover {
-    background-color: black;
-    cursor: pointer;
-    transition: 0.5;
-  }
+}
+
+.card-item:hover {
+  background-color: black;
+  cursor: pointer;
+  transition: 0.5;
 }
 
 .scrollable-container {
   height: calc(100vh - 250px);
-}
-
-.filter-btn {
-  width: 150px;
+  background-color: var(--bg-dark);
 }
 
 /* XS */

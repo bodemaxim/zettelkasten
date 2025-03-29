@@ -34,7 +34,7 @@ export const createCard = async (newCard: Card) => {
     .select()
 }
 
-export const getCardByUuid = async (uuid: string) => {
+export const getCardByUuid = async (uuid: string): Promise<Card> => {
   return getCardByUuidMockResponse
   /*
   const { data, error } = await supabase.from('cards').select('*').eq('uuid', uuid).single()

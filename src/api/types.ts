@@ -1,7 +1,10 @@
-export interface Card {
-  uuid: string | null,
-  createdAt: string,
-  title: string,
-  text: string,
-  links: number[];
+export type CardMinimal = {
+  uuid: string
+  title: string
+}
+
+export type Card = CardMinimal & {
+  created_at: string
+  text: string
+  links: number[]
 }

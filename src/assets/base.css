@@ -11,6 +11,7 @@ body {
   width: 100vw;
   height: 100vh;
   overflow-x: hidden;
+  background-color: red;
 }
 
 body {
@@ -56,4 +57,10 @@ body {
 div {
   background-color: var(--bg-primary);
   color: var(--text-primary);
+}
+
+ol,
+ul {
+  list-style: none;
+  padding: 0;
 }
