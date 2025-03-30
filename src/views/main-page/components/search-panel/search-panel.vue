@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import type { CardMinimal } from '@/api/types'
-import { Toolbar, ProgressSpinner, Button, InputText } from 'primevue'
+import { ProgressSpinner, Button, InputText } from 'primevue'
 import { getCardTitles } from '@/api'
 
 const emits = defineEmits<{
   cardUuid: [value: string | null]
+  createCard: []
 }>()
 
 const dataToSearch = ref<CardMinimal[]>([])
@@ -53,7 +54,6 @@ const parseSearchQuery = (str: string): string[] => {
 }
 
 const viewCard = (card: CardMinimal) => {
-  console.log('эмит отправлен', card)
   emits('cardUuid', card.uuid)
 }
 
@@ -69,7 +69,13 @@ initData()
   <div class="search-panel">
     <div class="toolbar">
       <InputText type="text" v-model="searchQuery" class="toolbar-input-form" />
-      <Button icon="pi pi-file-plus" class="mr-2" severity="secondary" text />
+      <Button
+        icon="pi pi-file-plus"
+        class="mr-2"
+        severity="secondary"
+        text
+        @click="$emit('createCard')"
+      />
     </div>
     <div>
       <ProgressSpinner v-if="isLoading" />

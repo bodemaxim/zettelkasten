@@ -4,6 +4,7 @@ import SearchPanel from './components/search-panel/search-panel.vue'
 import ViewPanel from './components/view-panel/view-panel.vue'
 import { getCardByUuid, getAllDefinitions } from '@/api'
 import type { Card } from '@/api/types'
+import EditCardModal from './components/edit-card-modal/edit-card-modal.vue'
 
 const viewedCard = ref<Card | null>(null)
 const definitions = ref<Card[]>([])
@@ -35,12 +36,23 @@ const onCardViewChanged = async (cardUuid: string | null) => {
 
   if (cardUuid) await viewCard(cardUuid)
 }
+
+const modalVisible = ref<boolean>(false)
+
+const createCard = () => {
+  modalVisible.value = true
+}
 </script>
 
 <template>
   <div class="main-view">
+    <EditCardModal v-model="modalVisible" />
     <div class="panels-container">
-      <SearchPanel @card-uuid="onCardViewChanged($event)" class="search-panel" />
+      <SearchPanel
+        @card-uuid="onCardViewChanged($event)"
+        @create-card="createCard()"
+        class="search-panel"
+      />
       <ViewPanel v-model="viewedCard" />
     </div>
   </div>

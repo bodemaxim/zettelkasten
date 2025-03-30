@@ -53,7 +53,7 @@ const handleSignIn = async () => {
   background-color: var(--bg-primary);
   padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin: auto; /* Центрирование формы на странице */
+  margin: auto;
 }
 
 h1 {

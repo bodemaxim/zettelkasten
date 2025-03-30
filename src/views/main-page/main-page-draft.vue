@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { getCardByUuid, getCardTitles, createCard } from '@/api'
 import TextEditor from '@/components/text-editor/text-editor.vue'
-import NoteCard from './components/note-card/note-card.vue'
 
 const cards: any = ref([])
 const viewedCard: any | null = ref(null)
