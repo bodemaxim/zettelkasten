@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import type { CardMinimal } from '@/api/types'
-import ProgressSpinner from 'primevue/progressspinner'
+import { Toolbar, ProgressSpinner, Button, InputText } from 'primevue'
 import { getCardTitles } from '@/api'
 
 const emits = defineEmits<{
@@ -67,10 +67,10 @@ initData()
 
 <template>
   <div class="search-panel">
-    <form class="input-form">
-      <input type="text" placeholder="Поиск..." v-model="searchQuery" />
-    </form>
-
+    <div class="toolbar">
+      <InputText type="text" v-model="searchQuery" class="toolbar-input-form" />
+      <Button icon="pi pi-file-plus" class="mr-2" severity="secondary" text />
+    </div>
     <div>
       <ProgressSpinner v-if="isLoading" />
       <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
@@ -91,7 +91,7 @@ initData()
   max-width: 100%;
   background-color: var(--bg-dark);
   border: 2px solid var(--accent-green);
-  padding: 10px 20px;
+  padding: 40px 20px 10px 20px;
   overflow: hidden;
   border-radius: 10px;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
@@ -111,6 +111,19 @@ initData()
 .scrollable-container {
   height: calc(100vh - 250px);
   background-color: var(--bg-dark);
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  background-color: var(--bg-dark);
+}
+
+.toolbar-input-form {
+  width: 150px;
 }
 
 /* XS */

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Card } from '@/api/types'
 import BottomShade from '@/ui/bottom-shade.vue'
+import { Toolbar, Button } from 'primevue'
 
 const viewedCard = defineModel<Card | null>()
 </script>
@@ -8,6 +9,11 @@ const viewedCard = defineModel<Card | null>()
 <template>
   <div class="view-panel">
     <div v-if="viewedCard" class="view-panel-question">
+      <div class="buttons-container">
+        <Button icon="pi pi-file-edit" class="mr-2" severity="secondary" text />
+        <Button icon="pi pi-file-excel" class="mr-2" severity="secondary" text />
+        <Button icon="pi pi-arrow-left" severity="secondary" text />
+      </div>
       <h2>{{ viewedCard?.title }}</h2>
       <p>{{ viewedCard?.text }}</p>
       <hr />
@@ -32,5 +38,13 @@ const viewedCard = defineModel<Card | null>()
   padding: 30px 15px 10px;
   overflow-y: auto;
   background-color: var(--bg-dark);
+}
+
+.buttons-container {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  background-color: var(--bg-dark);
+  float: right;
 }
 </style>
