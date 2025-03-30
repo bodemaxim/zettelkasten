@@ -1,13 +1,27 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import SearchPanel from './components/search-panel/search-panel.vue'
 import ViewPanel from './components/view-panel/view-panel.vue'
-import { getCardByUuid } from '@/api'
+import { getCardByUuid, getAllDefinitions } from '@/api'
 import type { Card } from '@/api/types'
 
 const viewedCard = ref<Card | null>(null)
+const definitions = ref<Card[]>([])
+
+const fetchDefinition = (uuid: string): Card | null => {
+  const result = definitions.value.find((item) => item.uuid === uuid)
+
+  return result ? result : null
+}
+
+onMounted(async () => (definitions.value = await getAllDefinitions()))
 
 const viewCard = async (cardUuid: string) => {
+  if (definitions.value.find((item) => item.uuid === cardUuid)) {
+    viewedCard.value = fetchDefinition(cardUuid)
+    return
+  }
+
   try {
     viewedCard.value = await getCardByUuid(cardUuid)
     console.debug('viewCard', viewedCard.value)

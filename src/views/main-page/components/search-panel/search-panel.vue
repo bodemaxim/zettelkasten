@@ -13,21 +13,13 @@ const searchQuery = ref<string>('')
 const searchResults = ref<CardMinimal[]>([])
 const isLoading = ref<boolean>(false)
 
-const fetchCards = async (): Promise<CardMinimal[]> => {
+const initData = async (): Promise<void> => {
   isLoading.value = true
-  try {
-    return await getCardTitles()
-  } catch (e) {
-    console.error(e)
-  }
+
+  dataToSearch.value = await getCardTitles()
+  searchResults.value = JSON.parse(JSON.stringify(dataToSearch.value))
 
   isLoading.value = false
-  return []
-}
-
-const initData = async (): Promise<void> => {
-  dataToSearch.value = await fetchCards()
-  searchResults.value = JSON.parse(JSON.stringify(dataToSearch.value))
 }
 
 onMounted(initData)
@@ -71,8 +63,6 @@ watch(
 )
 
 initData()
-
-const loading = ref(false)
 </script>
 
 <template>
@@ -82,15 +72,15 @@ const loading = ref(false)
     </form>
 
     <div>
-      <ProgressSpinner v-if="loading" />
-      <ul class="scrollable-container" v-if="!loading && searchResults.length > 0">
+      <ProgressSpinner v-if="isLoading" />
+      <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
         <li v-for="card in searchResults" :key="card.uuid">
           <p @click="viewCard(card)" class="border rounded mt-1 mb-1 p-3 card-item">
             {{ card.title }}
           </p>
         </li>
       </ul>
-      <p v-else-if="!loading">Не найдено</p>
+      <p v-else-if="!isLoading">Не найдено</p>
     </div>
   </div>
 </template>
