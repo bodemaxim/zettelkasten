@@ -38,15 +38,26 @@ const onCardViewChanged = async (cardUuid: string | null) => {
 }
 
 const modalVisible = ref<boolean>(false)
+const cardUuidForEdit = ref<string | null>(null)
 
 const createCard = () => {
   modalVisible.value = true
+}
+
+const onSave = async () => {
+  definitions.value = []
+  definitions.value = await getAllDefinitions()
+  console.debug('эмит пришел')
 }
 </script>
 
 <template>
   <div class="main-view">
-    <EditCardModal v-model="modalVisible" />
+    <EditCardModal
+      v-model:visible="modalVisible"
+      v-model:uuidForEdit="cardUuidForEdit"
+      @saved="onSave"
+    />
     <div class="panels-container">
       <SearchPanel
         @card-uuid="onCardViewChanged($event)"
