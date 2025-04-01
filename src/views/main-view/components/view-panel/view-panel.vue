@@ -31,15 +31,15 @@ const closeCard = () => {
   <div class="view-panel">
     <div v-if="viewedCard" class="view-panel-question">
       <div class="buttons-container">
-        <Button v-tooltip.bottom="'Редактировать карточку'" icon="pi pi-file-edit" class="mr-2" severity="secondary" text  @click="editCard()"/>
-        <Button v-tooltip.bottom="'Удалить карточку'" icon="pi pi-file-excel" class="mr-2" severity="secondary" text @click="deleteCard()" />
-        <Button v-if="isMobileView" v-tooltip.bottom="'Вернуться к списку'" icon="pi pi-arrow-left" severity="secondary" text @click="closeCard()"/>
+        <Button :v-tooltip.bottom="isMobileView ? 'Редактировать карточку' : undefined" icon="pi pi-file-edit" class="mr-2" severity="secondary" text  @click="editCard()"/>
+        <Button :v-tooltip.bottom="isMobileView ? 'Удалить карточку' : undefined" icon="pi pi-file-excel" class="mr-2" severity="secondary" text @click="deleteCard()" />
+        <Button v-if="isMobileView" :v-tooltip.bottom="isMobileView ? 'Вернуться к списку' : undefined" icon="pi pi-arrow-left" severity="secondary" text @click="closeCard()"/>
       </div>
       <h2>{{ viewedCard?.title }}</h2>
       <p>{{ viewedCard?.text }}</p>
       <hr />
     </div>
-    <p v-else>Выберите вопрос, чтобы посмотреть ответ на него.</p>
+    <p v-else>Выберите карточку, чтобы посмотреть содержание.</p>
     <BottomShade />
   </div>
 </template>
