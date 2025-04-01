@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { login, seeUser } from '@/api/auth'
 import router from '@/router'
 import { InputText, Button } from 'primevue'
@@ -11,13 +11,39 @@ const password = ref('')
 const isLoading = ref(false)
 
 const handleSignIn = async () => {
-  isLoading.value = true
-  await login(email.value, password.value)
-  await seeUser()
-  isLoading.value = false
+    isLoading.value = true
+    await login(email.value, password.value)
+    await seeUser()
 
-  router.push('/notes')
+    isLoading.value = false
+    
+    localStorage.setItem('email', email.value)
+    localStorage.setItem('password', password.value)
+    
+    router.push('/notes')
+
 }
+
+const loginAutomatically = () => {
+  const storedEmail = localStorage.getItem('email')
+  const storedPassword = localStorage.getItem('password')
+
+  if (storedEmail) {
+      email.value = storedEmail
+  }
+  
+  if (storedPassword) {
+      password.value = storedPassword
+  }
+
+  if (storedEmail && storedPassword) {
+      handleSignIn()
+  }
+}
+
+onMounted(() => {
+    loginAutomatically()
+})
 </script>
 
 <template>

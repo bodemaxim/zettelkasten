@@ -4,6 +4,7 @@ import type { CardMinimal } from '@/api/types'
 import { Button, InputText } from 'primevue'
 import { getCardTitles } from '@/api'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import { isMobileView } from '@/store/store'
 
 const isNeedToRefreshSearchList = defineModel<boolean>()
 
@@ -83,7 +84,7 @@ initData()
     <div class="toolbar">
       <InputText type="text" v-model="searchQuery" class="toolbar-input-form" />
       <Button
-        v-tooltip.bottom="'Создать карточку'"
+        :v-tooltip.bottom="isMobileView ?'Создать карточку' : undefined"
         icon="pi pi-file-plus"
         class="mr-2"
         severity="secondary"
