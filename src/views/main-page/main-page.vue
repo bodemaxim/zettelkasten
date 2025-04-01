@@ -39,16 +39,18 @@ const onCardViewChanged = async (cardUuid: string | null) => {
 
 const modalVisible = ref<boolean>(false)
 const cardUuidForEdit = ref<string | null>(null)
+const isNeedToRefreshSearchList = ref<boolean>(false)
 
 const createCard = () => {
   modalVisible.value = true
 }
 
-const onSave = async () => {
-  definitions.value = []
+const refreshDefinitions = async () => {
   definitions.value = await getAllDefinitions()
-  console.debug('эмит пришел')
+  isNeedToRefreshSearchList.value = true
+  console.debug("2 refreshDef")
 }
+
 </script>
 
 <template>
@@ -56,15 +58,16 @@ const onSave = async () => {
     <EditCardModal
       v-model:visible="modalVisible"
       v-model:uuidForEdit="cardUuidForEdit"
-      @saved="onSave"
+      @saved="refreshDefinitions"
     />
     <div class="panels-container">
       <SearchPanel
+        v-model="isNeedToRefreshSearchList"
         @card-uuid="onCardViewChanged($event)"
         @create-card="createCard()"
         class="search-panel"
       />
-      <ViewPanel v-model="viewedCard" />
+      <ViewPanel v-model="viewedCard" @deleted="refreshDefinitions"/>
     </div>
   </div>
 </template>

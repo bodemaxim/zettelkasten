@@ -4,6 +4,20 @@ import type { CardMinimal } from '@/api/types'
 import { ProgressSpinner, Button, InputText } from 'primevue'
 import { getCardTitles } from '@/api'
 
+const isNeedToRefreshSearchList = defineModel<boolean>()
+
+watch(
+    () => isNeedToRefreshSearchList.value,
+    async () => {
+        if  (!isNeedToRefreshSearchList.value) return
+
+        await initData()
+        console.debug("3 вотч в серч")
+        isNeedToRefreshSearchList.value = false
+
+    }
+)
+
 const emits = defineEmits<{
   cardUuid: [value: string | null]
   createCard: []
@@ -70,6 +84,7 @@ initData()
     <div class="toolbar">
       <InputText type="text" v-model="searchQuery" class="toolbar-input-form" />
       <Button
+        v-tooltip.bottom="'Создать карточку'"
         icon="pi pi-file-plus"
         class="mr-2"
         severity="secondary"
