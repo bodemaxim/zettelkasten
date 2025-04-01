@@ -2,48 +2,70 @@
 import { ref } from 'vue'
 import { login, seeUser } from '@/api/auth'
 import router from '@/router'
+import { ProgressSpinner, InputText, Button } from 'primevue'
+import { IftaLabel } from 'primevue'
 
 const email = ref('')
 const password = ref('')
+const isLoading = ref(false)
 
 const handleSignIn = async () => {
+  isLoading.value = true
   await login(email.value, password.value)
   await seeUser()
+  isLoading.value = false
+
   router.push('/notes')
 }
 </script>
 
 <template>
-  <div class="background">
-    <div class="signin">
+  <div class="login-view">
+    <ProgressSpinner v-if="isLoading" class="spinner" />
+    <div v-else class="signin">
       <h1>Войти</h1>
+
       <form @submit.prevent="handleSignIn">
         <div class="form-group">
-          <label for="email">эл. почта:</label>
-          <input type="text" v-model="email" id="email" autocomplete="username" required />
-        </div>
-        <div class="form-group">
-          <label for="password">Пароль:</label>
-          <input
-            type="password"
-            v-model="password"
-            id="password"
-            autocomplete="current-password"
-            required
+          <IftaLabel for="email">эл. почта:</IftaLabel>
+          <InputText 
+            id="email" 
+            v-model="email" 
+            autocomplete="username" 
+            required 
+            class="input-form"
           />
         </div>
-        <button type="submit">войти</button>
+        <div class="form-group">
+          <IftaLabel for="password">Пароль:</IftaLabel>
+          <InputText
+            id="password"
+            type="password"
+            v-model="password"
+            autocomplete="current-password"
+            required
+            class="input-form"
+          />
+        </div>
+        <Button @click="handleSignIn" class="submit-button">войти</Button>
       </form>
     </div>
   </div>
 </template>
 
 <style scoped>
-.background {
+.login-view {
   width: 100vw;
   height: 100vh;
   background: black;
   padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  background: transparent;
 }
 
 .signin {
@@ -66,41 +88,14 @@ h1 {
   margin-bottom: 15px;
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--text-beige);
-}
-
-input {
+.input-form {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  color: var(--text-primary);
   background-color: var(--bg-dark);
-}
-
-input:focus {
-  border-color: var(--accent-blue);
-  outline: none;
-  background-color: var(--bg-lighter);
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: var(--accent-green);
   color: var(--text-primary);
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  margin: 5px 0px 10px;
 }
 
-button:hover {
-  background-color: var(--accent-azure);
+.submit-button {
+  width: 100%;
 }
 </style>

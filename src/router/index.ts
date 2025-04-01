@@ -1,6 +1,6 @@
-import MainPage from '@/views/main-page/main-page.vue'
-import LoginPage from '@/views/login-page/login-page.vue'
-import UnauthorizedPage from '@/views/unauthorized-page/unauthorized-page.vue'
+import MainView from '@/views/main-view/main-view.vue'
+import LoginView from '@/views/login-view/login-view.vue'
+import UnauthorizedView from '@/views/unauthorized-view/unauthorized-view.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/api/supabaseClient'
 
@@ -12,18 +12,18 @@ const router = createRouter({
     {
       path: '/notes',
       name: 'notes',
-      component: MainPage,
+      component: MainView,
       meta: { requiresAuth: true }
     },
     {
       path: '/',
       name: 'login',
-      component: LoginPage
+      component: LoginView
     },
     {
       path: '/unauthorized',
       name: 'unauthorized',
-      component: UnauthorizedPage
+      component: UnauthorizedView
     }
   ]
 })
