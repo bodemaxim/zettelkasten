@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import type { CardMinimal } from '@/api/types'
-import { ProgressSpinner, Button, InputText } from 'primevue'
+import { Button, InputText } from 'primevue'
 import { getCardTitles } from '@/api'
+import CoolSpinner from '@/ui/cool-spinner.vue'
 
 const isNeedToRefreshSearchList = defineModel<boolean>()
 
@@ -93,7 +94,7 @@ initData()
       />
     </div>
     <div>
-      <ProgressSpinner v-if="isLoading" />
+      <CoolSpinner v-if="isLoading" class="spinner" />
       <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
         <li v-for="card in searchResults" :key="card.uuid">
           <p @click="viewCard(card)" class="border rounded mt-1 mb-1 p-3 card-item">
@@ -145,6 +146,10 @@ initData()
 
 .toolbar-input-form {
   width: 150px;
+}
+
+.spinner {
+  background: transparent;
 }
 
 /* XS */

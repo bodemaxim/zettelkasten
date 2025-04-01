@@ -9,8 +9,4 @@ export type Card = CardMinimal & {
   links: string[]
 }
 
-export type NewCard = {
-  title: string
-  text: string
-  links: string[]
-}
+export type CardEditable = Omit<Card, 'uuid' | 'created_at'>

@@ -2,8 +2,9 @@
 import { ref } from 'vue'
 import { login, seeUser } from '@/api/auth'
 import router from '@/router'
-import { ProgressSpinner, InputText, Button } from 'primevue'
+import { InputText, Button } from 'primevue'
 import { IftaLabel } from 'primevue'
+import CoolSpinner from '@/ui/cool-spinner.vue'
 
 const email = ref('')
 const password = ref('')
@@ -21,7 +22,7 @@ const handleSignIn = async () => {
 
 <template>
   <div class="login-view">
-    <ProgressSpinner v-if="isLoading" class="spinner" />
+    <CoolSpinner v-if="isLoading" class="spinner" />
     <div v-else class="signin">
       <h1>Войти</h1>
 

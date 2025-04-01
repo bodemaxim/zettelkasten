@@ -7,24 +7,26 @@ import { deleteCardByUuid } from '@/api'
 const viewedCard = defineModel<Card | null>()
 
 const emits = defineEmits<{
-  deleted: []
+  deleted: [],
+  edited: [],
 }>()
 
 const deleteCard = async () => {
   if(viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)
   viewedCard.value = null
   emits('deleted')
-  console.debug('1 emits deleted')
 }
 
-
+const editCard = () => {
+  emits('edited')
+}
 </script>
 
 <template>
   <div class="view-panel">
     <div v-if="viewedCard" class="view-panel-question">
       <div class="buttons-container">
-        <Button v-tooltip.bottom="'Редактировать карточку'" icon="pi pi-file-edit" class="mr-2" severity="secondary" text />
+        <Button v-tooltip.bottom="'Редактировать карточку'" icon="pi pi-file-edit" class="mr-2" severity="secondary" text  @click="editCard()"/>
         <Button v-tooltip.bottom="'Удалить карточку'" icon="pi pi-file-excel" class="mr-2" severity="secondary" text @click="deleteCard()" />
         <Button v-tooltip.bottom="'Вернуться к списку'" icon="pi pi-arrow-left" severity="secondary" text />
       </div>

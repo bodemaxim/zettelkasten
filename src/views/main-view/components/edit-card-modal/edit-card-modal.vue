@@ -1,25 +1,20 @@
 <script setup lang="ts">
-import { type StyleValue, ref, computed } from 'vue'
+import { type StyleValue, ref, computed, watch } from 'vue'
 import { Dialog, Button, InputText, Textarea } from 'primevue'
-import type { NewCard } from '@/api/types'
-import { createCard } from '@/api'
+import type { Card, CardEditable } from '@/api/types'
+import { createCard, updateCard } from '@/api'
+import { defaultCard } from './edit-card-modal.consts'
 
 const visible = defineModel<boolean>('visible')
-const uuidForEdit = defineModel<string | null>('uuidForEdit')
+const cardOnEdit = defineModel<Card | null>('cardOnEdit')
 
 const emits = defineEmits<{
   saved: []
 }>()
 
-const defaultCard: NewCard = {
-  title: '',
-  text: '',
-  links: []
-}
+const updatedCard = ref<CardEditable>(defaultCard)
 
-const updatedCard = ref<NewCard>(defaultCard)
-
-const title = computed(() => (uuidForEdit.value ? 'Редактировать карточку' : 'Создать карточку'))
+const title = computed(() => (cardOnEdit.value ? 'Редактировать карточку' : 'Создать карточку'))
 
 const dialogStyles = computed<StyleValue>(() => ({
   width: '80%',
@@ -33,11 +28,29 @@ const onCancel = () => {
 }
 
 const onSave = async () => {
-  await createCard(updatedCard.value)
-  updatedCard.value = defaultCard
+  if (!cardOnEdit.value) {
+    await createCard(updatedCard.value)
+    updatedCard.value = defaultCard
+  } else {
+    const newValue: Card = {
+      ...cardOnEdit.value,
+      ...updatedCard.value  
+    }
+
+    updateCard(newValue)
+  }
+
   visible.value = false
   emits('saved')
 }
+
+watch(
+    () => cardOnEdit.value,
+    () => {
+        if (cardOnEdit.value) updatedCard.value = cardOnEdit.value
+        else updatedCard.value = defaultCard
+    }
+)
 </script>
 
 <template>
@@ -54,7 +67,7 @@ const onSave = async () => {
       </div>
       <div class="input-block">
         <label for="email" class="input-label">Текст</label>
-        <Textarea v-model="updatedCard.text" class="input-element" />
+        <Textarea v-model="updatedCard.text" class="input-element textarea" />
       </div>
       <div class="buttons-block">
         <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
@@ -84,5 +97,9 @@ const onSave = async () => {
 
 .input-element {
   width: 100%;
+}
+
+.textarea {
+  height: 400px;
 }
 </style>

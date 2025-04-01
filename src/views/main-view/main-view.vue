@@ -8,16 +8,28 @@ import EditCardModal from './components/edit-card-modal/edit-card-modal.vue'
 
 const viewedCard = ref<Card | null>(null)
 const definitions = ref<Card[]>([])
+const modalVisible = ref<boolean>(false)
+const cardUuidForEdit = ref<string | null>(null)
+const isNeedToRefreshSearchList = ref<boolean>(false)
+
+const setDefinitions = async() => {
+  definitions.value = await getAllDefinitions()
+}
+
+onMounted(setDefinitions)
 
 const fetchDefinition = (uuid: string): Card | null => {
   const result = definitions.value.find((item) => item.uuid === uuid)
 
-  return result ? result : null
+  return result ?? null
 }
 
-onMounted(async () => (definitions.value = await getAllDefinitions()))
+const viewCard = async (cardUuid: string | null) => {
+  if (!cardUuid) {
+    viewedCard.value = null
+    return
+  }
 
-const viewCard = async (cardUuid: string) => {
   if (definitions.value.find((item) => item.uuid === cardUuid)) {
     viewedCard.value = fetchDefinition(cardUuid)
     return
@@ -25,49 +37,36 @@ const viewCard = async (cardUuid: string) => {
 
   try {
     viewedCard.value = await getCardByUuid(cardUuid)
-    console.debug('viewCard', viewedCard.value)
   } catch (e) {
     console.error(e)
   }
 }
 
-const onCardViewChanged = async (cardUuid: string | null) => {
-  console.debug('эмит принят')
-
-  if (cardUuid) await viewCard(cardUuid)
-}
-
-const modalVisible = ref<boolean>(false)
-const cardUuidForEdit = ref<string | null>(null)
-const isNeedToRefreshSearchList = ref<boolean>(false)
-
-const createCard = () => {
+const openModal = () => {
   modalVisible.value = true
 }
 
 const refreshDefinitions = async () => {
-  definitions.value = await getAllDefinitions()
+  await setDefinitions()
   isNeedToRefreshSearchList.value = true
-  console.debug("2 refreshDef")
 }
-
 </script>
 
 <template>
   <div class="main-view">
     <EditCardModal
       v-model:visible="modalVisible"
-      v-model:uuidForEdit="cardUuidForEdit"
+      v-model:cardOnEdit="viewedCard"
       @saved="refreshDefinitions"
     />
     <div class="panels-container">
       <SearchPanel
         v-model="isNeedToRefreshSearchList"
-        @card-uuid="onCardViewChanged($event)"
-        @create-card="createCard()"
+        @card-uuid="viewCard($event)"
+        @create-card="openModal()"
         class="search-panel"
       />
-      <ViewPanel v-model="viewedCard" @deleted="refreshDefinitions"/>
+      <ViewPanel v-model="viewedCard" @deleted="refreshDefinitions" @edited="openModal()"/>
     </div>
   </div>
 </template>
