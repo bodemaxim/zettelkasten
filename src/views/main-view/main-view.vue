@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { type StyleValue, ref, onMounted, computed } from 'vue'
 import SearchPanel from './components/search-panel/search-panel.vue'
 import ViewPanel from './components/view-panel/view-panel.vue'
 import { getCardByUuid, getAllDefinitions } from '@/api'
 import type { Card } from '@/api/types'
 import EditCardModal from './components/edit-card-modal/edit-card-modal.vue'
+import { vResizeObserver } from "@vueuse/components";
+import { isMobileView, setScreenWidth } from '@/store/store'
 
 const viewedCard = ref<Card | null>(null)
 const definitions = ref<Card[]>([])
 const modalVisible = ref<boolean>(false)
-const cardUuidForEdit = ref<string | null>(null)
 const isNeedToRefreshSearchList = ref<boolean>(false)
 
 const setDefinitions = async() => {
@@ -50,23 +51,40 @@ const refreshDefinitions = async () => {
   await setDefinitions()
   isNeedToRefreshSearchList.value = true
 }
+
+function onResizeObserver(entries: readonly ResizeObserverEntry[]) {
+  const [entry] = entries
+  const { width } = entry.contentRect
+  setScreenWidth(width)
+}
+
+const searchPanelStyles = computed<StyleValue>(() => ({
+  width: isMobileView.value ? '100%' : "300px",
+  minWidth: isMobileView.value ? undefined : "300px",
+}))
+
+
 </script>
 
 <template>
-  <div class="main-view">
+  <div  v-resize-observer="onResizeObserver" class="main-view">
     <EditCardModal
       v-model:visible="modalVisible"
       v-model:cardOnEdit="viewedCard"
       @saved="refreshDefinitions"
+
     />
-    <div class="panels-container">
+    <ViewPanel v-if="isMobileView && viewedCard" v-model="viewedCard" @deleted="refreshDefinitions" @edited="openModal()"/>
+
+    <div v-else class="panels-container">
       <SearchPanel
         v-model="isNeedToRefreshSearchList"
+        :style="searchPanelStyles"
+        class="search-panel"
         @card-uuid="viewCard($event)"
         @create-card="openModal()"
-        class="search-panel"
       />
-      <ViewPanel v-model="viewedCard" @deleted="refreshDefinitions" @edited="openModal()"/>
+      <ViewPanel v-if="!isMobileView" v-model="viewedCard" @deleted="refreshDefinitions" @edited="openModal()"/>
     </div>
   </div>
 </template>
@@ -88,8 +106,6 @@ const refreshDefinitions = async () => {
 .search-panel {
   margin: 3em 1em;
   height: calc(100vh - 80px);
-  min-width: 300px;
-  max-width: 300px;
 }
 
 .view-panel {
