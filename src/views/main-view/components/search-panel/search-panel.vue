@@ -4,7 +4,9 @@ import type { CardMinimal } from '@/api/types'
 import { Button, InputText } from 'primevue'
 import { getCardTitles } from '@/api'
 import CoolSpinner from '@/ui/cool-spinner.vue'
-import { isMobileView } from '@/store/store'
+import { useStore } from '@/composables/use-store'
+
+const { isMobileView, cardTitles, isLoading, toggleLoading } = useStore()
 
 const isNeedToRefreshSearchList = defineModel<boolean>()
 
@@ -26,15 +28,14 @@ const emits = defineEmits<{
 const dataToSearch = ref<CardMinimal[]>([])
 const searchQuery = ref<string>('')
 const searchResults = ref<CardMinimal[]>([])
-const isLoading = ref<boolean>(false)
 
-const initData = async (): Promise<void> => {
-  isLoading.value = true
+const initData = async (): Promise<void> => { //TODO: вызывается дважды. Дело не в вотче.
+  toggleLoading()
 
-  dataToSearch.value = await getCardTitles()
+  dataToSearch.value = cardTitles.value.length ? cardTitles.value : await getCardTitles()
   searchResults.value = JSON.parse(JSON.stringify(dataToSearch.value))
 
-  isLoading.value = false
+  toggleLoading()
 }
 
 onMounted(initData)

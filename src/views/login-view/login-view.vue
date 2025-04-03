@@ -5,17 +5,18 @@ import router from '@/router'
 import { InputText, Button } from 'primevue'
 import { IftaLabel } from 'primevue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import { useStore } from '@/composables/use-store'
 
 const email = ref('')
 const password = ref('')
-const isLoading = ref(false)
+const { isLoading, toggleLoading } = useStore()
 
 const handleSignIn = async () => {
-    isLoading.value = true
+    toggleLoading()
     await login(email.value, password.value)
     await seeUser()
 
-    isLoading.value = false
+    toggleLoading()
     
     localStorage.setItem('email', email.value)
     localStorage.setItem('password', password.value)

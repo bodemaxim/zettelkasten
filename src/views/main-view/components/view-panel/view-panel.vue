@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { Card } from '@/api/types'
 import BottomShade from '@/ui/bottom-shade.vue'
 import { Button } from 'primevue'
 import { deleteCardByUuid } from '@/api'
-import { isMobileView } from '@/store/store'
+import { useStore } from '@/composables/use-store'
+import CoolSpinner from '@/ui/cool-spinner.vue'
+
+const { isMobileView, isLoading, toggleLoading } = useStore()
 
 const viewedCard = defineModel<Card | null>()
 
@@ -13,9 +17,11 @@ const emits = defineEmits<{
 }>()
 
 const deleteCard = async () => {
-  if(viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)
+  toggleLoading()
+  if(viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)  
   viewedCard.value = null
   emits('deleted')
+  toggleLoading()
 }
 
 const editCard = () => {
@@ -29,6 +35,7 @@ const closeCard = () => {
 
 <template>
   <div class="view-panel">
+    <CoolSpinner v-if="isLoading" />
     <div v-if="viewedCard" class="view-panel-question">
       <div class="buttons-container">
         <Button :v-tooltip.bottom="isMobileView ? 'Редактировать карточку' : undefined" icon="pi pi-file-edit" class="mr-2" severity="secondary" text  @click="editCard()"/>

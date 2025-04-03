@@ -24,6 +24,7 @@ export const getAllDefinitions = async (): Promise<Card[]> => {
 }
 
 export const getCardTitles = async (): Promise<CardMinimal[]> => {
+  console.debug("getCardTitles")
   const { data, error } = await supabase.from('cards').select('uuid, title')
 
   if (error) {
