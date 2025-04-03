@@ -12,13 +12,13 @@ const { isMobileView, isLoading, toggleLoading } = useStore()
 const viewedCard = defineModel<Card | null>()
 
 const emits = defineEmits<{
-  deleted: [],
-  edited: [],
+  deleted: []
+  edited: []
 }>()
 
 const deleteCard = async () => {
   toggleLoading()
-  if(viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)  
+  if (viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)
   viewedCard.value = null
   emits('deleted')
   toggleLoading()
@@ -38,12 +38,33 @@ const closeCard = () => {
     <CoolSpinner v-if="isLoading" />
     <div v-if="viewedCard" class="view-panel-question">
       <div class="buttons-container">
-        <Button :v-tooltip.bottom="isMobileView ? 'Редактировать карточку' : undefined" icon="pi pi-file-edit" class="mr-2" severity="secondary" text  @click="editCard()"/>
-        <Button :v-tooltip.bottom="isMobileView ? 'Удалить карточку' : undefined" icon="pi pi-file-excel" class="mr-2" severity="secondary" text @click="deleteCard()" />
-        <Button v-if="isMobileView" :v-tooltip.bottom="isMobileView ? 'Вернуться к списку' : undefined" icon="pi pi-arrow-left" severity="secondary" text @click="closeCard()"/>
+        <Button
+          :v-tooltip.bottom="isMobileView ? 'Редактировать карточку' : undefined"
+          icon="pi pi-file-edit"
+          class="mr-2"
+          severity="secondary"
+          text
+          @click="editCard()"
+        />
+        <Button
+          :v-tooltip.bottom="isMobileView ? 'Удалить карточку' : undefined"
+          icon="pi pi-file-excel"
+          class="mr-2"
+          severity="secondary"
+          text
+          @click="deleteCard()"
+        />
+        <Button
+          v-if="isMobileView"
+          :v-tooltip.bottom="isMobileView ? 'Вернуться к списку' : undefined"
+          icon="pi pi-arrow-left"
+          severity="secondary"
+          text
+          @click="closeCard()"
+        />
       </div>
       <h2>{{ viewedCard?.title }}</h2>
-      <p>{{ viewedCard?.text }}</p>
+      <p v-html="viewedCard?.text"></p>
       <hr />
     </div>
     <p v-else>Выберите карточку, чтобы посмотреть содержание.</p>

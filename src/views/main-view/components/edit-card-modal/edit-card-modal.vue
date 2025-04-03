@@ -4,6 +4,7 @@ import { Dialog, Button, InputText, Textarea } from 'primevue'
 import type { Card, CardEditable } from '@/api/types'
 import { createCard, updateCard } from '@/api'
 import { defaultCard } from './edit-card-modal.consts'
+import TextEditor from '@/components/text-editor/text-editor.vue'
 
 const visible = defineModel<boolean>('visible')
 const cardOnEdit = defineModel<Card | null>('cardOnEdit')
@@ -13,6 +14,7 @@ const emits = defineEmits<{
 }>()
 
 const updatedCard = ref<CardEditable>(defaultCard)
+const richText = ref('')
 
 const title = computed(() => (cardOnEdit.value ? 'Редактировать карточку' : 'Создать карточку'))
 
@@ -32,9 +34,11 @@ const onSave = async () => {
     await createCard(updatedCard.value)
     updatedCard.value = defaultCard
   } else {
+    updatedCard.value.text = richText.value
+
     const newValue: Card = {
       ...cardOnEdit.value,
-      ...updatedCard.value  
+      ...updatedCard.value
     }
 
     updateCard(newValue)
@@ -45,11 +49,11 @@ const onSave = async () => {
 }
 
 watch(
-    () => cardOnEdit.value,
-    () => {
-        if (cardOnEdit.value) updatedCard.value = cardOnEdit.value
-        else updatedCard.value = defaultCard
-    }
+  () => cardOnEdit.value,
+  () => {
+    if (cardOnEdit.value) updatedCard.value = cardOnEdit.value
+    else updatedCard.value = defaultCard
+  }
 )
 </script>
 
@@ -65,9 +69,15 @@ watch(
           class="input-element"
         />
       </div>
+      <!--
+      <div class="input-block">
+          <label for="email" class="input-label">Текст</label>
+          <Textarea v-model="updatedCard.text" class="input-element textarea" />
+        </div>  
+      -->
       <div class="input-block">
         <label for="email" class="input-label">Текст</label>
-        <Textarea v-model="updatedCard.text" class="input-element textarea" />
+        <TextEditor v-model="richText" />
       </div>
       <div class="buttons-block">
         <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
