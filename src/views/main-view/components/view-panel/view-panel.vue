@@ -39,7 +39,7 @@ const closeCard = () => {
     <div v-if="viewedCard" class="view-panel-question">
       <div class="buttons-container">
         <Button
-          :v-tooltip.bottom="isMobileView ? 'Редактировать карточку' : undefined"
+          v-tooltip="'Редактировать карточку'"
           icon="pi pi-file-edit"
           class="mr-2"
           severity="secondary"
@@ -47,7 +47,7 @@ const closeCard = () => {
           @click="editCard()"
         />
         <Button
-          :v-tooltip.bottom="isMobileView ? 'Удалить карточку' : undefined"
+          v-tooltip="'Удалить карточку'"
           icon="pi pi-file-excel"
           class="mr-2"
           severity="secondary"
@@ -56,7 +56,7 @@ const closeCard = () => {
         />
         <Button
           v-if="isMobileView"
-          :v-tooltip.bottom="isMobileView ? 'Вернуться к списку' : undefined"
+          v-tooltip="'Вернуться к списку'"
           icon="pi pi-arrow-left"
           severity="secondary"
           text

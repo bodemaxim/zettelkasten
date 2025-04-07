@@ -5,16 +5,17 @@ import ViewPanel from './components/view-panel/view-panel.vue'
 import { getCardByUuid, getAllDefinitions } from '@/api'
 import type { Card } from '@/api/types'
 import EditCardModal from './components/edit-card-modal/edit-card-modal.vue'
-import { vResizeObserver } from "@vueuse/components";
+import { vResizeObserver } from '@vueuse/components'
 import { useStore } from '@/composables/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 
 const viewedCard = ref<Card | null>(null)
 const modalVisible = ref<boolean>(false)
 const isNeedToRefreshSearchList = ref<boolean>(false)
-const { definitions, setDefinitions, isMobileView, setScreenWidth, isLoading, toggleLoading } = useStore()
+const { definitions, setDefinitions, isMobileView, setScreenWidth, isLoading, toggleLoading } =
+  useStore()
 
-const fetchDefinitions = async() => {
+const fetchDefinitions = async () => {
   if (!definitions.value.length) setDefinitions(await getAllDefinitions())
 }
 
@@ -51,9 +52,10 @@ const openModal = () => {
   modalVisible.value = true
 }
 
-const refreshDefinitions = async () => {
+const updateData = async () => {
   await fetchDefinitions()
   isNeedToRefreshSearchList.value = true
+  viewedCard.value = null
 }
 
 function onResizeObserver(entries: readonly ResizeObserverEntry[]) {
@@ -63,22 +65,25 @@ function onResizeObserver(entries: readonly ResizeObserverEntry[]) {
 }
 
 const searchPanelStyles = computed<StyleValue>(() => ({
-  width: isMobileView.value ? '100%' : "300px",
-  minWidth: isMobileView.value ? undefined : "300px",
+  width: isMobileView.value ? '100%' : '300px',
+  minWidth: isMobileView.value ? undefined : '300px'
 }))
-
-
 </script>
 
 <template>
-  <div  v-resize-observer="onResizeObserver" class="main-view">
-    <CoolSpinner v-if="isLoading"/>
+  <div v-resize-observer="onResizeObserver" class="main-view">
+    <CoolSpinner v-if="isLoading" />
     <EditCardModal
       v-model:visible="modalVisible"
       v-model:cardOnEdit="viewedCard"
-      @saved="refreshDefinitions"
+      @saved="updateData"
     />
-    <ViewPanel v-if="isMobileView && viewedCard" v-model="viewedCard" @deleted="refreshDefinitions" @edited="openModal"/>
+    <ViewPanel
+      v-if="isMobileView && viewedCard"
+      v-model="viewedCard"
+      @deleted="updateData"
+      @edited="openModal"
+    />
 
     <div v-else class="panels-container">
       <SearchPanel
@@ -88,7 +93,12 @@ const searchPanelStyles = computed<StyleValue>(() => ({
         @card-uuid="viewCard($event)"
         @create-card="openModal"
       />
-      <ViewPanel v-if="!isMobileView" v-model="viewedCard" @deleted="refreshDefinitions" @edited="openModal"/>
+      <ViewPanel
+        v-if="!isMobileView"
+        v-model="viewedCard"
+        @deleted="updateData"
+        @edited="openModal"
+      />
     </div>
   </div>
 </template>

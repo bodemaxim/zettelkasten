@@ -4,7 +4,7 @@ import { Dialog, Button, InputText, Textarea } from 'primevue'
 import type { Card, CardEditable } from '@/api/types'
 import { createCard, updateCard } from '@/api'
 import { defaultCard } from './edit-card-modal.consts'
-import TextEditor from '@/components/text-editor/text-editor.vue'
+import CardsMultiselect from './components/cards-multiselect.vue'
 
 const visible = defineModel<boolean>('visible')
 const cardOnEdit = defineModel<Card | null>('cardOnEdit')
@@ -61,7 +61,7 @@ watch(
   <Dialog v-model:visible="visible" modal :header="title" :style="dialogStyles">
     <div class="dialog-content">
       <div class="input-block">
-        <label for="username" class="input-label">Заголовок</label>
+        <p class="input-label">Заголовок</p>
         <InputText
           v-model="updatedCard.title"
           autocomplete="off"
@@ -69,15 +69,13 @@ watch(
           class="input-element"
         />
       </div>
-      <!--
       <div class="input-block">
-          <label for="email" class="input-label">Текст</label>
-          <Textarea v-model="updatedCard.text" class="input-element textarea" />
-        </div>  
-      -->
+        <p class="input-label">Текст</p>
+        <Textarea v-model="updatedCard.text" class="input-element textarea" />
+      </div>
       <div class="input-block">
-        <label for="email" class="input-label">Текст</label>
-        <TextEditor v-model="richText" />
+        <p class="input-label">Ссылки</p>
+        <CardsMultiselect class="input-element" />
       </div>
       <div class="buttons-block">
         <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
@@ -111,5 +109,7 @@ watch(
 
 .textarea {
   height: 400px;
+  resize: none;
+  margin: 10px 0;
 }
 </style>

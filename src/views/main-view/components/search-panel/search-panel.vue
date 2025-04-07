@@ -11,13 +11,13 @@ const { isMobileView, cardTitles, isLoading, toggleLoading } = useStore()
 const isNeedToRefreshSearchList = defineModel<boolean>()
 
 watch(
-    () => isNeedToRefreshSearchList.value,
-    async () => {
-        if  (!isNeedToRefreshSearchList.value) return
+  () => isNeedToRefreshSearchList.value,
+  async () => {
+    if (!isNeedToRefreshSearchList.value) return
 
-        await initData()
-        isNeedToRefreshSearchList.value = false
-    }
+    await initData()
+    isNeedToRefreshSearchList.value = false
+  }
 )
 
 const emits = defineEmits<{
@@ -29,7 +29,8 @@ const dataToSearch = ref<CardMinimal[]>([])
 const searchQuery = ref<string>('')
 const searchResults = ref<CardMinimal[]>([])
 
-const initData = async (): Promise<void> => { //TODO: вызывается дважды. Дело не в вотче.
+const initData = async (): Promise<void> => {
+  //TODO: вызывается дважды. Дело не в вотче.
   toggleLoading()
 
   dataToSearch.value = cardTitles.value.length ? cardTitles.value : await getCardTitles()
@@ -85,7 +86,7 @@ initData()
     <div class="toolbar">
       <InputText type="text" v-model="searchQuery" class="toolbar-input-form" />
       <Button
-        :v-tooltip.bottom="isMobileView ?'Создать карточку' : undefined"
+        v-tooltip="'Создать карточку'"
         icon="pi pi-file-plus"
         class="mr-2"
         severity="secondary"
