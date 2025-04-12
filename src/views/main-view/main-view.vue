@@ -6,7 +6,7 @@ import { getCardByUuid, getAllDefinitions } from '@/api'
 import type { Card } from '@/api/types'
 import EditCardModal from './components/edit-card-modal/edit-card-modal.vue'
 import { vResizeObserver } from '@vueuse/components'
-import { useStore } from '@/composables/use-store'
+import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 
 const viewedCard = ref<Card | null>(null)

@@ -4,9 +4,9 @@ import type { CardMinimal } from '@/api/types'
 import { Button, InputText } from 'primevue'
 import { getCardTitles } from '@/api'
 import CoolSpinner from '@/ui/cool-spinner.vue'
-import { useStore } from '@/composables/use-store'
+import { useStore } from '@/use-store'
 
-const { isMobileView, cardTitles, isLoading, toggleLoading } = useStore()
+const { cardTitles, setCardTitles, isLoading, toggleLoading } = useStore()
 
 const isNeedToRefreshSearchList = defineModel<boolean>()
 
@@ -25,7 +25,6 @@ const emits = defineEmits<{
   createCard: []
 }>()
 
-const dataToSearch = ref<CardMinimal[]>([])
 const searchQuery = ref<string>('')
 const searchResults = ref<CardMinimal[]>([])
 
@@ -33,8 +32,10 @@ const initData = async (): Promise<void> => {
   //TODO: вызывается дважды. Дело не в вотче.
   toggleLoading()
 
-  dataToSearch.value = cardTitles.value.length ? cardTitles.value : await getCardTitles()
-  searchResults.value = JSON.parse(JSON.stringify(dataToSearch.value))
+  const response = await getCardTitles()
+  setCardTitles(response)
+  console.debug('инит дата', cardTitles.value)
+  searchResults.value = JSON.parse(JSON.stringify(cardTitles.value))
 
   toggleLoading()
 }
@@ -44,14 +45,14 @@ onMounted(initData)
 const onSearch = async (): Promise<void> => {
   if (searchQuery.value.length === 0) {
     emits('cardUuid', null)
-    searchResults.value = JSON.parse(JSON.stringify(dataToSearch.value))
+    searchResults.value = JSON.parse(JSON.stringify(cardTitles.value))
 
     return
   }
 
   const ids: string[] = parseSearchQuery(searchQuery.value)
 
-  searchResults.value = dataToSearch.value.filter((item: CardMinimal) => ids.includes(item.uuid))
+  searchResults.value = cardTitles.value.filter((item: CardMinimal) => ids.includes(item.uuid))
 }
 
 const parseSearchQuery = (str: string): string[] => {
@@ -62,7 +63,7 @@ const parseSearchQuery = (str: string): string[] => {
     return mainString.toLowerCase().includes(subString.toLowerCase())
   }
 
-  for (const item of dataToSearch.value) {
+  for (const item of cardTitles.value) {
     if (containsSubstring(item.title, query)) result.push(item.uuid)
   }
 
@@ -95,6 +96,7 @@ initData()
       />
     </div>
     <div>
+      <br />
       <CoolSpinner v-if="isLoading" class="spinner" />
       <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
         <li v-for="card in searchResults" :key="card.uuid">

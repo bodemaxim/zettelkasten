@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
-import { Dialog, Button, InputText, Textarea } from 'primevue'
+import { Dialog, Button, InputText, Textarea, Select } from 'primevue'
 import type { Card, CardEditable } from '@/api/types'
 import { createCard, updateCard } from '@/api'
 import { defaultCard } from './edit-card-modal.consts'
 import CardsMultiselect from './components/cards-multiselect.vue'
+import { type TypeOption } from './edit-card-modal.types'
 
 const visible = defineModel<boolean>('visible')
 const cardOnEdit = defineModel<Card | null>('cardOnEdit')
@@ -14,9 +15,10 @@ const emits = defineEmits<{
 }>()
 
 const updatedCard = ref<CardEditable>(defaultCard)
-const richText = ref('')
 
-const title = computed(() => (cardOnEdit.value ? 'Редактировать карточку' : 'Создать карточку'))
+const title = computed<string>(() =>
+  cardOnEdit.value ? 'Редактировать карточку' : 'Создать карточку'
+)
 
 const dialogStyles = computed<StyleValue>(() => ({
   width: '80%',
@@ -31,19 +33,19 @@ const onCancel = () => {
 
 const onSave = async () => {
   if (!cardOnEdit.value) {
+    console.debug('create', updatedCard)
     await createCard(updatedCard.value)
-    updatedCard.value = defaultCard
   } else {
-    updatedCard.value.text = richText.value
-
     const newValue: Card = {
       ...cardOnEdit.value,
       ...updatedCard.value
     }
+    newValue.type = selectedType.value.value
 
-    updateCard(newValue)
+    await updateCard(newValue)
   }
 
+  updatedCard.value = defaultCard
   visible.value = false
   emits('saved')
 }
@@ -55,6 +57,12 @@ watch(
     else updatedCard.value = defaultCard
   }
 )
+
+const selectedType = ref<TypeOption>({ value: 'definition', label: 'Определение' })
+const cardTypes = ref<TypeOption[]>([
+  { value: 'definition', label: 'Определение' },
+  { value: 'article', label: 'Статья' }
+])
 </script>
 
 <template>
@@ -70,12 +78,22 @@ watch(
         />
       </div>
       <div class="input-block">
+        <p class="input-label">Тип</p>
+        <Select
+          v-model="selectedType"
+          :options="cardTypes"
+          optionLabel="label"
+          placeholder="Выберите тип карточки"
+          class="input-element"
+        />
+      </div>
+      <div class="input-block">
         <p class="input-label">Текст</p>
         <Textarea v-model="updatedCard.text" class="input-element textarea" />
       </div>
       <div class="input-block">
         <p class="input-label">Ссылки</p>
-        <CardsMultiselect class="input-element" />
+        <CardsMultiselect v-model="updatedCard.links" />
       </div>
       <div class="buttons-block">
         <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>

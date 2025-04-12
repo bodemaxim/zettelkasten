@@ -1,39 +1,34 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { MultiSelect, Button } from 'primevue'
+import { useStore } from '@/use-store'
+import type { CardMinimal } from '@/api/types'
 
-//в дропдаун выводить 15 последних по времени создания
+const selectedUuids = defineModel<string[]>()
 
-const selectedCountries = ref()
+const { cardTitles } = useStore()
+const selectedTitles = ref<CardMinimal[]>([])
+const sortedCardTitles = computed(() => [...cardTitles.value].reverse())
 
-const countries = ref([
-  { name: 'Australia', code: 'AU' },
-  { name: 'Brazil', code: 'BR' },
-  { name: 'China', code: 'CN' },
-  { name: 'Egypt', code: 'EG' },
-  { name: 'France', code: 'FR' },
-  { name: 'Germany', code: 'DE' },
-  { name: 'India', code: 'IN' },
-  { name: 'Japan', code: 'JP' },
-  { name: 'Spain', code: 'ES' },
-  { name: 'United States', code: 'US' }
-])
+watch(selectedTitles, (newSelectedTitles) => {
+  selectedUuids.value = newSelectedTitles.map((card) => card.uuid)
+})
 </script>
 
 <template>
   <div>
     <MultiSelect
-      v-model="selectedCountries"
-      :options="countries"
-      optionLabel="name"
+      v-model="selectedTitles"
+      :options="sortedCardTitles"
+      optionLabel="title"
       filter
-      placeholder="Select Countries"
+      placeholder="Выберите связанные карточки"
       display="chip"
       class="card-multiselect"
     >
       <template #option="slotProps">
         <div class="option">
-          <div>{{ slotProps.option.name }}</div>
+          <div>{{ slotProps.option.title }}</div>
         </div>
       </template>
       <template #dropdownicon>
@@ -43,20 +38,28 @@ const countries = ref([
         <i class="pi pi-map-marker" />
       </template>
       <template #header>
-        <div class="font-medium px-3 py-2">Available Countries</div>
+        <div class="font-medium px-3 py-2">Доступные карточки</div>
       </template>
       <template #footer>
         <div class="p-3 flex justify-between">
-          <Button label="Убрать все" severity="danger" text size="small" icon="pi pi-times" />
+          <Button
+            label="Убрать все"
+            severity="danger"
+            text
+            size="small"
+            icon="pi pi-times"
+            @click="selectedTitles = []"
+          />
         </div>
       </template>
     </MultiSelect>
   </div>
+  <br />
 </template>
 
 <style scoped>
 .card-multiselect {
-  width: 60%;
+  width: 100%;
   min-width: 300px;
   margin: 10px 0;
 }

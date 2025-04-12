@@ -4,10 +4,10 @@ import type { Card } from '@/api/types'
 import BottomShade from '@/ui/bottom-shade.vue'
 import { Button } from 'primevue'
 import { deleteCardByUuid } from '@/api'
-import { useStore } from '@/composables/use-store'
+import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 
-const { isMobileView, isLoading, toggleLoading } = useStore()
+const { isMobileView, isLoading, toggleLoading, cardTitles } = useStore()
 
 const viewedCard = defineModel<Card | null>()
 
@@ -66,6 +66,8 @@ const closeCard = () => {
       <h2>{{ viewedCard?.title }}</h2>
       <p v-html="viewedCard?.text"></p>
       <hr />
+      <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
+      <p>Связанные термины: {{ viewedCard.links.length }}</p>
     </div>
     <p v-else>Выберите карточку, чтобы посмотреть содержание.</p>
     <BottomShade />

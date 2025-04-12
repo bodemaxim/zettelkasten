@@ -5,24 +5,23 @@ import router from '@/router'
 import { InputText, Button } from 'primevue'
 import { IftaLabel } from 'primevue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
-import { useStore } from '@/composables/use-store'
+import { useStore } from '@/use-store'
 
 const email = ref('')
 const password = ref('')
 const { isLoading, toggleLoading } = useStore()
 
 const handleSignIn = async () => {
-    toggleLoading()
-    await login(email.value, password.value)
-    await seeUser()
+  toggleLoading()
+  await login(email.value, password.value)
+  await seeUser()
 
-    toggleLoading()
-    
-    localStorage.setItem('email', email.value)
-    localStorage.setItem('password', password.value)
-    
-    router.push('/notes')
+  toggleLoading()
 
+  localStorage.setItem('email', email.value)
+  localStorage.setItem('password', password.value)
+
+  router.push('/notes')
 }
 
 const loginAutomatically = () => {
@@ -30,20 +29,20 @@ const loginAutomatically = () => {
   const storedPassword = localStorage.getItem('password')
 
   if (storedEmail) {
-      email.value = storedEmail
+    email.value = storedEmail
   }
-  
+
   if (storedPassword) {
-      password.value = storedPassword
+    password.value = storedPassword
   }
 
   if (storedEmail && storedPassword) {
-      handleSignIn()
+    handleSignIn()
   }
 }
 
 onMounted(() => {
-    loginAutomatically()
+  loginAutomatically()
 })
 </script>
 
@@ -56,11 +55,11 @@ onMounted(() => {
       <form @submit.prevent="handleSignIn">
         <div class="form-group">
           <IftaLabel for="email">эл. почта:</IftaLabel>
-          <InputText 
-            id="email" 
-            v-model="email" 
-            autocomplete="username" 
-            required 
+          <InputText
+            id="email"
+            v-model="email"
+            autocomplete="username"
+            required
             class="input-form"
           />
         </div>

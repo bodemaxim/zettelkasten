@@ -1,26 +1,29 @@
 import { ref, computed } from 'vue'
 import type { Card, CardMinimal } from '@/api/types'
 
-export const useStore = () => {
-  const definitions = ref<Card[]>([])
+const cardTitles = ref<CardMinimal[]>([])
+const definitions = ref<Card[]>([])
 
+export const useStore = () => {
   const setDefinitions = (newValue: Card[]) => {
     definitions.value = newValue
   }
 
-  const cardTitles = ref<CardMinimal[]>([])
+  const setCardTitles = (newValue: CardMinimal[]) => {
+    cardTitles.value = newValue
+    console.debug('setCardTitles', newValue)
+  }
 
   const isLoading = ref<boolean>(false)
 
   const toggleLoading = () => {
     isLoading.value = !isLoading.value
-    console.debug("toggleLoading", isLoading.value)
   }
 
   const screenWidth = ref<number>(window.innerWidth)
 
   const setScreenWidth = (newValue: number) => {
-    screenWidth.value = newValue;
+    screenWidth.value = newValue
   }
 
   const isMobileView = computed(() => {
@@ -31,6 +34,7 @@ export const useStore = () => {
     definitions,
     setDefinitions,
     cardTitles,
+    setCardTitles,
     screenWidth,
     setScreenWidth,
     isMobileView,
@@ -38,4 +42,3 @@ export const useStore = () => {
     toggleLoading
   }
 }
-
