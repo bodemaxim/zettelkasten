@@ -24,7 +24,6 @@ export const getAllDefinitions = async (): Promise<Card[]> => {
 }
 
 export const getCardTitles = async (): Promise<CardMinimal[]> => {
-  console.debug("getCardTitles")
   const { data, error } = await supabase.from('cards').select('uuid, title')
 
   if (error) {
@@ -49,6 +48,7 @@ export const updateCard = async (card: Card): Promise<void> => {
       title: card.title,
       text: card.text,
       links: card.links,
+      type: card.type,
     })
     .eq('uuid', card.uuid)
 

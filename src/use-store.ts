@@ -11,7 +11,6 @@ export const useStore = () => {
 
   const setCardTitles = (newValue: CardMinimal[]) => {
     cardTitles.value = newValue
-    console.debug('setCardTitles', newValue)
   }
 
   const isLoading = ref<boolean>(false)

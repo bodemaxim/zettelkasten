@@ -34,7 +34,6 @@ const initData = async (): Promise<void> => {
 
   const response = await getCardTitles()
   setCardTitles(response)
-  console.debug('инит дата', cardTitles.value)
   searchResults.value = JSON.parse(JSON.stringify(cardTitles.value))
 
   toggleLoading()

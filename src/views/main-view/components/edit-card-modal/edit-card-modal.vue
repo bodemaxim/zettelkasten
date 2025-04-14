@@ -33,7 +33,6 @@ const onCancel = () => {
 
 const onSave = async () => {
   if (!cardOnEdit.value) {
-    console.debug('create', updatedCard)
     await createCard(updatedCard.value)
   } else {
     const newValue: Card = {

@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import type { Card } from '@/api/types'
 import BottomShade from '@/ui/bottom-shade.vue'
 import { Button } from 'primevue'
 import { deleteCardByUuid } from '@/api'
 import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import { ConfirmDialog } from 'primevue'
+import { useConfirm } from "primevue/useconfirm";
 
-const { isMobileView, isLoading, toggleLoading, cardTitles } = useStore()
+const { isMobileView, isLoading, toggleLoading } = useStore()
 
 const viewedCard = defineModel<Card | null>()
+
+const confirm = useConfirm();
 
 const emits = defineEmits<{
   deleted: []
@@ -17,11 +20,26 @@ const emits = defineEmits<{
 }>()
 
 const deleteCard = async () => {
-  toggleLoading()
-  if (viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)
-  viewedCard.value = null
-  emits('deleted')
-  toggleLoading()
+  confirm.require({
+        message: 'Вы уверены, что хотите удалить карточку?',
+        header: 'Подтверждение',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Нет',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Да'
+        },
+        accept: async () => {
+          toggleLoading()
+          if (viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)
+          viewedCard.value = null
+          emits('deleted')
+          toggleLoading()
+        },
+    });
 }
 
 const editCard = () => {
@@ -36,6 +54,7 @@ const closeCard = () => {
 <template>
   <div class="view-panel">
     <CoolSpinner v-if="isLoading" />
+    <ConfirmDialog></ConfirmDialog>
     <div v-if="viewedCard" class="view-panel-question">
       <div class="buttons-container">
         <Button
