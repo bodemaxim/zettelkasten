@@ -2,7 +2,7 @@
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Dialog, Button, InputText, Textarea, Select } from 'primevue'
 import type { Card, CardEditable } from '@/api/types'
-import { createCard, updateCard } from '@/api'
+import { createCard, updateCard, getCardsByUuid, updateCards } from '@/api'
 import { defaultCard } from './edit-card-modal.consts'
 import CardsMultiselect from './components/cards-multiselect.vue'
 import { type TypeOption } from './edit-card-modal.types'
@@ -33,15 +33,21 @@ const onCancel = () => {
 
 const onSave = async () => {
   if (!cardOnEdit.value) {
-    await createCard(updatedCard.value)
+      console.debug("if")
+      const newCard = await createCard(updatedCard.value)
+      updateLinkedCards(newCard);
   } else {
+    console.debug("else")
     const newValue: Card = {
       ...cardOnEdit.value,
-      ...updatedCard.value
+      ...updatedCard.value,
+      type: selectedType.value.value
     }
-    newValue.type = selectedType.value.value
 
+    //TODO: можно объединить запросы в один
     await updateCard(newValue)
+    console.debug("card updated!") 
+    await updateLinkedCards(newValue);
   }
 
   updatedCard.value = defaultCard
@@ -49,11 +55,31 @@ const onSave = async () => {
   emits('saved')
 }
 
+const updateLinkedCards = async (card: Card): Promise<void> => {
+  if (!card.links.length) return;
+
+  console.debug("1 updateLinkedCards")
+  const cards = await getCardsByUuid(card.links);
+  console.debug("2 cards", cards)
+
+  const updatedCards = cards.map<Card>(item => ({
+    ...item,
+    links: [...(item.links || []), card.uuid] 
+  }));  
+
+  console.debug("3 updatedCards", updatedCards)
+  await updateCards(updatedCards);
+
+}
+
 watch(
   () => cardOnEdit.value,
   () => {
-    if (cardOnEdit.value) updatedCard.value = cardOnEdit.value
-    else updatedCard.value = defaultCard
+    if (cardOnEdit.value) {
+      updatedCard.value = { ...cardOnEdit.value }
+    } else { 
+      updatedCard.value = defaultCard
+    }
   }
 )
 

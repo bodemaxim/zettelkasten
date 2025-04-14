@@ -5,7 +5,7 @@ export const getAllCards = async () => {
   const { error, data } = await supabase.from('cards').select('*')
 
   if (error) {
-    console.error('Error fetching definitions:', error)
+    console.error('Error fetching all cards:', error)
     return null
   }
 
@@ -34,11 +34,18 @@ export const getCardTitles = async (): Promise<CardMinimal[]> => {
   return data
 }
 
-export const createCard = async (newCard: CardEditable) => {
-  await supabase
+export const createCard = async (newCard: CardEditable): Promise<Card> => {
+  const { data, error } = await supabase
     .from('cards')
     .insert([{ ...newCard }])
     .select()
+
+  if (error) {
+    console.error('Error creating card:', error)
+    throw error
+  }
+
+  return data[0]
 }
 
 export const updateCard = async (card: Card): Promise<void> => {
@@ -77,6 +84,24 @@ export const updateCards = async (cards: Card[]): Promise<void> => {
       }
     })
   )
+}
+
+export const getCardsByUuid = async (uuids: string[]): Promise<Card[]> => {
+  if (uuids.length === 0) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('cards')
+    .select('*')
+    .in('uuid', uuids)
+
+  if (error) {
+    console.error('Error fetching cards by UUIDs:', error)
+    return []
+  }
+
+  return data || []
 }
 
 export const getCardByUuid = async (uuid: string): Promise<Card | null> => {

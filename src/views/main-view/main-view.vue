@@ -16,7 +16,10 @@ const { definitions, setDefinitions, isMobileView, setScreenWidth, isLoading, to
   useStore()
 
 const fetchDefinitions = async () => {
-  if (!definitions.value.length) setDefinitions(await getAllDefinitions())
+  if (!definitions.value.length) {
+    setDefinitions(await getAllDefinitions())
+    console.debug("definitions.value", definitions.value)
+  }
 }
 
 onMounted(fetchDefinitions)
