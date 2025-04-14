@@ -58,6 +58,27 @@ export const updateCard = async (card: Card): Promise<void> => {
   }
 }
 
+export const updateCards = async (cards: Card[]): Promise<void> => {
+  await Promise.all(
+    cards.map(async (card) => {
+      const { error } = await supabase
+        .from('cards')
+        .update({
+          title: card.title,
+          text: card.text,
+          links: card.links,
+          type: card.type,
+        })
+        .eq('uuid', card.uuid)
+
+      if (error) {
+        console.error(`Error updating card ${card.uuid}:`, error)
+        throw error
+      }
+    })
+  )
+}
+
 export const getCardByUuid = async (uuid: string): Promise<Card | null> => {
   const { data, error } = await supabase.from('cards').select('*').eq('uuid', uuid).single()
 
