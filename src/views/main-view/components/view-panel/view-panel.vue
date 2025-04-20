@@ -1,45 +1,81 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import type { Card } from '@/api/types'
 import BottomShade from '@/ui/bottom-shade.vue'
 import { Button } from 'primevue'
-import { deleteCardByUuid } from '@/api'
+import { deleteCardByUuid, getCardByUuid } from '@/api'
 import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { ConfirmDialog } from 'primevue'
-import { useConfirm } from "primevue/useconfirm";
+import { useConfirm } from 'primevue/useconfirm'
 
-const { isMobileView, isLoading, toggleLoading } = useStore()
+const { isMobileView, isLoading, toggleLoading, definitions, viewedCard, setViewedCard } =
+  useStore()
 
-const viewedCard = defineModel<Card | null>()
+const viewedCardUuid = defineModel<string | null>()
 
-const confirm = useConfirm();
+watch(
+  () => viewedCardUuid.value,
+  () => {
+    viewCard(viewedCardUuid.value)
+  }
+)
+
+const confirm = useConfirm()
 
 const emits = defineEmits<{
   deleted: []
   edited: []
 }>()
 
+const fetchDefinition = (uuid: string): Card | null => {
+  const result = definitions.value.find((item) => item.uuid === uuid)
+
+  return result ?? null
+}
+
+const viewCard = async (cardUuid: string | null | undefined): Promise<void> => {
+  if (!cardUuid) {
+    setViewedCard(null)
+    return
+  }
+
+  if (definitions.value.find((item) => item.uuid === cardUuid)) {
+    setViewedCard(fetchDefinition(cardUuid))
+    return
+  }
+
+  toggleLoading()
+
+  try {
+    setViewedCard(await getCardByUuid(cardUuid))
+  } catch (e) {
+    console.error(e)
+  }
+  toggleLoading()
+}
+
 const deleteCard = async () => {
   confirm.require({
-        message: 'Вы уверены, что хотите удалить карточку?',
-        header: 'Подтверждение',
-        icon: 'pi pi-exclamation-triangle',
-        rejectProps: {
-            label: 'Нет',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Да'
-        },
-        accept: async () => {
-          toggleLoading()
-          if (viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)
-          viewedCard.value = null
-          emits('deleted')
-          toggleLoading()
-        },
-    });
+    message: 'Вы уверены, что хотите удалить карточку?',
+    header: 'Подтверждение',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Нет',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Да'
+    },
+    accept: async () => {
+      toggleLoading()
+      if (viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)
+      viewedCard.value = null
+      emits('deleted')
+      toggleLoading()
+    }
+  })
 }
 
 const editCard = () => {
@@ -86,7 +122,17 @@ const closeCard = () => {
       <p v-html="viewedCard?.text"></p>
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
-      <p>Связанные термины: {{ viewedCard.links.length }}</p>
+      <div v-if="viewedCard.links.length > 0">
+        <p>Связанные термины:</p>
+        <div
+          v-for="link in viewedCard.links"
+          :key="link.uuid"
+          class="link"
+          @click="viewCard(link.uuid)"
+        >
+          {{ link.title }}
+        </div>
+      </div>
     </div>
     <p v-else>Выберите карточку, чтобы посмотреть содержание.</p>
     <BottomShade />
@@ -116,5 +162,9 @@ const closeCard = () => {
   gap: 5px;
   background-color: var(--bg-dark);
   float: right;
+}
+
+.link {
+  cursor: pointer;
 }
 </style>

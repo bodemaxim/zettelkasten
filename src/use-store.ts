@@ -3,6 +3,7 @@ import type { Card, CardMinimal } from '@/api/types'
 
 const cardTitles = ref<CardMinimal[]>([])
 const definitions = ref<Card[]>([])
+const viewedCard = ref<Card | null>(null)
 
 export const useStore = () => {
   const setDefinitions = (newValue: Card[]) => {
@@ -29,6 +30,10 @@ export const useStore = () => {
     return screenWidth.value < 768
   })
 
+  const setViewedCard = (newValue: Card | null) => {
+    viewedCard.value = newValue
+  }
+
   return {
     definitions,
     setDefinitions,
@@ -38,6 +43,8 @@ export const useStore = () => {
     setScreenWidth,
     isMobileView,
     isLoading,
-    toggleLoading
+    toggleLoading,
+    viewedCard,
+    setViewedCard
   }
 }

@@ -6,7 +6,7 @@ export type CardMinimal = {
 export type Card = CardMinimal & {
   created_at: string
   text: string
-  links: string[]
+  links: CardMinimal[]
   type: 'definition' | 'article'
 }
 

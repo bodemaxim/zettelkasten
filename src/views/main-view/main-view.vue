@@ -2,63 +2,40 @@
 import { type StyleValue, ref, onMounted, computed } from 'vue'
 import SearchPanel from './components/search-panel/search-panel.vue'
 import ViewPanel from './components/view-panel/view-panel.vue'
-import { getCardByUuid, getAllDefinitions } from '@/api'
-import type { Card } from '@/api/types'
+import { getAllDefinitions } from '@/api'
 import EditCardModal from './components/edit-card-modal/edit-card-modal.vue'
 import { vResizeObserver } from '@vueuse/components'
 import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 
-const viewedCard = ref<Card | null>(null)
+const viewedCardUuid = ref<string | null>(null)
 const modalVisible = ref<boolean>(false)
 const isNeedToRefreshSearchList = ref<boolean>(false)
-const { definitions, setDefinitions, isMobileView, setScreenWidth, isLoading, toggleLoading } =
+
+const { definitions, setDefinitions, isMobileView, setScreenWidth, isLoading, setViewedCard } =
   useStore()
 
 const fetchDefinitions = async () => {
   if (!definitions.value.length) {
     setDefinitions(await getAllDefinitions())
-    console.debug("definitions.value", definitions.value)
+    console.debug('definitions.value', definitions.value)
   }
 }
 
 onMounted(fetchDefinitions)
 
-const fetchDefinition = (uuid: string): Card | null => {
-  const result = definitions.value.find((item) => item.uuid === uuid)
+const isNewCard = true
 
-  return result ?? null
-}
+const openModal = (isNewCard = false) => {
+  if (isNewCard) setViewedCard(null)
 
-const viewCard = async (cardUuid: string | null) => {
-  if (!cardUuid) {
-    viewedCard.value = null
-    return
-  }
-
-  if (definitions.value.find((item) => item.uuid === cardUuid)) {
-    viewedCard.value = fetchDefinition(cardUuid)
-    return
-  }
-
-  toggleLoading()
-
-  try {
-    viewedCard.value = await getCardByUuid(cardUuid)
-  } catch (e) {
-    console.error(e)
-  }
-  toggleLoading()
-}
-
-const openModal = () => {
   modalVisible.value = true
 }
 
-const updateData = async () => {
+const onCardUpdate = async () => {
   await fetchDefinitions()
   isNeedToRefreshSearchList.value = true
-  viewedCard.value = null
+  setViewedCard(null)
 }
 
 function onResizeObserver(entries: readonly ResizeObserverEntry[]) {
@@ -76,15 +53,11 @@ const searchPanelStyles = computed<StyleValue>(() => ({
 <template>
   <div v-resize-observer="onResizeObserver" class="main-view">
     <CoolSpinner v-if="isLoading" />
-    <EditCardModal
-      v-model:visible="modalVisible"
-      v-model:cardOnEdit="viewedCard"
-      @saved="updateData"
-    />
+    <EditCardModal v-model:visible="modalVisible" @saved="onCardUpdate" />
     <ViewPanel
-      v-if="isMobileView && viewedCard"
-      v-model="viewedCard"
-      @deleted="updateData"
+      v-if="isMobileView && viewedCardUuid"
+      v-model="viewedCardUuid"
+      @deleted="onCardUpdate"
       @edited="openModal"
     />
 
@@ -93,13 +66,13 @@ const searchPanelStyles = computed<StyleValue>(() => ({
         v-model="isNeedToRefreshSearchList"
         :style="searchPanelStyles"
         class="search-panel"
-        @card-uuid="viewCard($event)"
-        @create-card="openModal"
+        @card-uuid="viewedCardUuid = $event"
+        @create-card="openModal(isNewCard)"
       />
       <ViewPanel
         v-if="!isMobileView"
-        v-model="viewedCard"
-        @deleted="updateData"
+        v-model="viewedCardUuid"
+        @deleted="onCardUpdate"
         @edited="openModal"
       />
     </div>

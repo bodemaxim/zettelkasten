@@ -1,24 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { computed } from 'vue'
 import { MultiSelect, Button } from 'primevue'
 import { useStore } from '@/use-store'
 import type { CardMinimal } from '@/api/types'
 
-const selectedUuids = defineModel<string[]>()
-
+const selectedCards = defineModel<CardMinimal[]>()
 const { cardTitles } = useStore()
-const selectedTitles = ref<CardMinimal[]>([])
 const sortedCardTitles = computed(() => [...cardTitles.value].reverse())
-
-watch(selectedTitles, (newSelectedTitles) => {
-  selectedUuids.value = newSelectedTitles.map((card) => card.uuid)
-})
 </script>
 
 <template>
   <div>
     <MultiSelect
-      v-model="selectedTitles"
+      v-model="selectedCards"
       :options="sortedCardTitles"
       optionLabel="title"
       filter
@@ -48,7 +42,7 @@ watch(selectedTitles, (newSelectedTitles) => {
             text
             size="small"
             icon="pi pi-times"
-            @click="selectedTitles = []"
+            @click="selectedCards = []"
           />
         </div>
       </template>

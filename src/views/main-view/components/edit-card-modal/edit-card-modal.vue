@@ -6,9 +6,11 @@ import { createCard, updateCard, getCardsByUuid, updateCards } from '@/api'
 import { defaultCard } from './edit-card-modal.consts'
 import CardsMultiselect from './components/cards-multiselect.vue'
 import { type TypeOption } from './edit-card-modal.types'
+import { useStore } from '@/use-store'
 
 const visible = defineModel<boolean>('visible')
-const cardOnEdit = defineModel<Card | null>('cardOnEdit')
+
+const { viewedCard } = useStore()
 
 const emits = defineEmits<{
   saved: []
@@ -17,7 +19,7 @@ const emits = defineEmits<{
 const updatedCard = ref<CardEditable>(defaultCard)
 
 const title = computed<string>(() =>
-  cardOnEdit.value ? 'Редактировать карточку' : 'Создать карточку'
+  viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
 )
 
 const dialogStyles = computed<StyleValue>(() => ({
@@ -32,22 +34,19 @@ const onCancel = () => {
 }
 
 const onSave = async () => {
-  if (!cardOnEdit.value) {
-      console.debug("if")
-      const newCard = await createCard(updatedCard.value)
-      updateLinkedCards(newCard);
+  if (!viewedCard.value) {
+    const newCard = await createCard(updatedCard.value)
+    updateLinkedCards(newCard)
   } else {
-    console.debug("else")
     const newValue: Card = {
-      ...cardOnEdit.value,
+      ...viewedCard.value,
       ...updatedCard.value,
       type: selectedType.value.value
     }
 
     //TODO: можно объединить запросы в один
     await updateCard(newValue)
-    console.debug("card updated!") 
-    await updateLinkedCards(newValue);
+    await updateLinkedCards(newValue)
   }
 
   updatedCard.value = defaultCard
@@ -56,28 +55,26 @@ const onSave = async () => {
 }
 
 const updateLinkedCards = async (card: Card): Promise<void> => {
-  if (!card.links.length) return;
+  if (!card.links.length) return
 
-  console.debug("1 updateLinkedCards")
-  const cards = await getCardsByUuid(card.links);
-  console.debug("2 cards", cards)
+  const cardUuids = card.links.map((link) => link.uuid)
 
-  const updatedCards = cards.map<Card>(item => ({
+  const cards = await getCardsByUuid(cardUuids)
+
+  const updatedCards = cards.map<Card>((item) => ({
     ...item,
-    links: [...(item.links || []), card.uuid] 
-  }));  
+    links: [...(item.links || []), { uuid: card.uuid, title: card.title }]
+  }))
 
-  console.debug("3 updatedCards", updatedCards)
-  await updateCards(updatedCards);
-
+  await updateCards(updatedCards)
 }
 
 watch(
-  () => cardOnEdit.value,
+  () => viewedCard.value,
   () => {
-    if (cardOnEdit.value) {
-      updatedCard.value = { ...cardOnEdit.value }
-    } else { 
+    if (viewedCard.value) {
+      updatedCard.value = { ...viewedCard.value }
+    } else {
       updatedCard.value = defaultCard
     }
   }
