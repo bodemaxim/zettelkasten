@@ -62,10 +62,16 @@ const updateLinkedCards = async (card: Card): Promise<void> => {
 
   const cards = await getCardsByUuid(cardUuids)
 
-  const updatedCards = cards.map<Card>((item) => ({
-    ...item,
-    links: [...(item.links || []), { uuid: card.uuid, title: card.title }]
-  }))
+  const updatedCards = cards.map<Card>((item) => {
+    const linkExists = item.links?.some((link) => link.uuid === card.uuid)
+
+    if (linkExists) return item
+
+    return {
+      ...item,
+      links: [...(item.links || []), { uuid: card.uuid, title: card.title }]
+    }
+  })
 
   await updateCards(updatedCards)
 }

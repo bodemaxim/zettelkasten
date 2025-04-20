@@ -171,6 +171,8 @@ const backToList = () => {
   cursor: pointer;
   background-color: var(--bg-dark);
   margin-bottom: 5px;
+  color: var(--accent-azure);
+  text-decoration: underline;
 }
 
 .link:hover {
