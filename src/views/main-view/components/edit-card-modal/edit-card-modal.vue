@@ -3,14 +3,14 @@ import { type StyleValue, ref, computed, watch } from 'vue'
 import { Dialog, Button, InputText, Textarea, Select } from 'primevue'
 import type { Card, CardEditable } from '@/api/types'
 import { createCard, updateCard, getCardsByUuid, updateCards } from '@/api'
-import { defaultCard } from './edit-card-modal.consts'
+import { defaultCard, typeOptionsList } from './edit-card-modal.consts'
 import CardsMultiselect from './components/cards-multiselect.vue'
 import { type TypeOption } from './edit-card-modal.types'
 import { useStore } from '@/use-store'
 
 const visible = defineModel<boolean>('visible')
 
-const { viewedCard } = useStore()
+const { viewedCard, isMobileView } = useStore()
 
 const emits = defineEmits<{
   saved: []
@@ -23,9 +23,10 @@ const title = computed<string>(() =>
 )
 
 const dialogStyles = computed<StyleValue>(() => ({
-  width: '80%',
-  height: 'calc(100% - 40px)',
-  padding: '20px'
+  width: isMobileView ? '100%' : 'calc(100% - 20px)',
+  height: '100%',
+  padding: '10px',
+  overflow: 'hidden'
 }))
 
 const onCancel = () => {
@@ -81,16 +82,13 @@ watch(
 )
 
 const selectedType = ref<TypeOption>({ value: 'definition', label: 'Определение' })
-const cardTypes = ref<TypeOption[]>([
-  { value: 'definition', label: 'Определение' },
-  { value: 'article', label: 'Статья' }
-])
+const cardTypes = ref<TypeOption[]>(typeOptionsList)
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" modal :header="title" :style="dialogStyles">
+  <Dialog v-model:visible="visible" modal :header="title" class="dialog" :style="dialogStyles">
     <div class="dialog-content">
-      <div class="input-block">
+      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
         <p class="input-label">Заголовок</p>
         <InputText
           v-model="updatedCard.title"
@@ -99,7 +97,7 @@ const cardTypes = ref<TypeOption[]>([
           class="input-element"
         />
       </div>
-      <div class="input-block">
+      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
         <p class="input-label">Тип</p>
         <Select
           v-model="selectedType"
@@ -109,11 +107,11 @@ const cardTypes = ref<TypeOption[]>([
           class="input-element"
         />
       </div>
-      <div class="input-block">
+      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
         <p class="input-label">Текст</p>
         <Textarea v-model="updatedCard.text" class="input-element textarea" />
       </div>
-      <div class="input-block">
+      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
         <p class="input-label">Ссылки</p>
         <CardsMultiselect v-model="updatedCard.links" />
       </div>
@@ -131,6 +129,10 @@ const cardTypes = ref<TypeOption[]>([
   align-items: center;
   gap: 4px;
   margin-bottom: 4px;
+}
+
+.input-block-mobile {
+  flex-direction: column;
 }
 
 .buttons-block {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import type { Card } from '@/api/types'
 import BottomShade from '@/ui/bottom-shade.vue'
 import { Button } from 'primevue'
@@ -13,6 +13,8 @@ const { isMobileView, isLoading, toggleLoading, definitions, viewedCard, setView
   useStore()
 
 const viewedCardUuid = defineModel<string | null>()
+
+onMounted(async () => viewCard(viewedCardUuid.value))
 
 watch(
   () => viewedCardUuid.value,
@@ -78,12 +80,9 @@ const deleteCard = async () => {
   })
 }
 
-const editCard = () => {
-  emits('edited')
-}
-
-const closeCard = () => {
-  viewedCard.value = null
+const backToList = () => {
+  viewedCardUuid.value = null
+  setViewedCard(null)
 }
 </script>
 
@@ -99,7 +98,7 @@ const closeCard = () => {
           class="mr-2"
           severity="secondary"
           text
-          @click="editCard()"
+          @click="$emit('edited')"
         />
         <Button
           v-tooltip="'Удалить карточку'"
@@ -115,15 +114,15 @@ const closeCard = () => {
           icon="pi pi-arrow-left"
           severity="secondary"
           text
-          @click="closeCard()"
+          @click="backToList"
         />
       </div>
       <h2>{{ viewedCard?.title }}</h2>
       <p v-html="viewedCard?.text"></p>
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
-      <div v-if="viewedCard.links.length > 0">
-        <p>Связанные термины:</p>
+      <div v-if="viewedCard.links.length > 0" class="links-container">
+        <h3>Связанные термины:</h3>
         <div
           v-for="link in viewedCard.links"
           :key="link.uuid"
@@ -134,7 +133,7 @@ const closeCard = () => {
         </div>
       </div>
     </div>
-    <p v-else>Выберите карточку, чтобы посмотреть содержание.</p>
+    <div v-else>Выберите карточку, чтобы посмотреть содержание.</div>
     <BottomShade />
   </div>
 </template>
@@ -164,7 +163,17 @@ const closeCard = () => {
   float: right;
 }
 
+.links-container {
+  background-color: var(--bg-dark);
+}
+
 .link {
   cursor: pointer;
+  background-color: var(--bg-dark);
+  margin-bottom: 5px;
+}
+
+.link:hover {
+  background-color: black;
 }
 </style>

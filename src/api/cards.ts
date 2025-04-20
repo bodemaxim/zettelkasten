@@ -55,7 +55,7 @@ export const updateCard = async (card: Card): Promise<void> => {
       title: card.title,
       text: card.text,
       links: card.links,
-      type: card.type,
+      type: card.type
     })
     .eq('uuid', card.uuid)
 
@@ -74,7 +74,7 @@ export const updateCards = async (cards: Card[]): Promise<void> => {
           title: card.title,
           text: card.text,
           links: card.links,
-          type: card.type,
+          type: card.type
         })
         .eq('uuid', card.uuid)
 
@@ -91,10 +91,7 @@ export const getCardsByUuid = async (uuids: string[]): Promise<Card[]> => {
     return []
   }
 
-  const { data, error } = await supabase
-    .from('cards')
-    .select('*')
-    .in('uuid', uuids)
+  const { data, error } = await supabase.from('cards').select('*').in('uuid', uuids)
 
   if (error) {
     console.error('Error fetching cards by UUIDs:', error)

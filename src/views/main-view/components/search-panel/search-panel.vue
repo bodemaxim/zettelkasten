@@ -95,7 +95,6 @@ initData()
       />
     </div>
     <div>
-      <br />
       <CoolSpinner v-if="isLoading" class="spinner" />
       <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
         <li v-for="card in searchResults" :key="card.uuid">

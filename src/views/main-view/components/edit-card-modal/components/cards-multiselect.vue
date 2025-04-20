@@ -18,6 +18,8 @@ const sortedCardTitles = computed(() => [...cardTitles.value].reverse())
       filter
       placeholder="Выберите связанные карточки"
       display="chip"
+      fluid
+      :selectionLimit="8"
       class="card-multiselect"
     >
       <template #option="slotProps">
@@ -53,7 +55,6 @@ const sortedCardTitles = computed(() => [...cardTitles.value].reverse())
 
 <style scoped>
 .card-multiselect {
-  width: 100%;
   min-width: 300px;
   margin: 10px 0;
 }

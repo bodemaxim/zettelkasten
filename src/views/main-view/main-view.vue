@@ -18,7 +18,6 @@ const { definitions, setDefinitions, isMobileView, setScreenWidth, isLoading, se
 const fetchDefinitions = async () => {
   if (!definitions.value.length) {
     setDefinitions(await getAllDefinitions())
-    console.debug('definitions.value', definitions.value)
   }
 }
 
@@ -54,6 +53,7 @@ const searchPanelStyles = computed<StyleValue>(() => ({
   <div v-resize-observer="onResizeObserver" class="main-view">
     <CoolSpinner v-if="isLoading" />
     <EditCardModal v-model:visible="modalVisible" @saved="onCardUpdate" />
+
     <ViewPanel
       v-if="isMobileView && viewedCardUuid"
       v-model="viewedCardUuid"
