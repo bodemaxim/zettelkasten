@@ -8,7 +8,7 @@ import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
-import { marked } from 'marked'
+import TextDisplay from './components/text-display.vue'
 
 const { isMobileView, isLoading, toggleLoading, definitions, viewedCard, setViewedCard } =
   useStore()
@@ -99,6 +99,8 @@ const deleteLinksToCard = async (card: Card): Promise<void> => {
     }
   })
 
+  console.log('updatedCards в запросе', updatedCards)
+
   await updateCards(updatedCards)
 }
 
@@ -139,7 +141,7 @@ const backToList = () => {
         />
       </div>
       <h2>{{ viewedCard?.title }}</h2>
-      <p v-html="marked.parse(viewedCard.text)"></p>
+      <TextDisplay v-model="viewedCard.text" />
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
       <div v-if="viewedCard.links.length > 0" class="links-container">

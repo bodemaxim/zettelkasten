@@ -1,0 +1,93 @@
+<script setup lang="ts">
+import { onMounted, computed } from 'vue'
+import { marked } from 'marked'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/atom-one-dark.css'
+
+const markdownText = defineModel<string>()
+
+const parsedMarkdown = computed(() => marked.parse(markdownText.value ?? ''))
+
+onMounted(async () => {
+  marked.setOptions({
+    //@ts-ignore
+    highlight: function (code: any, lang: any) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+      return hljs.highlight(code, { language }).value
+    },
+    langPrefix: 'hljs language-'
+  })
+})
+
+hljs.highlightAll()
+</script>
+
+<template>
+  <div v-html="parsedMarkdown" class="text-display"></div>
+</template>
+
+<style scoped>
+.text-display {
+  background-color: var(--bg-dark);
+}
+
+:deep(img) {
+  max-width: calc(100% - 30px);
+  margin: 30px auto;
+  display: block;
+  border: 3px solid var(--bg-lighter);
+  border-radius: 5px;
+  box-shadow: 0 0 15px var(--accent-blue);
+}
+
+:deep(h1) {
+  font-size: 24px;
+  margin: 15px 0;
+  color: var(--accent-yellow);
+}
+
+:deep(h2) {
+  font-size: 22px;
+  color: rgb(116, 138, 236);
+  margin: 15px 0;
+  color: var(--accent-yellow);
+}
+
+:deep(h3) {
+  font-size: 20px;
+  color: lightpink;
+  margin: 15px 0 5px 10px;
+  color: var(--accent-yellow);
+}
+
+:deep(h4) {
+  font-size: 18px;
+  color: lightblue;
+  margin: 10px 0 5px 20px;
+  color: var(--accent-yellow);
+}
+
+:deep(p) {
+  font-size: 16px;
+  margin: 10px 0 10px 40px;
+}
+
+:deep(ul, ol) {
+  margin: 12px 50px;
+}
+
+:deep(li) {
+  font-size: 14px;
+  margin: 0 0 5px 0;
+}
+
+:deep(pre) {
+  display: inline-block;
+  background-color: var(--accent-blue);
+  border-radius: 8px;
+  padding: 15px 80px 15px 15px;
+  margin: 10px 40px;
+  max-width: calc(100% - 100px);
+  overflow-y: auto;
+}
+</style>
