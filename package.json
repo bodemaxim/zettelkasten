@@ -16,6 +16,7 @@
     "@primeuix/themes": "^1.0.0",
     "@supabase/supabase-js": "^2.49.1",
     "highlight.js": "^11.11.1",
+    "marked": "^13.0.2",
     "primeicons": "^7.0.0",
     "primevue": "^4.1.0",
     "quill": "^2.0.3",

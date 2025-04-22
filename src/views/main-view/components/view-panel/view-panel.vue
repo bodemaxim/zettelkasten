@@ -8,6 +8,7 @@ import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
+import { marked } from 'marked'
 
 const { isMobileView, isLoading, toggleLoading, definitions, viewedCard, setViewedCard } =
   useStore()
@@ -138,7 +139,7 @@ const backToList = () => {
         />
       </div>
       <h2>{{ viewedCard?.title }}</h2>
-      <p v-html="viewedCard?.text"></p>
+      <p v-html="marked.parse(viewedCard.text)"></p>
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
       <div v-if="viewedCard.links.length > 0" class="links-container">
