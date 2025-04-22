@@ -96,7 +96,7 @@ initData()
       />
     </div>
     <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
-      <li v-for="card in searchResults" :key="card.uuid">
+      <li v-for="card in searchResults" :key="card.uuid" class="list-item">
         <p @click="viewCard(card)" class="card-item">
           {{ card.title }}
         </p>
@@ -117,9 +117,8 @@ initData()
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.card-item {
-  margin: 0;
-  padding: 0;
+.list-item {
+  margin: 10px 0;
 }
 
 .card-item:hover {
