@@ -161,3 +161,9 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
   margin: 10px 0;
 }
 </style>
+
+<style>
+.dialog.p-dialog {
+  background-color: var(--bg-primary);
+}
+</style>

@@ -3,7 +3,7 @@ import { onMounted, watch } from 'vue'
 import type { Card } from '@/api/types'
 import BottomShade from '@/ui/bottom-shade.vue'
 import { Button } from 'primevue'
-import { deleteCardByUuid, getCardByUuid } from '@/api'
+import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
 import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { ConfirmDialog } from 'primevue'
@@ -72,12 +72,33 @@ const deleteCard = async () => {
     },
     accept: async () => {
       toggleLoading()
-      if (viewedCard.value) await deleteCardByUuid(viewedCard.value.uuid)
+      if (viewedCard.value) {
+        //TODO: объединить запросы в один
+        await deleteCardByUuid(viewedCard.value.uuid)
+        await deleteLinksToCard(viewedCard.value)
+      }
       viewedCard.value = null
       emits('deleted')
       toggleLoading()
     }
   })
+}
+
+const deleteLinksToCard = async (card: Card): Promise<void> => {
+  if (!card.links.length) return
+
+  const cardUuids = card.links.map((link) => link.uuid)
+
+  const cards = await getCardsByUuid(cardUuids)
+
+  const updatedCards = cards.map<Card>((item) => {
+    return {
+      ...item,
+      links: (item.links || []).filter((link) => link.uuid !== card.uuid)
+    }
+  })
+
+  await updateCards(updatedCards)
 }
 
 const backToList = () => {
@@ -110,7 +131,6 @@ const backToList = () => {
         />
         <Button
           v-if="isMobileView"
-          v-tooltip="'Вернуться к списку'"
           icon="pi pi-arrow-left"
           severity="secondary"
           text
