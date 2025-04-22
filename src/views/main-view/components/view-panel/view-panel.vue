@@ -99,8 +99,6 @@ const deleteLinksToCard = async (card: Card): Promise<void> => {
     }
   })
 
-  console.log('updatedCards в запросе', updatedCards)
-
   await updateCards(updatedCards)
 }
 

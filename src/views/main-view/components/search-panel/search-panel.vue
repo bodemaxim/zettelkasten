@@ -83,6 +83,7 @@ initData()
 
 <template>
   <div class="search-panel">
+    <CoolSpinner v-if="isLoading" class="spinner" />
     <div class="toolbar">
       <InputText type="text" v-model="searchQuery" class="toolbar-input-form" />
       <Button
@@ -94,17 +95,14 @@ initData()
         @click="$emit('createCard')"
       />
     </div>
-    <div>
-      <CoolSpinner v-if="isLoading" class="spinner" />
-      <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
-        <li v-for="card in searchResults" :key="card.uuid">
-          <p @click="viewCard(card)" class="card-item">
-            {{ card.title }}
-          </p>
-        </li>
-      </ul>
-      <p v-else-if="!isLoading">Не найдено</p>
-    </div>
+    <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
+      <li v-for="card in searchResults" :key="card.uuid">
+        <p @click="viewCard(card)" class="card-item">
+          {{ card.title }}
+        </p>
+      </li>
+    </ul>
+    <p v-else-if="!isLoading">Не найдено</p>
   </div>
 </template>
 
@@ -115,7 +113,6 @@ initData()
   background-color: var(--bg-dark);
   border: 2px solid var(--accent-green);
   padding: 40px 20px 10px 20px;
-  overflow: hidden;
   border-radius: 10px;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
@@ -132,8 +129,9 @@ initData()
 }
 
 .scrollable-container {
-  height: calc(100vh - 250px);
+  height: calc(100% - 50px);
   background-color: var(--bg-dark);
+  overflow-y: auto;
 }
 
 .toolbar {
