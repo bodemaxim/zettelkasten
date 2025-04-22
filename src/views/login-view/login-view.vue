@@ -21,7 +21,7 @@ const handleSignIn = async () => {
   localStorage.setItem('email', email.value)
   localStorage.setItem('password', password.value)
 
-  router.push('/notes')
+  router.push('/')
 }
 
 const loginAutomatically = () => {
