@@ -170,7 +170,7 @@ const backToList = () => {
 }
 
 .view-panel-question {
-  height: calc(100vh - 80px);
+  height: calc(100vh - 100px);
   padding: 30px 15px 10px;
   overflow-y: auto;
   background-color: var(--bg-dark);

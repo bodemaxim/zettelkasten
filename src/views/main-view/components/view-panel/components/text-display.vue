@@ -9,6 +9,7 @@ const markdownText = defineModel<string>()
 const parsedMarkdown = computed(() => marked.parse(markdownText.value ?? ''))
 
 onMounted(async () => {
+  //TODO: сейчас это не работает. Надо прикрутить hljs или prism
   marked.setOptions({
     //@ts-ignore
     highlight: function (code: any, lang: any) {
@@ -72,13 +73,14 @@ hljs.highlightAll()
   margin: 10px 0 10px 40px;
 }
 
-:deep(ul, ol) {
+:deep(ul) {
   margin: 12px 50px;
+  list-style: disc;
 }
 
-:deep(li) {
-  font-size: 14px;
-  margin: 0 0 5px 0;
+:deep(ol) {
+  margin: 12px 50px;
+  list-style: decimal;
 }
 
 :deep(pre) {
@@ -89,5 +91,49 @@ hljs.highlightAll()
   margin: 10px 40px;
   max-width: calc(100% - 100px);
   overflow-y: auto;
+}
+
+/* XS */
+@media (min-width: 320px) and (max-width: 768px) {
+  :deep(h1) {
+    font-size: 17px;
+    margin: 15px 0;
+  }
+
+  :deep(h2) {
+    font-size: 16px;
+    margin: 15px 0;
+  }
+
+  :deep(h3) {
+    font-size: 15px;
+    margin: 15px 0 5px 0;
+  }
+
+  :deep(h4) {
+    font-size: 14px;
+    margin: 10px 0 5px;
+  }
+
+  :deep(p) {
+    font-size: 13px;
+    margin: 10px 0;
+  }
+
+  :deep(ul, ol) {
+    margin: 12px 20px;
+  }
+
+  :deep(li) {
+    font-size: 12px;
+    margin: 0 0 5px;
+  }
+
+  :deep(pre) {
+    padding: 15px 20px 15px 15px;
+    margin: 10px 0;
+    max-width: 100%;
+    font-size: 11px;
+  }
 }
 </style>
