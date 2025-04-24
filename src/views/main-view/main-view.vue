@@ -59,6 +59,7 @@ const searchPanelStyles = computed<StyleValue>(() => ({
       v-model="viewedCardUuid"
       @deleted="onCardUpdate"
       @edited="openModal"
+      @click-on-link="viewedCardUuid = $event"
     />
 
     <div v-else class="panels-container">
@@ -74,6 +75,7 @@ const searchPanelStyles = computed<StyleValue>(() => ({
         v-model="viewedCardUuid"
         @deleted="onCardUpdate"
         @edited="openModal"
+        @click-on-link="viewedCardUuid = $event"
       />
     </div>
   </div>

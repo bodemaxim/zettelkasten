@@ -29,6 +29,7 @@ const confirm = useConfirm()
 const emits = defineEmits<{
   deleted: []
   edited: []
+  clickOnLink: [uuid: string]
 }>()
 
 const fetchDefinition = (uuid: string): Card | null => {
@@ -139,7 +140,7 @@ const backToList = () => {
         />
       </div>
       <h2>{{ viewedCard?.title }}</h2>
-      <TextDisplay v-model="viewedCard.text" />
+      <TextDisplay v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
       <div v-if="viewedCard.links.length > 0" class="links-container">

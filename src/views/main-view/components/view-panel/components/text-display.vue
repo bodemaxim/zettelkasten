@@ -1,26 +1,41 @@
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { marked } from 'marked'
-import hljs from 'highlight.js'
 import 'highlight.js/styles/atom-one-dark.css'
 
 const markdownText = defineModel<string>()
 
+const emits = defineEmits<{
+  clickOnLink: [uuid: string]
+}>()
+
 const parsedMarkdown = computed(() => marked.parse(markdownText.value ?? ''))
 
-onMounted(async () => {
-  //TODO: сейчас это не работает. Надо прикрутить hljs или prism
-  marked.setOptions({
-    //@ts-ignore
-    highlight: function (code: any, lang: any) {
-      const language = hljs.getLanguage(lang) ? lang : 'plaintext'
-      return hljs.highlight(code, { language }).value
-    },
-    langPrefix: 'hljs language-'
-  })
-})
+const handleLinkClicks = () => {
+  const links = document.querySelectorAll('.text-display a')
 
-hljs.highlightAll()
+  links.forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault()
+
+      const href = link.getAttribute('href')
+
+      if (!href) return
+
+      if (href.startsWith('http') && href.includes('/')) {
+        window.open(href, '_blank')
+        return
+      }
+
+      console.log('Clicked on card UUID:', href)
+      emits('clickOnLink', href)
+    })
+  })
+}
+
+onMounted(async () => {
+  handleLinkClicks()
+})
 </script>
 
 <template>
