@@ -21,9 +21,7 @@ const fetchDefinitions = async () => {
   }
 }
 
-onMounted(async () => {
-  await fetchDefinitions()
-})
+onMounted(fetchDefinitions)
 
 const isNewCard = true
 
@@ -51,7 +49,6 @@ const searchPanelStyles = computed<StyleValue>(() => ({
 }))
 
 const viewLink = (uuid: string) => {
-  console.log('newUuid', uuid)
   viewedCardUuid.value = uuid
 }
 </script>

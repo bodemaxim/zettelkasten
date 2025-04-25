@@ -38,7 +38,6 @@ const onCancel = () => {
 const onSave = async () => {
   if (!viewedCard.value) {
     await addUuidHyperLinksFromText()
-    console.log('mew', updatedCard.value.links)
     const newCard = await createCard(updatedCard.value)
     updateLinkedCards(newCard)
   } else {
@@ -84,9 +83,8 @@ const updateLinkedCards = async (card: Card): Promise<void> => {
 const findUuidsInText = (): string[] => {
   const regex = /\[([^\]]+)\]\(([^)]+)\)/g
   const matches = Array.from(updatedCard.value.text.matchAll(regex))
-
   const uuids = matches.map((match) => match[2])
-  console.log(uuids)
+
   return uuids
 }
 

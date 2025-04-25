@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
-import type { Card } from '@/api/types'
+import { onMounted, watch, computed } from 'vue'
+import type { Card, CardMinimal } from '@/api/types'
 import BottomShade from '@/ui/bottom-shade.vue'
 import { Button } from 'primevue'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
@@ -107,6 +107,26 @@ const backToList = () => {
   viewedCardUuid.value = null
   setViewedCard(null)
 }
+
+const cardsInBottomList = computed<CardMinimal[]>(() => {
+  const cards = viewedCard.value?.links || []
+
+  if (cards.length === 0) return []
+
+  const uuidsInText = findUuidsInText()
+
+  return cards.filter((card) => !uuidsInText.includes(card.uuid))
+})
+
+const findUuidsInText = (): string[] => {
+  if (!viewedCard.value) return []
+
+  const regex = /\[([^\]]+)\]\(([^)]+)\)/g
+  const matches = Array.from(viewedCard.value.text.matchAll(regex))
+  const uuids = matches.map((match) => match[2])
+
+  return uuids
+}
 </script>
 
 <template>
@@ -141,10 +161,10 @@ const backToList = () => {
       <TextDisplay v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
-      <div v-if="viewedCard.links.length > 0" class="links-container">
-        <h3>Связанные термины:</h3>
+      <div v-if="cardsInBottomList.length > 0" class="links-container">
+        <h3>Еще связанные карточки</h3>
         <div
-          v-for="link in viewedCard.links"
+          v-for="link in cardsInBottomList"
           :key="link.uuid"
           class="link"
           @click="viewCard(link.uuid)"

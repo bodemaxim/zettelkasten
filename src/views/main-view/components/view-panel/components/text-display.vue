@@ -14,8 +14,6 @@ const parsedMarkdown = computed(() => marked.parse(markdownText.value ?? ''))
 const textDisplayRef = ref<HTMLElement | null>(null)
 
 const handleLinkClick = (event: MouseEvent) => {
-  console.log('handleLinkClick', event)
-  // Always prevent default behavior for links
   event.preventDefault()
   event.stopPropagation()
 
@@ -31,7 +29,6 @@ const handleLinkClick = (event: MouseEvent) => {
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
   if (uuidPattern.test(href)) {
-    console.log('Clicked on card UUID:', href)
     emits('clickOnLink', href)
   } else if (href.startsWith('http')) {
     window.open(href, '_blank')
@@ -44,7 +41,6 @@ const delegateClickHandler = (event: MouseEvent) => {
 
   const target = event.target as HTMLElement
   const link = target.closest('a')
-  console.log('delegateClickHandler', link)
 
   if (link) {
     handleLinkClick(event)
@@ -52,7 +48,6 @@ const delegateClickHandler = (event: MouseEvent) => {
 }
 
 onMounted(() => {
-  console.log('text-display onMounted')
   if (textDisplayRef.value) {
     textDisplayRef.value.addEventListener('click', delegateClickHandler)
   }
@@ -67,7 +62,6 @@ onBeforeUnmount(() => {
 
 <template>
   <div v-html="parsedMarkdown" class="text-display" @click="delegateClickHandler"></div>
-  <button @click="console.log(parsedMarkdown)">тест</button>
 </template>
 
 <style scoped>
