@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type StyleValue, ref, onMounted, computed } from 'vue'
+import { type StyleValue, ref, onMounted, computed, watch } from 'vue'
 import SearchPanel from './components/search-panel/search-panel.vue'
 import ViewPanel from './components/view-panel/view-panel.vue'
 import { getAllDefinitions } from '@/api'
@@ -7,7 +7,9 @@ import EditCardModal from './components/edit-card-modal/edit-card-modal.vue'
 import { vResizeObserver } from '@vueuse/components'
 import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const viewedCardUuid = ref<string | null>(null)
 const modalVisible = ref<boolean>(false)
 const isNeedToRefreshSearchList = ref<boolean>(false)
@@ -21,7 +23,22 @@ const fetchDefinitions = async () => {
   }
 }
 
-onMounted(fetchDefinitions)
+onMounted(async () => {
+  await fetchDefinitions()
+
+  if (route.params.uuid) {
+    viewedCardUuid.value = route.params.uuid as string
+  }
+})
+
+watch(
+  () => route.params.uuid,
+  (newUuid) => {
+    if (newUuid) {
+      viewedCardUuid.value = newUuid as string
+    }
+  }
+)
 
 const isNewCard = true
 

@@ -11,28 +11,29 @@ const emits = defineEmits<{
 
 const parsedMarkdown = computed(() => marked.parse(markdownText.value ?? ''))
 
-// Use a single event listener on the container instead of multiple listeners on each link
 const textDisplayRef = ref<HTMLElement | null>(null)
 
 const handleLinkClick = (event: MouseEvent) => {
+  event.preventDefault()
+
   const target = event.target as HTMLElement
   const link = target.closest('a')
 
   if (!link) return
 
-  event.preventDefault()
-
   const href = link.getAttribute('href')
 
   if (!href) return
 
-  if (href.startsWith('http') && href.includes('/')) {
-    window.open(href, '_blank')
-    return
-  }
+  // Проверяем, является ли href UUID (например, длина и формат)
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-  console.log('Clicked on card UUID:', href)
-  emits('clickOnLink', href)
+  if (uuidPattern.test(href)) {
+    console.log('Clicked on card UUID:', href)
+    emits('clickOnLink', href)
+  } else if (href.startsWith('http')) {
+    window.open(href, '_blank')
+  }
 }
 
 onMounted(() => {
