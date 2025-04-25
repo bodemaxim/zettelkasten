@@ -10,7 +10,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/:uuid?',
+      path: '/',
       name: 'notes',
       component: MainView,
       meta: { requiresAuth: true }

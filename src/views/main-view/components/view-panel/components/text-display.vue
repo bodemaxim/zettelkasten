@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { marked } from 'marked'
 import 'highlight.js/styles/atom-one-dark.css'
 
@@ -14,7 +14,10 @@ const parsedMarkdown = computed(() => marked.parse(markdownText.value ?? ''))
 const textDisplayRef = ref<HTMLElement | null>(null)
 
 const handleLinkClick = (event: MouseEvent) => {
+  console.log('handleLinkClick', event)
+  // Always prevent default behavior for links
   event.preventDefault()
+  event.stopPropagation()
 
   const target = event.target as HTMLElement
   const link = target.closest('a')
@@ -25,7 +28,6 @@ const handleLinkClick = (event: MouseEvent) => {
 
   if (!href) return
 
-  // Проверяем, является ли href UUID (например, длина и формат)
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
   if (uuidPattern.test(href)) {
@@ -36,17 +38,36 @@ const handleLinkClick = (event: MouseEvent) => {
   }
 }
 
+const delegateClickHandler = (event: MouseEvent) => {
+  event.stopPropagation()
+  event.preventDefault()
+
+  const target = event.target as HTMLElement
+  const link = target.closest('a')
+  console.log('delegateClickHandler', link)
+
+  if (link) {
+    handleLinkClick(event)
+  }
+}
+
 onMounted(() => {
-  textDisplayRef.value?.addEventListener('click', handleLinkClick)
+  console.log('text-display onMounted')
+  if (textDisplayRef.value) {
+    textDisplayRef.value.addEventListener('click', delegateClickHandler)
+  }
 })
 
-onUnmounted(() => {
-  textDisplayRef.value?.removeEventListener('click', handleLinkClick)
+onBeforeUnmount(() => {
+  if (textDisplayRef.value) {
+    textDisplayRef.value.removeEventListener('click', delegateClickHandler)
+  }
 })
 </script>
 
 <template>
-  <div v-html="parsedMarkdown" class="text-display"></div>
+  <div v-html="parsedMarkdown" class="text-display" @click="delegateClickHandler"></div>
+  <button @click="console.log(parsedMarkdown)">тест</button>
 </template>
 
 <style scoped>

@@ -18,7 +18,6 @@ const emits = defineEmits<{
 }>()
 
 const updatedCard = ref<CardEditable>(defaultCard)
-const everAddedHyperLinks = ref<CardMinimal[]>([])
 
 const title = computed<string>(() =>
   viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
