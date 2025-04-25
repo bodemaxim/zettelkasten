@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { marked } from 'marked'
 import 'highlight.js/styles/atom-one-dark.css'
 
@@ -11,30 +11,36 @@ const emits = defineEmits<{
 
 const parsedMarkdown = computed(() => marked.parse(markdownText.value ?? ''))
 
-const handleLinkClicks = () => {
-  const links = document.querySelectorAll('.text-display a')
+// Use a single event listener on the container instead of multiple listeners on each link
+const textDisplayRef = ref<HTMLElement | null>(null)
 
-  links.forEach((link) => {
-    link.addEventListener('click', (event) => {
-      event.preventDefault()
+const handleLinkClick = (event: MouseEvent) => {
+  const target = event.target as HTMLElement
+  const link = target.closest('a')
 
-      const href = link.getAttribute('href')
+  if (!link) return
 
-      if (!href) return
+  event.preventDefault()
 
-      if (href.startsWith('http') && href.includes('/')) {
-        window.open(href, '_blank')
-        return
-      }
+  const href = link.getAttribute('href')
 
-      console.log('Clicked on card UUID:', href)
-      emits('clickOnLink', href)
-    })
-  })
+  if (!href) return
+
+  if (href.startsWith('http') && href.includes('/')) {
+    window.open(href, '_blank')
+    return
+  }
+
+  console.log('Clicked on card UUID:', href)
+  emits('clickOnLink', href)
 }
 
-onMounted(async () => {
-  handleLinkClicks()
+onMounted(() => {
+  textDisplayRef.value?.addEventListener('click', handleLinkClick)
+})
+
+onUnmounted(() => {
+  textDisplayRef.value?.removeEventListener('click', handleLinkClick)
 })
 </script>
 

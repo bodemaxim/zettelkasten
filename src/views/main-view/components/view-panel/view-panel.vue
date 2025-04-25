@@ -118,7 +118,6 @@ const backToList = () => {
         <Button
           v-tooltip="'Редактировать карточку'"
           icon="pi pi-file-edit"
-          class="mr-2"
           severity="secondary"
           text
           @click="$emit('edited')"
@@ -126,7 +125,6 @@ const backToList = () => {
         <Button
           v-tooltip="'Удалить карточку'"
           icon="pi pi-file-excel"
-          class="mr-2"
           severity="secondary"
           text
           @click="deleteCard()"

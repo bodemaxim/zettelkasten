@@ -1,22 +1,24 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
-import { Dialog, Button, InputText, Textarea, Select } from 'primevue'
-import type { Card, CardEditable } from '@/api/types'
+import { Dialog, Button, InputText, Select } from 'primevue'
+import type { Card, CardEditable, CardMinimal } from '@/api/types'
 import { createCard, updateCard, getCardsByUuid, updateCards } from '@/api'
 import { defaultCard, typeOptionsList } from './edit-card-modal.consts'
 import CardsMultiselect from './components/cards-multiselect.vue'
 import { type TypeOption } from './edit-card-modal.types'
 import { useStore } from '@/use-store'
+import TextEditor from './components/text-editor.vue'
 
 const visible = defineModel<boolean>('visible')
 
-const { viewedCard, isMobileView } = useStore()
+const { viewedCard, isMobileView, toggleLoading } = useStore()
 
 const emits = defineEmits<{
   saved: []
 }>()
 
 const updatedCard = ref<CardEditable>(defaultCard)
+const everAddedHyperLinks = ref<CardMinimal[]>([])
 
 const title = computed<string>(() =>
   viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
@@ -36,9 +38,13 @@ const onCancel = () => {
 
 const onSave = async () => {
   if (!viewedCard.value) {
+    await addUuidHyperLinksFromText()
+    console.log('mew', updatedCard.value.links)
     const newCard = await createCard(updatedCard.value)
     updateLinkedCards(newCard)
   } else {
+    await addUuidHyperLinksFromText()
+
     const newValue: Card = {
       ...viewedCard.value,
       ...updatedCard.value,
@@ -74,6 +80,32 @@ const updateLinkedCards = async (card: Card): Promise<void> => {
   })
 
   await updateCards(updatedCards)
+}
+
+const findUuidsInText = (): string[] => {
+  const regex = /\[([^\]]+)\]\(([^)]+)\)/g
+  const matches = Array.from(updatedCard.value.text.matchAll(regex))
+
+  const uuids = matches.map((match) => match[2])
+  console.log(uuids)
+  return uuids
+}
+
+const addUuidHyperLinksFromText = async () => {
+  const uuids = findUuidsInText()
+  if (uuids.length) {
+    const existingUuids = new Set(updatedCard.value.links?.map((link) => link.uuid) || [])
+
+    const newUuids = uuids.filter((uuid) => !existingUuids.has(uuid))
+
+    toggleLoading()
+    const hyperlinkCards = await getCardsByUuid(newUuids)
+    toggleLoading()
+
+    const newLinks = hyperlinkCards.map((card) => ({ uuid: card.uuid, title: card.title }))
+
+    updatedCard.value.links = [...(updatedCard.value.links || []), ...newLinks]
+  }
 }
 
 watch(
@@ -113,9 +145,12 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
           class="input-element"
         />
       </div>
-      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
+      <div
+        :class="['input-block', { 'input-block-mobile': isMobileView }]"
+        :style="{ alignItems: 'start' }"
+      >
         <p class="input-label">Текст</p>
-        <Textarea v-model="updatedCard.text" class="input-element textarea" />
+        <TextEditor v-model:text="updatedCard.text" />
       </div>
       <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
         <p class="input-label">Ссылки</p>
@@ -153,12 +188,6 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 
 .input-element {
   width: 100%;
-}
-
-.textarea {
-  height: 400px;
-  resize: none;
-  margin: 10px 0;
 }
 </style>
 

@@ -47,6 +47,11 @@ const searchPanelStyles = computed<StyleValue>(() => ({
   width: isMobileView.value ? '100%' : '300px',
   minWidth: isMobileView.value ? undefined : '300px'
 }))
+
+const viewLink = (uuid: string) => {
+  console.log('newUuid', uuid)
+  viewedCardUuid.value = uuid
+}
 </script>
 
 <template>
@@ -59,7 +64,7 @@ const searchPanelStyles = computed<StyleValue>(() => ({
       v-model="viewedCardUuid"
       @deleted="onCardUpdate"
       @edited="openModal"
-      @click-on-link="viewedCardUuid = $event"
+      @click-on-link="viewLink($event)"
     />
 
     <div v-else class="panels-container">
@@ -75,7 +80,7 @@ const searchPanelStyles = computed<StyleValue>(() => ({
         v-model="viewedCardUuid"
         @deleted="onCardUpdate"
         @edited="openModal"
-        @click-on-link="viewedCardUuid = $event"
+        @click-on-link="viewLink($event)"
       />
     </div>
   </div>
