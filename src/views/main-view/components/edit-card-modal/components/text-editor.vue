@@ -37,7 +37,6 @@ const addHyperlinkToSelection = (hyperlink: CardMinimal) => {
   const newText = textarea.value.substring(0, start) + markdownLink + textarea.value.substring(end)
   text.value = newText
 
-  isHyperLinkEditorVisible.value = false
   selectionRange.value = null
 }
 </script>

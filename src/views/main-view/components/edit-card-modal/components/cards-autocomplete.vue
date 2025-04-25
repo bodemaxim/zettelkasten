@@ -27,8 +27,8 @@ const search = (event: any) => {
 }
 
 const onValueChange = (e: CardMinimal) => {
+  if (!e || typeof e !== 'object') return
   emits('updated', e)
-  console.debug('emit')
 }
 </script>
 
