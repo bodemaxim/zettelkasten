@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Dialog, Button, InputText, Select } from 'primevue'
-import type { Card, CardEditable, CardMinimal } from '@/api/types'
+import type { Card, CardEditable } from '@/types'
 import { createCard, updateCard, getCardsByUuid, updateCards } from '@/api'
 import { defaultCard, typeOptionsList } from './edit-card-modal.consts'
 import CardsMultiselect from './components/cards-multiselect.vue'

@@ -5,7 +5,6 @@
     <div class="view-panel-content">
       <slot></slot>
     </div>
-    <BottomShade />
   </div>
 </template>
 

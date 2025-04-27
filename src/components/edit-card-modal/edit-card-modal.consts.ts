@@ -1,4 +1,4 @@
-import type { CardEditable } from '@/api/types'
+import type { CardEditable } from '@/types'
 import type { TypeOption } from './edit-card-modal.types'
 
 export const defaultCard: CardEditable = {

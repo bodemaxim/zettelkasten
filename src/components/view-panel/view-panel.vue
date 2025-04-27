@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
-import type { Card, CardMinimal } from '@/api/types'
-import BottomShade from '@/ui/bottom-shade.vue'
+import type { Card, CardMinimal } from '@/types'
 import { Button } from 'primevue'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
 import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
-import TextDisplay from './components/text-display.vue'
+import TextViewer from './components/text-viewer.vue'
 
 const { isMobileView, isLoading, toggleLoading, definitions, viewedCard, setViewedCard } =
   useStore()
@@ -158,7 +157,7 @@ const findUuidsInText = (): string[] => {
         />
       </div>
       <h2>{{ viewedCard?.title }}</h2>
-      <TextDisplay v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
+      <TextViewer v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
       <div v-if="cardsInBottomList.length > 0" class="links-container">
@@ -174,7 +173,6 @@ const findUuidsInText = (): string[] => {
       </div>
     </div>
     <div v-else>Выберите карточку, чтобы посмотреть содержание.</div>
-    <BottomShade />
   </div>
 </template>
 

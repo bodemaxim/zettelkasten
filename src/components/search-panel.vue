@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import type { CardMinimal } from '@/api/types'
+import type { CardMinimal } from '@/types'
 import { Button, InputText } from 'primevue'
 import { getCardTitles } from '@/api'
 import CoolSpinner from '@/ui/cool-spinner.vue'

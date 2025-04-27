@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import CardsAutocomplete from './cards-autocomplete.vue'
 import { Button, Toolbar } from 'primevue'
-import type { CardMinimal } from '@/api/types'
+import type { CardMinimal } from '@/types'
 
 const text = defineModel<string>('text')
 

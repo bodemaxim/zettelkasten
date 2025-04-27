@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { AutoComplete } from 'primevue'
 import { useStore } from '@/use-store'
-import type { CardMinimal } from '@/api/types'
+import type { CardMinimal } from '@/types'
 
 const emits = defineEmits<{
   updated: [value: CardMinimal]

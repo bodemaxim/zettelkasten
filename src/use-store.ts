@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import type { Card, CardMinimal } from '@/api/types'
+import type { Card, CardMinimal } from '@/types'
 
 const cardTitles = ref<CardMinimal[]>([])
 const definitions = ref<Card[]>([])

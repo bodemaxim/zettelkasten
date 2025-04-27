@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { MultiSelect, Button } from 'primevue'
 import { useStore } from '@/use-store'
-import type { CardMinimal } from '@/api/types'
+import type { CardMinimal } from '@/types'
 
 const selectedCards = defineModel<CardMinimal[]>()
 const { cardTitles } = useStore()

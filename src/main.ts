@@ -5,8 +5,8 @@ import './assets/base.css'
 import PrimeVue from 'primevue/config'
 import 'primeicons/primeicons.css'
 import Aura from '@primeuix/themes/aura'
-import Tooltip from 'primevue/tooltip';
-import ConfirmationService from 'primevue/confirmationservice';
+import Tooltip from 'primevue/tooltip'
+import ConfirmationService from 'primevue/confirmationservice'
 
 const app = createApp(App)
 
@@ -23,8 +23,8 @@ app.use(PrimeVue, {
   }
 })
 
-app.use(ConfirmationService);
+app.use(ConfirmationService)
 
-app.directive('tooltip', Tooltip);
+app.directive('tooltip', Tooltip)
 
 app.mount('#app')
