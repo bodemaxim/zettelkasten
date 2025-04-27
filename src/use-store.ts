@@ -16,8 +16,8 @@ export const useStore = () => {
 
   const isLoading = ref<boolean>(false)
 
-  const toggleLoading = () => {
-    isLoading.value = !isLoading.value
+  const setLoading = (value: boolean) => {
+    isLoading.value = value
   }
 
   const screenWidth = ref<number>(window.innerWidth)
@@ -43,7 +43,7 @@ export const useStore = () => {
     setScreenWidth,
     isMobileView,
     isLoading,
-    toggleLoading,
+    setLoading,
     viewedCard,
     setViewedCard
   }

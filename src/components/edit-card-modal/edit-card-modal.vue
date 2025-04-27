@@ -11,7 +11,7 @@ import TextEditor from './components/text-editor.vue'
 
 const visible = defineModel<boolean>('visible')
 
-const { viewedCard, isMobileView, toggleLoading } = useStore()
+const { viewedCard, isMobileView, setLoading } = useStore()
 
 const emits = defineEmits<{
   saved: []
@@ -95,9 +95,9 @@ const addUuidHyperLinksFromText = async () => {
 
     const newUuids = uuids.filter((uuid) => !existingUuids.has(uuid))
 
-    toggleLoading()
+    setLoading(true)
     const hyperlinkCards = await getCardsByUuid(newUuids)
-    toggleLoading()
+    setLoading(false)
 
     const newLinks = hyperlinkCards.map((card) => ({ uuid: card.uuid, title: card.title }))
 

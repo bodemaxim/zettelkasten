@@ -9,8 +9,7 @@ import { ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
 import TextViewer from './components/text-viewer.vue'
 
-const { isMobileView, isLoading, toggleLoading, definitions, viewedCard, setViewedCard } =
-  useStore()
+const { isMobileView, isLoading, setLoading, definitions, viewedCard, setViewedCard } = useStore()
 
 const viewedCardUuid = defineModel<string | null>()
 
@@ -48,14 +47,14 @@ const viewCard = async (cardUuid: string | null | undefined): Promise<void> => {
     return
   }
 
-  toggleLoading()
+  setLoading(true)
 
   try {
     setViewedCard(await getCardByUuid(cardUuid))
   } catch (e) {
     console.error(e)
   }
-  toggleLoading()
+  setLoading(false)
 }
 
 const deleteCard = async () => {
@@ -72,7 +71,7 @@ const deleteCard = async () => {
       label: 'Да'
     },
     accept: async () => {
-      toggleLoading()
+      setLoading(true)
       if (viewedCard.value) {
         //TODO: объединить запросы в один
         await deleteCardByUuid(viewedCard.value.uuid)
@@ -80,7 +79,7 @@ const deleteCard = async () => {
       }
       viewedCard.value = null
       emits('deleted')
-      toggleLoading()
+      setLoading(false)
     }
   })
 }

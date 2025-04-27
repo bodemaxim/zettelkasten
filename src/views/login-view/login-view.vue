@@ -9,14 +9,14 @@ import { useStore } from '@/use-store'
 
 const email = ref('')
 const password = ref('')
-const { isLoading, toggleLoading } = useStore()
+const { isLoading, setLoading } = useStore()
 
 const handleSignIn = async () => {
-  toggleLoading()
+  setLoading(true)
   await login(email.value, password.value)
   await seeUser()
 
-  toggleLoading()
+  setLoading(false)
 
   localStorage.setItem('email', email.value)
   localStorage.setItem('password', password.value)

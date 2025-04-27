@@ -6,7 +6,7 @@ import { getCardTitles } from '@/api'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 
-const { cardTitles, setCardTitles, isLoading, toggleLoading } = useStore()
+const { cardTitles, setCardTitles, isLoading, setLoading } = useStore()
 
 const isNeedToRefreshSearchList = defineModel<boolean>()
 
@@ -30,13 +30,13 @@ const searchResults = ref<CardMinimal[]>([])
 
 const initData = async (): Promise<void> => {
   //TODO: вызывается дважды. Дело не в вотче.
-  toggleLoading()
+  setLoading(true)
 
   const response = await getCardTitles()
   setCardTitles(response)
   searchResults.value = JSON.parse(JSON.stringify(cardTitles.value))
 
-  toggleLoading()
+  setLoading(false)
 }
 
 onMounted(initData)
