@@ -1,10 +1,11 @@
-import MainView from '@/views/main-view/main-view.vue'
-import LoginView from '@/views/login-view/login-view.vue'
-import UnauthorizedView from '@/views/unauthorized-view/unauthorized-view.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/api/supabaseClient'
 
 let localUser
+
+const MainView = () => import('@/views/main-view.vue')
+const LoginView = () => import('@/views/login-view.vue')
+const UnauthorizedView = () => import('@/views/unauthorized-view.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
