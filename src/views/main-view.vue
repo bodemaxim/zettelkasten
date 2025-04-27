@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { type StyleValue, ref, onMounted, computed } from 'vue'
+import { vResizeObserver } from '@vueuse/components'
 import SearchPanel from '@/components/search-panel.vue'
 import ViewPanel from '@/components/view-panel/view-panel.vue'
-import { getAllDefinitions } from '@/api'
 import EditCardModal from '@/components/edit-card-modal/edit-card-modal.vue'
-import { vResizeObserver } from '@vueuse/components'
-import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import { getAllDefinitions } from '@/api'
+import { useStore } from '@/use-store'
 
 const viewedCardUuid = ref<string | null>(null)
 const modalVisible = ref<boolean>(false)
@@ -37,19 +37,15 @@ const onCardUpdate = async () => {
   setViewedCard(null)
 }
 
-function onResizeObserver(entries: readonly ResizeObserverEntry[]) {
-  const [entry] = entries
-  const { width } = entry.contentRect
-  setScreenWidth(width)
-}
-
 const searchPanelStyles = computed<StyleValue>(() => ({
   width: isMobileView.value ? '100%' : '300px',
   minWidth: isMobileView.value ? undefined : '300px'
 }))
 
-const viewLink = (uuid: string) => {
-  viewedCardUuid.value = uuid
+const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
+  const [entry] = entries
+  const { width } = entry.contentRect
+  setScreenWidth(width)
 }
 </script>
 
@@ -63,7 +59,7 @@ const viewLink = (uuid: string) => {
       v-model="viewedCardUuid"
       @deleted="onCardUpdate"
       @edited="openModal"
-      @click-on-link="viewLink($event)"
+      @click-on-link="viewedCardUuid = $event"
     />
 
     <div v-else class="panels-container">
@@ -71,7 +67,7 @@ const viewLink = (uuid: string) => {
         v-model="isNeedToRefreshSearchList"
         :style="searchPanelStyles"
         class="search-panel"
-        @card-uuid="viewedCardUuid = $event"
+        @viewed-card-uuid="viewedCardUuid = $event"
         @create-card="openModal(isNewCard)"
       />
       <ViewPanel
@@ -79,7 +75,7 @@ const viewLink = (uuid: string) => {
         v-model="viewedCardUuid"
         @deleted="onCardUpdate"
         @edited="openModal"
-        @click-on-link="viewLink($event)"
+        @click-on-link="viewedCardUuid = $event"
       />
     </div>
   </div>
@@ -111,9 +107,5 @@ const viewLink = (uuid: string) => {
   flex-grow: 1;
   margin-right: 2em;
   margin-left: 2em;
-}
-
-hr {
-  border: 2px solid gray;
 }
 </style>

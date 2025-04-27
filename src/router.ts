@@ -32,20 +32,14 @@ const router = createRouter({
 
 async function getUser(next: NavigationGuardNext) {
   localUser = await supabase.auth.getSession()
-  if (localUser.data.session == null) {
-    next('/unauthorized')
-  } else {
-    next()
-  }
+  if (localUser.data.session == null) next('/unauthorized')
+  else next()
 }
 
 router.beforeEach(
   (to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-    if (to.meta.requiresAuth) {
-      getUser(next)
-    } else {
-      next()
-    }
+    if (to.meta.requiresAuth) getUser(next)
+    else next()
   }
 )
 

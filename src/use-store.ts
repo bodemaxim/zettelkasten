@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
-import type { Card, CardMinimal } from '@/types'
+import type { Card, CardShortInfo } from '@/types'
 
-const cardTitles = ref<CardMinimal[]>([])
+const cardsShortInfo = ref<CardShortInfo[]>([])
 const definitions = ref<Card[]>([])
 const viewedCard = ref<Card | null>(null)
 
@@ -10,8 +10,8 @@ export const useStore = () => {
     definitions.value = newValue
   }
 
-  const setCardTitles = (newValue: CardMinimal[]) => {
-    cardTitles.value = newValue
+  const setCardsShortInfo = (newValue: CardShortInfo[]) => {
+    cardsShortInfo.value = newValue
   }
 
   const isLoading = ref<boolean>(false)
@@ -37,8 +37,8 @@ export const useStore = () => {
   return {
     definitions,
     setDefinitions,
-    cardTitles,
-    setCardTitles,
+    cardsShortInfo,
+    setCardsShortInfo,
     screenWidth,
     setScreenWidth,
     isMobileView,

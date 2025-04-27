@@ -2,11 +2,11 @@
 import { computed } from 'vue'
 import { MultiSelect, Button } from 'primevue'
 import { useStore } from '@/use-store'
-import type { CardMinimal } from '@/types'
+import type { CardShortInfo } from '@/types'
 
-const selectedCards = defineModel<CardMinimal[]>()
-const { cardTitles } = useStore()
-const sortedCardTitles = computed(() => [...cardTitles.value].reverse())
+const selectedCards = defineModel<CardShortInfo[]>()
+const { cardsShortInfo } = useStore()
+const sortedCardTitles = computed(() => [...cardsShortInfo.value].reverse())
 </script>
 
 <template>

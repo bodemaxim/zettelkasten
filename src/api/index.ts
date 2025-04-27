@@ -1,15 +1,15 @@
-import { createAccount, login, seeUser, logout } from "@/api/auth"
+import { createAccount, login, seeUser, logout } from '@/api/auth'
 import {
   getAllCards,
   getAllDefinitions,
-  getCardTitles,
+  getCardsShortInfo,
   createCard,
   getCardByUuid,
   deleteCardByUuid,
   updateCard,
   updateCards,
   getCardsByUuid
-} from "@/api/cards"
+} from '@/api/cards'
 
 export {
   createAccount,
@@ -18,7 +18,7 @@ export {
   logout,
   getAllCards,
   getAllDefinitions,
-  getCardTitles,
+  getCardsShortInfo,
   createCard,
   getCardByUuid,
   deleteCardByUuid,

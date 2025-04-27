@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
-import type { Card, CardMinimal } from '@/types'
+import type { Card, CardShortInfo } from '@/types'
 import { Button } from 'primevue'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
 import { useStore } from '@/use-store'
@@ -106,7 +106,7 @@ const backToList = () => {
   setViewedCard(null)
 }
 
-const cardsInBottomList = computed<CardMinimal[]>(() => {
+const cardsInBottomList = computed<CardShortInfo[]>(() => {
   const cards = viewedCard.value?.links || []
 
   if (cards.length === 0) return []
@@ -136,22 +136,19 @@ const findUuidsInText = (): string[] => {
         <Button
           v-tooltip="'Редактировать карточку'"
           icon="pi pi-file-edit"
-          severity="secondary"
-          text
+          severity="primary"
           @click="$emit('edited')"
         />
         <Button
           v-tooltip="'Удалить карточку'"
           icon="pi pi-file-excel"
           severity="secondary"
-          text
           @click="deleteCard()"
         />
         <Button
           v-if="isMobileView"
           icon="pi pi-arrow-left"
           severity="secondary"
-          text
           @click="backToList"
         />
       </div>

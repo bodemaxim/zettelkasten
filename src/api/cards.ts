@@ -1,5 +1,5 @@
 import { supabase } from '@/api/supabaseClient'
-import type { Card, CardMinimal, CardEditable } from './types'
+import type { Card, CardShortInfo, CardEditable } from './types'
 
 export const getAllCards = async () => {
   const { error, data } = await supabase.from('cards').select('*')
@@ -23,7 +23,7 @@ export const getAllDefinitions = async (): Promise<Card[]> => {
   return data
 }
 
-export const getCardTitles = async (): Promise<CardMinimal[]> => {
+export const getCardsShortInfo = async (): Promise<CardShortInfo[]> => {
   const { data, error } = await supabase.from('cards').select('uuid, title')
 
   if (error) {

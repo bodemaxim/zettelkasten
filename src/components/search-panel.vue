@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import type { CardMinimal } from '@/types'
+import type { CardShortInfo } from '@/types'
 import { Button, InputText } from 'primevue'
-import { getCardTitles } from '@/api'
+import { getCardsShortInfo } from '@/api'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 
-const { cardTitles, setCardTitles, isLoading, setLoading } = useStore()
+const emits = defineEmits<{
+  viewedCardUuid: [value: string | null]
+  createCard: []
+}>()
+
+const { cardsShortInfo, setCardsShortInfo, isLoading, setLoading } = useStore()
 
 const isNeedToRefreshSearchList = defineModel<boolean>()
 
@@ -20,21 +25,18 @@ watch(
   }
 )
 
-const emits = defineEmits<{
-  cardUuid: [value: string | null]
-  createCard: []
-}>()
-
 const searchQuery = ref<string>('')
-const searchResults = ref<CardMinimal[]>([])
+const searchResults = ref<CardShortInfo[]>([])
 
 const initData = async (): Promise<void> => {
-  //TODO: вызывается дважды. Дело не в вотче.
+  //TODO: Сейчас есть лишние вызовы при возврате на страницу поиска, даже когда
+  // никаких изменений в карточках не было
+  console.log('initData')
   setLoading(true)
 
-  const response = await getCardTitles()
-  setCardTitles(response)
-  searchResults.value = JSON.parse(JSON.stringify(cardTitles.value))
+  const response = await getCardsShortInfo()
+  setCardsShortInfo(response)
+  searchResults.value = JSON.parse(JSON.stringify(cardsShortInfo.value))
 
   setLoading(false)
 }
@@ -43,34 +45,17 @@ onMounted(initData)
 
 const onSearch = async (): Promise<void> => {
   if (searchQuery.value.length === 0) {
-    emits('cardUuid', null)
-    searchResults.value = JSON.parse(JSON.stringify(cardTitles.value))
+    emits('viewedCardUuid', null)
+    searchResults.value = JSON.parse(JSON.stringify(cardsShortInfo.value))
 
     return
   }
 
-  const ids: string[] = parseSearchQuery(searchQuery.value)
+  const uuids: string[] = parseSearchQuery(searchQuery.value)
 
-  searchResults.value = cardTitles.value.filter((item: CardMinimal) => ids.includes(item.uuid))
-}
-
-const parseSearchQuery = (str: string): string[] => {
-  const query: string = str.trim()
-  const result: string[] = []
-
-  const containsSubstring = (mainString: string, subString: string): boolean => {
-    return mainString.toLowerCase().includes(subString.toLowerCase())
-  }
-
-  for (const item of cardTitles.value) {
-    if (containsSubstring(item.title, query)) result.push(item.uuid)
-  }
-
-  return result
-}
-
-const viewCard = (card: CardMinimal) => {
-  emits('cardUuid', card.uuid)
+  searchResults.value = cardsShortInfo.value.filter((item: CardShortInfo) =>
+    uuids.includes(item.uuid)
+  )
 }
 
 watch(
@@ -78,28 +63,43 @@ watch(
   () => onSearch()
 )
 
-initData()
+const parseSearchQuery = (str: string): string[] => {
+  const query: string = str.trim()
+  const result: string[] = []
+
+  //TODO: уточнить, не переиспользуется ли функция где-то еще
+  const containsSubstring = (mainString: string, subString: string): boolean => {
+    return mainString.toLowerCase().includes(subString.toLowerCase())
+  }
+
+  cardsShortInfo.value.forEach((card) => {
+    if (containsSubstring(card.title, query)) result.push(card.uuid)
+  })
+
+  return result
+}
 </script>
 
 <template>
   <div class="search-panel">
-    <CoolSpinner v-if="isLoading" class="spinner" />
+    <CoolSpinner v-if="isLoading" />
     <div class="toolbar">
-      <InputText type="text" v-model="searchQuery" class="toolbar-input-form" />
+      <InputText type="text" v-model="searchQuery" class="search-box" />
       <Button
         v-tooltip="'Создать карточку'"
         icon="pi pi-file-plus"
-        class="mr-2"
-        severity="secondary"
-        text
+        severity="primary"
         @click="$emit('createCard')"
       />
     </div>
-    <ul class="scrollable-container" v-if="!isLoading && searchResults.length > 0">
-      <li v-for="card in searchResults" :key="card.uuid" class="list-item">
-        <p @click="viewCard(card)" class="card-item">
-          {{ card.title }}
-        </p>
+    <ul class="search-results-list" v-if="!isLoading && searchResults.length">
+      <li
+        v-for="card in searchResults"
+        :key="card.uuid"
+        class="card-title"
+        @click="$emit('viewedCardUuid', card.uuid)"
+      >
+        {{ card.title }}
       </li>
     </ul>
     <p v-else-if="!isLoading">Не найдено</p>
@@ -117,22 +117,6 @@ initData()
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
 }
 
-.list-item {
-  margin: 10px 0;
-}
-
-.card-item:hover {
-  background-color: black;
-  cursor: pointer;
-  transition: 0.5;
-}
-
-.scrollable-container {
-  height: calc(100% - 50px);
-  background-color: var(--bg-dark);
-  overflow-y: auto;
-}
-
 .toolbar {
   display: flex;
   flex-direction: row;
@@ -142,11 +126,23 @@ initData()
   background-color: var(--bg-dark);
 }
 
-.toolbar-input-form {
+.search-box {
   width: calc(100% - 50px);
 }
 
-.spinner {
-  background: transparent;
+.search-results-list {
+  height: calc(100% - 50px);
+  background-color: var(--bg-dark);
+  overflow-y: auto;
+}
+
+.card-title {
+  margin: 10px 0;
+}
+
+.card-title:hover {
+  background-color: black;
+  cursor: pointer;
+  transition: 0.5;
 }
 </style>

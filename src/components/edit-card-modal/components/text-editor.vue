@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import CardsAutocomplete from './cards-autocomplete.vue'
 import { Button, Toolbar } from 'primevue'
-import type { CardMinimal } from '@/types'
+import type { CardShortInfo } from '@/types'
 
 const text = defineModel<string>('text')
 
@@ -24,7 +24,7 @@ const saveCurrentSelection = () => {
   }
 }
 
-const addHyperlinkToSelection = (hyperlink: CardMinimal) => {
+const addHyperlinkToSelection = (hyperlink: CardShortInfo) => {
   const textarea = textareaRef.value
 
   if (!textarea) return

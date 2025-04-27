@@ -1,12 +1,12 @@
-export type CardMinimal = {
+export type CardShortInfo = {
   uuid: string
   title: string
 }
 
-export type Card = CardMinimal & {
+export type Card = CardShortInfo & {
   created_at: string
   text: string
-  links: CardMinimal[]
+  links: CardShortInfo[]
   type: 'definition' | 'article'
 }
 
