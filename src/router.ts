@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/api/supabaseClient'
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
 let localUser
 
@@ -29,7 +30,7 @@ const router = createRouter({
   ]
 })
 
-async function getUser(next: any) {
+async function getUser(next: NavigationGuardNext) {
   localUser = await supabase.auth.getSession()
   if (localUser.data.session == null) {
     next('/unauthorized')
@@ -38,12 +39,14 @@ async function getUser(next: any) {
   }
 }
 
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    getUser(next)
-  } else {
-    next()
+router.beforeEach(
+  (to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
+    if (to.meta.requiresAuth) {
+      getUser(next)
+    } else {
+      next()
+    }
   }
-})
+)
 
 export default router

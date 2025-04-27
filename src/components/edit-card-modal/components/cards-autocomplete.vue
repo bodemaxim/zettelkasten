@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { AutoComplete } from 'primevue'
+import { type AutoCompleteCompleteEvent, AutoComplete } from 'primevue'
 import { useStore } from '@/use-store'
 import type { CardMinimal } from '@/types'
 
@@ -14,7 +14,7 @@ const suggestions = ref<CardMinimal[]>([])
 const { cardTitles } = useStore()
 const sortedCardTitles = computed(() => [...cardTitles.value].reverse())
 
-const search = (event: any) => {
+const search = (event: AutoCompleteCompleteEvent) => {
   if (!event.query.trim()) {
     suggestions.value = sortedCardTitles.value
   } else {
