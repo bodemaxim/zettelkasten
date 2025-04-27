@@ -11,7 +11,7 @@ body {
   width: 100vw;
   height: 100vh;
   overflow-x: hidden;
-  background-color: black;
+  background-color: var(--bg-darker);
 }
 
 body {
@@ -30,7 +30,7 @@ body {
 :root {
   --bg-primary: #212121;
   --bg-dark: #1a1a1a;
-  --bg-darker: #0b0721;
+  --bg-darker: #000000;
   --bg-lighter: #333333;
 }
 

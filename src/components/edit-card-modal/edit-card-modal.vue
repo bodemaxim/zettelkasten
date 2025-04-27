@@ -8,6 +8,7 @@ import CardsMultiselect from './components/cards-multiselect.vue'
 import { type TypeOption } from './edit-card-modal.types'
 import { useStore } from '@/use-store'
 import TextEditor from './components/text-editor.vue'
+import { getUuidsInString } from '@/utils'
 
 const visible = defineModel<boolean>('visible')
 
@@ -36,13 +37,12 @@ const onCancel = () => {
 }
 
 const onSave = async () => {
+  await addUuidHyperLinksFromText()
+
   if (!viewedCard.value) {
-    await addUuidHyperLinksFromText()
     const newCard = await createCard(updatedCard.value)
     updateLinkedCards(newCard)
   } else {
-    await addUuidHyperLinksFromText()
-
     const newValue: Card = {
       ...viewedCard.value,
       ...updatedCard.value,
@@ -80,39 +80,32 @@ const updateLinkedCards = async (card: Card): Promise<void> => {
   await updateCards(updatedCards)
 }
 
-const findUuidsInText = (): string[] => {
-  const regex = /\[([^\]]+)\]\(([^)]+)\)/g
-  const matches = Array.from(updatedCard.value.text.matchAll(regex))
-  const uuids = matches.map((match) => match[2])
-
-  return uuids
-}
-
 const addUuidHyperLinksFromText = async () => {
-  const uuids = findUuidsInText()
-  if (uuids.length) {
-    const existingUuids = new Set(updatedCard.value.links?.map((link) => link.uuid) || [])
+  const uuids = getUuidsInString(updatedCard.value.text)
 
-    const newUuids = uuids.filter((uuid) => !existingUuids.has(uuid))
+  if (uuids.length) return
 
-    setLoading(true)
-    const hyperlinkCards = await getCardsByUuid(newUuids)
-    setLoading(false)
+  const existingUuids = new Set(updatedCard.value.links?.map((link) => link.uuid) || [])
+  const newUuids = uuids.filter((uuid) => !existingUuids.has(uuid))
 
-    const newLinks = hyperlinkCards.map((card) => ({ uuid: card.uuid, title: card.title }))
+  /*
+    TODO: ощущение, что сейчас запрос нужен только для правильного
+    обновления старых карточек. но для новых карточек можно брать
+    тайтлы карточек из text-editor при редактировании текста.
+  */
+  setLoading(true)
+  const hyperlinkCards = await getCardsByUuid(newUuids)
+  setLoading(false)
 
-    updatedCard.value.links = [...(updatedCard.value.links || []), ...newLinks]
-  }
+  const newLinks = hyperlinkCards.map((card) => ({ uuid: card.uuid, title: card.title }))
+  updatedCard.value.links = [...(updatedCard.value.links || []), ...newLinks]
 }
 
 watch(
   () => viewedCard.value,
   () => {
-    if (viewedCard.value) {
-      updatedCard.value = { ...viewedCard.value }
-    } else {
-      updatedCard.value = defaultCard
-    }
+    if (viewedCard.value) updatedCard.value = { ...viewedCard.value }
+    else updatedCard.value = defaultCard
   }
 )
 
@@ -121,8 +114,14 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 </script>
 
 <template>
-  <Dialog v-model:visible="visible" modal :header="title" class="dialog" :style="dialogStyles">
-    <div class="dialog-content">
+  <Dialog
+    v-model:visible="visible"
+    modal
+    :header="title"
+    class="edit-card-modal"
+    :style="dialogStyles"
+  >
+    <div class="modal-content">
       <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
         <p class="input-label">Заголовок</p>
         <InputText
@@ -189,7 +188,7 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 </style>
 
 <style>
-.dialog.p-dialog {
+.edit-card-modal.p-dialog {
   background-color: var(--bg-primary);
 }
 </style>

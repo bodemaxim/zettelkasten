@@ -141,7 +141,7 @@ const parseSearchQuery = (str: string): string[] => {
 }
 
 .card-title:hover {
-  background-color: black;
+  background-color: var(--bg-darker);
   cursor: pointer;
   transition: 0.5;
 }

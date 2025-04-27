@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { marked } from 'marked'
-import 'highlight.js/styles/atom-one-dark.css'
+import { getIsUuid } from '@/utils'
 
 const markdownText = defineModel<string>()
 
@@ -9,13 +9,16 @@ const emits = defineEmits<{
   clickOnLink: [uuid: string]
 }>()
 
-const parsedMarkdown = computed(() => marked.parse(markdownText.value ?? ''))
+const parsedMarkdown = computed<string>(() => {
+  const result = marked.parse(markdownText.value ?? '')
+  return typeof result === 'string' ? result : ''
+})
 
-const textDisplayRef = ref<HTMLElement | null>(null)
+const textViewerRef = ref<HTMLElement | null>(null)
 
-const handleLinkClick = (event: MouseEvent) => {
-  event.preventDefault()
+const delegateClickHandler = (event: MouseEvent) => {
   event.stopPropagation()
+  event.preventDefault()
 
   const target = event.target as HTMLElement
   const link = target.closest('a')
@@ -26,36 +29,19 @@ const handleLinkClick = (event: MouseEvent) => {
 
   if (!href) return
 
-  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-
-  if (uuidPattern.test(href)) {
-    emits('clickOnLink', href)
-  } else if (href.startsWith('http')) {
-    window.open(href, '_blank')
-  }
-}
-
-const delegateClickHandler = (event: MouseEvent) => {
-  event.stopPropagation()
-  event.preventDefault()
-
-  const target = event.target as HTMLElement
-  const link = target.closest('a')
-
-  if (link) {
-    handleLinkClick(event)
-  }
+  if (getIsUuid(href)) emits('clickOnLink', href)
+  else if (href.startsWith('http')) window.open(href, '_blank')
 }
 
 onMounted(() => {
-  if (textDisplayRef.value) {
-    textDisplayRef.value.addEventListener('click', delegateClickHandler)
+  if (textViewerRef.value) {
+    textViewerRef.value.addEventListener('click', delegateClickHandler)
   }
 })
 
 onBeforeUnmount(() => {
-  if (textDisplayRef.value) {
-    textDisplayRef.value.removeEventListener('click', delegateClickHandler)
+  if (textViewerRef.value) {
+    textViewerRef.value.removeEventListener('click', delegateClickHandler)
   }
 })
 </script>
@@ -130,7 +116,6 @@ onBeforeUnmount(() => {
   overflow-y: auto;
 }
 
-/* XS */
 @media (min-width: 320px) and (max-width: 768px) {
   :deep(h1) {
     font-size: 17px;

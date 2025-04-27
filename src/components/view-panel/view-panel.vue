@@ -3,26 +3,12 @@ import { onMounted, watch, computed } from 'vue'
 import type { Card, CardShortInfo } from '@/types'
 import { Button } from 'primevue'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
-import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import TextViewer from './components/text-viewer.vue'
 import { ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
-import TextViewer from './components/text-viewer.vue'
-
-const { isMobileView, isLoading, setLoading, definitions, viewedCard, setViewedCard } = useStore()
-
-const viewedCardUuid = defineModel<string | null>()
-
-onMounted(async () => viewCard(viewedCardUuid.value))
-
-watch(
-  () => viewedCardUuid.value,
-  () => {
-    viewCard(viewedCardUuid.value)
-  }
-)
-
-const confirm = useConfirm()
+import { useStore } from '@/use-store'
+import { getUuidsInString } from '@/utils'
 
 const emits = defineEmits<{
   deleted: []
@@ -30,11 +16,17 @@ const emits = defineEmits<{
   clickOnLink: [uuid: string]
 }>()
 
-const fetchDefinition = (uuid: string): Card | null => {
-  const result = definitions.value.find((item) => item.uuid === uuid)
+const { isMobileView, isLoading, setLoading, definitions, viewedCard, setViewedCard } = useStore()
+const confirm = useConfirm()
 
-  return result ?? null
-}
+const viewedCardUuid = defineModel<string | null>()
+
+watch(
+  () => viewedCardUuid.value,
+  async () => viewCard(viewedCardUuid.value)
+)
+
+onMounted(async () => viewCard(viewedCardUuid.value))
 
 const viewCard = async (cardUuid: string | null | undefined): Promise<void> => {
   if (!cardUuid) {
@@ -42,8 +34,11 @@ const viewCard = async (cardUuid: string | null | undefined): Promise<void> => {
     return
   }
 
-  if (definitions.value.find((item) => item.uuid === cardUuid)) {
-    setViewedCard(fetchDefinition(cardUuid))
+  const preloadedDefinition: Card | null =
+    definitions.value.find((item) => item.uuid === cardUuid) ?? null
+
+  if (preloadedDefinition) {
+    setViewedCard(preloadedDefinition)
     return
   }
 
@@ -70,25 +65,26 @@ const deleteCard = async () => {
     acceptProps: {
       label: 'Да'
     },
-    accept: async () => {
-      setLoading(true)
-      if (viewedCard.value) {
-        //TODO: объединить запросы в один
-        await deleteCardByUuid(viewedCard.value.uuid)
-        await deleteLinksToCard(viewedCard.value)
-      }
-      viewedCard.value = null
-      emits('deleted')
-      setLoading(false)
-    }
+    accept: deleteCardOnAccept
   })
+}
+
+const deleteCardOnAccept = async () => {
+  setLoading(true)
+  if (viewedCard.value) {
+    //TODO: объединить запросы в один
+    await deleteCardByUuid(viewedCard.value.uuid)
+    await deleteLinksToCard(viewedCard.value)
+  }
+  viewedCard.value = null
+  emits('deleted')
+  setLoading(false)
 }
 
 const deleteLinksToCard = async (card: Card): Promise<void> => {
   if (!card.links.length) return
 
   const cardUuids = card.links.map((link) => link.uuid)
-
   const cards = await getCardsByUuid(cardUuids)
 
   const updatedCards = cards.map<Card>((item) => {
@@ -111,28 +107,18 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
 
   if (cards.length === 0) return []
 
-  const uuidsInText = findUuidsInText()
+  const uuidsInText = getUuidsInString(viewedCard.value?.text ?? '')
 
   return cards.filter((card) => !uuidsInText.includes(card.uuid))
 })
-
-const findUuidsInText = (): string[] => {
-  if (!viewedCard.value) return []
-
-  const regex = /\[([^\]]+)\]\(([^)]+)\)/g
-  const matches = Array.from(viewedCard.value.text.matchAll(regex))
-  const uuids = matches.map((match) => match[2])
-
-  return uuids
-}
 </script>
 
 <template>
   <div class="view-panel">
     <CoolSpinner v-if="isLoading" />
     <ConfirmDialog></ConfirmDialog>
-    <div v-if="viewedCard" class="view-panel-question">
-      <div class="buttons-container">
+    <article v-if="viewedCard" class="article">
+      <div class="toolbar">
         <Button
           v-tooltip="'Редактировать карточку'"
           icon="pi pi-file-edit"
@@ -167,8 +153,8 @@ const findUuidsInText = (): string[] => {
           {{ link.title }}
         </div>
       </div>
-    </div>
-    <div v-else>Выберите карточку, чтобы посмотреть содержание.</div>
+    </article>
+    <p v-else>Выберите карточку, чтобы посмотреть содержание.</p>
   </div>
 </template>
 
@@ -182,14 +168,14 @@ const findUuidsInText = (): string[] => {
   padding: 10px 20px;
 }
 
-.view-panel-question {
+.article {
   height: calc(100vh - 100px);
   padding: 30px 15px 10px;
   overflow-y: auto;
   background-color: var(--bg-dark);
 }
 
-.buttons-container {
+.toolbar {
   display: flex;
   flex-direction: row;
   gap: 5px;
@@ -210,6 +196,6 @@ const findUuidsInText = (): string[] => {
 }
 
 .link:hover {
-  background-color: black;
+  background-color: var(--bg-darker);
 }
 </style>
