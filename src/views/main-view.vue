@@ -53,26 +53,26 @@ const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
   <div v-resize-observer="onResizeObserver" class="main-view">
     <CoolSpinner v-if="isLoading" />
     <EditCardModal v-model:visible="modalVisible" @saved="onCardUpdate" />
-
     <ViewPanel
       v-if="isMobileView && viewedCardUuid"
       v-model="viewedCardUuid"
+      :class="['view-panel', { 'mobile-panel': isMobileView }]"
       @deleted="onCardUpdate"
       @edited="openModal"
       @click-on-link="viewedCardUuid = $event"
     />
-
     <div v-else class="panels-container">
       <SearchPanel
         v-model="isNeedToRefreshSearchList"
+        :class="['search-panel', { 'mobile-panel': isMobileView }]"
         :style="searchPanelStyles"
-        class="search-panel"
         @viewed-card-uuid="viewedCardUuid = $event"
         @create-card="openModal(isNewCard)"
       />
       <ViewPanel
         v-if="!isMobileView"
         v-model="viewedCardUuid"
+        :class="['view-panel', { 'mobile-panel': isMobileView }]"
         @deleted="onCardUpdate"
         @edited="openModal"
         @click-on-link="viewedCardUuid = $event"
@@ -83,11 +83,11 @@ const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
 
 <style scoped>
 .main-view {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100vw;
   overflow-y: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
 .panels-container {
@@ -96,16 +96,19 @@ const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
 }
 
 .search-panel {
-  margin: 3em 1em;
+  margin: 3em 0 3em 2em;
   height: calc(100vh - 80px);
 }
 
 .view-panel {
-  margin: 3em 1em;
+  margin: 3em 2em;
   height: calc(100vh - 80px);
   position: relative;
   flex-grow: 1;
-  margin-right: 2em;
-  margin-left: 2em;
+}
+
+.mobile-panel {
+  margin: 0;
+  height: 100vh;
 }
 </style>

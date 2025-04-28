@@ -4,6 +4,7 @@ import type { CardShortInfo } from '@/types'
 import { Button, InputText } from 'primevue'
 import { getCardsShortInfo } from '@/api'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import CoolPanel from '@/ui/cool-panel.vue'
 import { useStore } from '@/use-store'
 
 const emits = defineEmits<{
@@ -81,7 +82,7 @@ const parseSearchQuery = (str: string): string[] => {
 </script>
 
 <template>
-  <div class="search-panel">
+  <CoolPanel>
     <CoolSpinner v-if="isLoading" />
     <div class="toolbar">
       <InputText type="text" v-model="searchQuery" class="search-box" />
@@ -104,20 +105,10 @@ const parseSearchQuery = (str: string): string[] => {
       </li>
     </ul>
     <p v-else-if="!isLoading">Не найдено</p>
-  </div>
+  </CoolPanel>
 </template>
 
 <style scoped>
-.search-panel {
-  overflow: hidden;
-  max-width: 100%;
-  background-color: var(--bg-dark);
-  border: 2px solid var(--accent-green);
-  padding: 40px 20px 10px 20px;
-  border-radius: 10px;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
 .toolbar {
   display: flex;
   flex-direction: row;
@@ -125,6 +116,7 @@ const parseSearchQuery = (str: string): string[] => {
   justify-content: space-between;
   gap: 5px;
   background-color: var(--bg-dark);
+  padding-right: 20px;
 }
 
 .search-box {

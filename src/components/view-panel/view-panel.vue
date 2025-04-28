@@ -9,6 +9,7 @@ import { ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
 import { useStore } from '@/use-store'
 import { getUuidsInString } from '@/utils'
+import CoolPanel from '@/ui/cool-panel.vue'
 
 const emits = defineEmits<{
   deleted: []
@@ -114,7 +115,7 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
 </script>
 
 <template>
-  <div class="view-panel">
+  <CoolPanel>
     <CoolSpinner v-if="isLoading" />
     <ConfirmDialog></ConfirmDialog>
     <article v-if="viewedCard" class="article">
@@ -158,24 +159,21 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
       </div>
     </article>
     <p v-else>Выберите карточку, чтобы посмотреть содержание.</p>
-  </div>
+  </CoolPanel>
 </template>
 
 <style scoped>
-.view-panel {
-  border-radius: 10px;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  background-color: var(--bg-dark);
-  border: 2px solid var(--accent-green);
-  padding: 10px 20px;
-}
-
 .article {
-  height: calc(100vh - 100px);
+  height: calc(100vh - 130px);
   padding: 30px 15px 10px;
   overflow-y: auto;
   background-color: var(--bg-dark);
+}
+
+@media (max-width: 768px) {
+  .article {
+    height: 100%;
+  }
 }
 
 .toolbar {
