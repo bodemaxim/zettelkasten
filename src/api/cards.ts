@@ -1,11 +1,31 @@
 import { supabase } from '@/api/supabaseClient'
-import type { Card, CardMinimal, CardEditable } from './types'
+import type { Card, CardShortInfo, CardEditable } from './types'
+import { useStore } from '@/use-store'
+
+const { setErrorMessage } = useStore()
+
+export const getCardsShortInfo = async (): Promise<CardShortInfo[]> => {
+  const { data, error } = await supabase.from('cards').select('uuid, title')
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка загрузки сокращенной информации карточек',
+      message: error.message
+    })
+    return []
+  }
+
+  return data
+}
 
 export const getAllCards = async () => {
   const { error, data } = await supabase.from('cards').select('*')
 
   if (error) {
-    console.error('Error fetching all cards:', error)
+    setErrorMessage({
+      customText: 'Ошибка загрузки карточек',
+      message: error.message
+    })
     return null
   }
 
@@ -16,18 +36,11 @@ export const getAllDefinitions = async (): Promise<Card[]> => {
   const { data, error } = await supabase.from('cards').select('*').eq('type', 'definition')
 
   if (error) {
-    console.error('Error fetching definitions:', error)
-    return []
-  }
+    setErrorMessage({
+      customText: 'Ошибка загрузки определений',
+      message: error.message
+    })
 
-  return data
-}
-
-export const getCardTitles = async (): Promise<CardMinimal[]> => {
-  const { data, error } = await supabase.from('cards').select('uuid, title')
-
-  if (error) {
-    console.error('Error fetching card titles:', error)
     return []
   }
 
@@ -41,7 +54,11 @@ export const createCard = async (newCard: CardEditable): Promise<Card> => {
     .select()
 
   if (error) {
-    console.error('Error creating card:', error)
+    setErrorMessage({
+      customText: 'Ошибка создания карточки',
+      message: error.message
+    })
+
     throw error
   }
 
@@ -60,7 +77,11 @@ export const updateCard = async (card: Card): Promise<void> => {
     .eq('uuid', card.uuid)
 
   if (error) {
-    console.error('Error updating card:', error)
+    setErrorMessage({
+      customText: 'Ошибка обновления карточки',
+      message: error.message
+    })
+
     throw error
   }
 }
@@ -79,7 +100,11 @@ export const updateCards = async (cards: Card[]): Promise<void> => {
         .eq('uuid', card.uuid)
 
       if (error) {
-        console.error(`Error updating card ${card.uuid}:`, error)
+        setErrorMessage({
+          customText: 'Ошибка обновления карточек',
+          message: error.message
+        })
+
         throw error
       }
     })
@@ -94,7 +119,11 @@ export const getCardsByUuid = async (uuids: string[]): Promise<Card[]> => {
   const { data, error } = await supabase.from('cards').select('*').in('uuid', uuids)
 
   if (error) {
-    console.error('Error fetching cards by UUIDs:', error)
+    setErrorMessage({
+      customText: 'Ошибка получения карточек по UUID',
+      message: error.message
+    })
+
     return []
   }
 
@@ -105,7 +134,11 @@ export const getCardByUuid = async (uuid: string): Promise<Card | null> => {
   const { data, error } = await supabase.from('cards').select('*').eq('uuid', uuid).single()
 
   if (error) {
-    console.error('Error fetching card by UUID:', error)
+    setErrorMessage({
+      customText: 'Ошибка получения карточки',
+      message: error.message
+    })
+
     return null
   }
 
@@ -114,4 +147,11 @@ export const getCardByUuid = async (uuid: string): Promise<Card | null> => {
 
 export const deleteCardByUuid = async (uuid: string): Promise<void> => {
   const { error } = await supabase.from('cards').delete().eq('uuid', uuid)
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка удаления карточки',
+      message: error.message
+    })
+  }
 }

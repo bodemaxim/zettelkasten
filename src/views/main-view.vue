@@ -1,19 +1,26 @@
 <script setup lang="ts">
 import { type StyleValue, ref, onMounted, computed, watch } from 'vue'
-import SearchPanel from './components/search-panel/search-panel.vue'
-import ViewPanel from './components/view-panel/view-panel.vue'
-import { getAllDefinitions } from '@/api'
-import EditCardModal from './components/edit-card-modal/edit-card-modal.vue'
 import { vResizeObserver } from '@vueuse/components'
-import { useStore } from '@/use-store'
+import SearchPanel from '@/components/search-panel.vue'
+import ViewPanel from '@/components/view-panel/view-panel.vue'
+import EditCardModal from '@/components/edit-card-modal/edit-card-modal.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import CoolErrorDialog from '@/ui/cool-error-dialog.vue'
+import { getAllDefinitions, getCardByUuid } from '@/api'
+import { useStore } from '@/use-store'
 
 const viewedCardUuid = ref<string | null>(null)
 const modalVisible = ref<boolean>(false)
-const isNeedToRefreshSearchList = ref<boolean>(false)
 
-const { definitions, setDefinitions, isMobileView, setScreenWidth, isLoading, setViewedCard } =
-  useStore()
+const {
+  definitions,
+  setDefinitions,
+  isMobileView,
+  setScreenWidth,
+  isLoading,
+  setViewedCard,
+  errorMessage
+} = useStore()
 
 const fetchDefinitions = async () => {
   if (!definitions.value.length) {
@@ -27,20 +34,15 @@ const isNewCard = true
 
 const openModal = (isNewCard = false) => {
   if (isNewCard) setViewedCard(null)
-
   modalVisible.value = true
 }
 
-const onCardUpdate = async () => {
-  await fetchDefinitions()
-  isNeedToRefreshSearchList.value = true
-  setViewedCard(null)
+const onCardSave = async (uuid: string) => {
+  setViewedCard(await getCardByUuid(uuid))
 }
 
-function onResizeObserver(entries: readonly ResizeObserverEntry[]) {
-  const [entry] = entries
-  const { width } = entry.contentRect
-  setScreenWidth(width)
+const onCardDelete = () => {
+  setViewedCard(null)
 }
 
 const searchPanelStyles = computed<StyleValue>(() => ({
@@ -48,38 +50,49 @@ const searchPanelStyles = computed<StyleValue>(() => ({
   minWidth: isMobileView.value ? undefined : '300px'
 }))
 
-const viewLink = (uuid: string) => {
-  viewedCardUuid.value = uuid
+const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
+  const [entry] = entries
+  const { width } = entry.contentRect
+  setScreenWidth(width)
 }
+
+const isError = ref<boolean>(false)
+
+watch(
+  () => errorMessage.value,
+  () => {
+    isError.value = !!errorMessage.value
+  }
+)
 </script>
 
 <template>
   <div v-resize-observer="onResizeObserver" class="main-view">
     <CoolSpinner v-if="isLoading" />
-    <EditCardModal v-model:visible="modalVisible" @saved="onCardUpdate" />
-
+    <CoolErrorDialog v-model:visible="isError" />
+    <EditCardModal v-model:visible="modalVisible" @saved="onCardSave" />
     <ViewPanel
       v-if="isMobileView && viewedCardUuid"
       v-model="viewedCardUuid"
-      @deleted="onCardUpdate"
+      :class="['view-panel', { 'mobile-panel': isMobileView }]"
+      @deleted="onCardDelete"
       @edited="openModal"
-      @click-on-link="viewLink($event)"
+      @click-on-link="viewedCardUuid = $event"
     />
-
     <div v-else class="panels-container">
       <SearchPanel
-        v-model="isNeedToRefreshSearchList"
+        v-model="viewedCardUuid"
+        :class="['search-panel', { 'mobile-panel': isMobileView }]"
         :style="searchPanelStyles"
-        class="search-panel"
-        @card-uuid="viewedCardUuid = $event"
         @create-card="openModal(isNewCard)"
       />
       <ViewPanel
         v-if="!isMobileView"
         v-model="viewedCardUuid"
-        @deleted="onCardUpdate"
+        :class="['view-panel', { 'mobile-panel': isMobileView }]"
+        @deleted="onCardDelete"
         @edited="openModal"
-        @click-on-link="viewLink($event)"
+        @click-on-link="viewedCardUuid = $event"
       />
     </div>
   </div>
@@ -87,11 +100,11 @@ const viewLink = (uuid: string) => {
 
 <style scoped>
 .main-view {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
   width: 100vw;
   overflow-y: hidden;
-  display: flex;
-  flex-direction: column;
 }
 
 .panels-container {
@@ -100,20 +113,19 @@ const viewLink = (uuid: string) => {
 }
 
 .search-panel {
-  margin: 3em 1em;
+  margin: 3em 0 3em 2em;
   height: calc(100vh - 80px);
 }
 
 .view-panel {
-  margin: 3em 1em;
+  margin: 3em 2em;
   height: calc(100vh - 80px);
   position: relative;
   flex-grow: 1;
-  margin-right: 2em;
-  margin-left: 2em;
 }
 
-hr {
-  border: 2px solid gray;
+.mobile-panel {
+  margin: 0;
+  height: 100vh;
 }
 </style>

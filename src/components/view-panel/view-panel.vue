@@ -1,30 +1,15 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
-import type { Card, CardMinimal } from '@/api/types'
-import BottomShade from '@/ui/bottom-shade.vue'
+import type { Card, CardShortInfo } from '@/types'
 import { Button } from 'primevue'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
-import { useStore } from '@/use-store'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import TextViewer from './components/text-viewer.vue'
 import { ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
-import TextDisplay from './components/text-display.vue'
-
-const { isMobileView, isLoading, toggleLoading, definitions, viewedCard, setViewedCard } =
-  useStore()
-
-const viewedCardUuid = defineModel<string | null>()
-
-onMounted(async () => viewCard(viewedCardUuid.value))
-
-watch(
-  () => viewedCardUuid.value,
-  () => {
-    viewCard(viewedCardUuid.value)
-  }
-)
-
-const confirm = useConfirm()
+import { useStore } from '@/use-store'
+import { getUuidsInString } from '@/utils'
+import CoolPanel from '@/ui/cool-panel.vue'
 
 const emits = defineEmits<{
   deleted: []
@@ -32,11 +17,27 @@ const emits = defineEmits<{
   clickOnLink: [uuid: string]
 }>()
 
-const fetchDefinition = (uuid: string): Card | null => {
-  const result = definitions.value.find((item) => item.uuid === uuid)
+const {
+  isMobileView,
+  isLoading,
+  setLoading,
+  definitions,
+  viewedCard,
+  setViewedCard,
+  cardsShortInfo,
+  setCardsShortInfo,
+  setDefinitions
+} = useStore()
+const confirm = useConfirm()
 
-  return result ?? null
-}
+const viewedCardUuid = defineModel<string | null>()
+
+watch(
+  () => viewedCardUuid.value,
+  async () => viewCard(viewedCardUuid.value)
+)
+
+onMounted(async () => viewCard(viewedCardUuid.value))
 
 const viewCard = async (cardUuid: string | null | undefined): Promise<void> => {
   if (!cardUuid) {
@@ -44,19 +45,17 @@ const viewCard = async (cardUuid: string | null | undefined): Promise<void> => {
     return
   }
 
-  if (definitions.value.find((item) => item.uuid === cardUuid)) {
-    setViewedCard(fetchDefinition(cardUuid))
+  const preloadedDefinition: Card | null =
+    definitions.value.find((item) => item.uuid === cardUuid) ?? null
+
+  if (preloadedDefinition) {
+    setViewedCard(preloadedDefinition)
     return
   }
 
-  toggleLoading()
-
-  try {
-    setViewedCard(await getCardByUuid(cardUuid))
-  } catch (e) {
-    console.error(e)
-  }
-  toggleLoading()
+  setLoading(true)
+  setViewedCard(await getCardByUuid(cardUuid))
+  setLoading(false)
 }
 
 const deleteCard = async () => {
@@ -72,18 +71,39 @@ const deleteCard = async () => {
     acceptProps: {
       label: 'Да'
     },
-    accept: async () => {
-      toggleLoading()
-      if (viewedCard.value) {
-        //TODO: объединить запросы в один
-        await deleteCardByUuid(viewedCard.value.uuid)
-        await deleteLinksToCard(viewedCard.value)
-      }
-      viewedCard.value = null
-      emits('deleted')
-      toggleLoading()
-    }
+    accept: deleteCardOnAccept
   })
+}
+
+const deleteCardOnAccept = async () => {
+  setLoading(true)
+
+  if (viewedCard.value) {
+    await Promise.all([
+      deleteCardByUuid(viewedCard.value.uuid),
+      deleteLinksToCard(viewedCard.value)
+    ])
+
+    /*
+     TODO: в качестве будущей оптимизации,
+     можно написать методы deleteFromCardsShortInfo и deleteFromDefinitions
+    */
+    const newCardsShortInfo: CardShortInfo[] = cardsShortInfo.value.filter(
+      (item) => item.uuid !== viewedCard.value?.uuid
+    )
+    setCardsShortInfo(newCardsShortInfo)
+
+    if (viewedCard.value.type !== 'definition') return
+
+    const newDefinitions: Card[] = definitions.value.filter(
+      (item) => item.uuid !== viewedCard.value?.uuid
+    )
+    setDefinitions(newDefinitions)
+  }
+
+  viewedCard.value = null
+  emits('deleted')
+  setLoading(false)
 }
 
 const deleteLinksToCard = async (card: Card): Promise<void> => {
@@ -91,6 +111,10 @@ const deleteLinksToCard = async (card: Card): Promise<void> => {
 
   const cardUuids = card.links.map((link) => link.uuid)
 
+  /*
+    TODO: в качестве будущей оптимизации, можно сделать проверку,
+    нет ли этих uuid в определениях
+   */
   const cards = await getCardsByUuid(cardUuids)
 
   const updatedCards = cards.map<Card>((item) => {
@@ -108,57 +132,47 @@ const backToList = () => {
   setViewedCard(null)
 }
 
-const cardsInBottomList = computed<CardMinimal[]>(() => {
+const cardsInBottomList = computed<CardShortInfo[]>(() => {
   const cards = viewedCard.value?.links || []
 
   if (cards.length === 0) return []
 
-  const uuidsInText = findUuidsInText()
+  const uuidsInText = getUuidsInString(viewedCard.value?.text ?? '')
 
   return cards.filter((card) => !uuidsInText.includes(card.uuid))
 })
-
-const findUuidsInText = (): string[] => {
-  if (!viewedCard.value) return []
-
-  const regex = /\[([^\]]+)\]\(([^)]+)\)/g
-  const matches = Array.from(viewedCard.value.text.matchAll(regex))
-  const uuids = matches.map((match) => match[2])
-
-  return uuids
-}
 </script>
 
 <template>
-  <div class="view-panel">
+  <CoolPanel>
     <CoolSpinner v-if="isLoading" />
     <ConfirmDialog></ConfirmDialog>
-    <div v-if="viewedCard" class="view-panel-question">
-      <div class="buttons-container">
+    <article v-if="viewedCard" class="article">
+      <div class="toolbar">
         <Button
           v-tooltip="'Редактировать карточку'"
           icon="pi pi-file-edit"
-          severity="secondary"
-          text
+          severity="primary"
+          size="small"
           @click="$emit('edited')"
         />
         <Button
           v-tooltip="'Удалить карточку'"
           icon="pi pi-file-excel"
           severity="secondary"
-          text
+          size="small"
           @click="deleteCard()"
         />
         <Button
           v-if="isMobileView"
           icon="pi pi-arrow-left"
           severity="secondary"
-          text
+          size="small"
           @click="backToList"
         />
       </div>
       <h2>{{ viewedCard?.title }}</h2>
-      <TextDisplay v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
+      <TextViewer v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
       <div v-if="cardsInBottomList.length > 0" class="links-container">
@@ -172,30 +186,26 @@ const findUuidsInText = (): string[] => {
           {{ link.title }}
         </div>
       </div>
-    </div>
-    <div v-else>Выберите карточку, чтобы посмотреть содержание.</div>
-    <BottomShade />
-  </div>
+    </article>
+    <p v-else>Выберите карточку, чтобы посмотреть содержание.</p>
+  </CoolPanel>
 </template>
 
 <style scoped>
-.view-panel {
-  border-radius: 10px;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  overflow: hidden;
-  background-color: var(--bg-dark);
-  border: 2px solid var(--accent-green);
-  padding: 10px 20px;
-}
-
-.view-panel-question {
-  height: calc(100vh - 100px);
+.article {
+  height: calc(100vh - 130px);
   padding: 30px 15px 10px;
   overflow-y: auto;
   background-color: var(--bg-dark);
 }
 
-.buttons-container {
+@media (max-width: 768px) {
+  .article {
+    height: 100%;
+  }
+}
+
+.toolbar {
   display: flex;
   flex-direction: row;
   gap: 5px;
@@ -216,6 +226,6 @@ const findUuidsInText = (): string[] => {
 }
 
 .link:hover {
-  background-color: black;
+  background-color: var(--bg-darker);
 }
 </style>

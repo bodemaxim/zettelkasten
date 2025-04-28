@@ -2,13 +2,16 @@
 import { ref } from 'vue'
 import CardsAutocomplete from './cards-autocomplete.vue'
 import { Button, Toolbar } from 'primevue'
-import type { CardMinimal } from '@/api/types'
+import type { CardShortInfo } from '@/types'
+import { useStore } from '@/use-store'
 
 const text = defineModel<string>('text')
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const selectionRange = ref<{ start: number; end: number } | null>(null)
 const isHyperLinkEditorVisible = ref(false)
+
+const { isMobileView } = useStore()
 
 const toggleHyperLinkEditor = () => {
   isHyperLinkEditorVisible.value = !isHyperLinkEditorVisible.value
@@ -24,7 +27,7 @@ const saveCurrentSelection = () => {
   }
 }
 
-const addHyperlinkToSelection = (hyperlink: CardMinimal) => {
+const addHyperlinkToSelection = (hyperlink: CardShortInfo) => {
   const textarea = textareaRef.value
 
   if (!textarea) return
@@ -35,8 +38,8 @@ const addHyperlinkToSelection = (hyperlink: CardMinimal) => {
 
   const markdownLink = `[${selectedText}](${hyperlink.uuid})`
   const newText = textarea.value.substring(0, start) + markdownLink + textarea.value.substring(end)
-  text.value = newText
 
+  text.value = newText
   selectionRange.value = null
 }
 </script>
@@ -50,8 +53,8 @@ const addHyperlinkToSelection = (hyperlink: CardMinimal) => {
           <Button
             v-tooltip="'Выделите фразу и нажмите эту кнопку, чтобы добавить гиперссылку'"
             icon="pi pi-external-link"
-            severity="secondary"
-            text
+            severity="primary"
+            size="small"
             class="button"
             @click="toggleHyperLinkEditor"
           />
@@ -65,7 +68,7 @@ const addHyperlinkToSelection = (hyperlink: CardMinimal) => {
     <textarea
       ref="textareaRef"
       v-model="text"
-      class="input-element textarea"
+      :class="['input-form', { 'input-form-mobile': isMobileView }]"
       @blur="saveCurrentSelection"
     ></textarea>
   </div>
@@ -80,10 +83,17 @@ const addHyperlinkToSelection = (hyperlink: CardMinimal) => {
   width: 100%;
 }
 
-.textarea {
+.input-form {
   height: 400px;
   resize: none;
   margin: 10px 0;
+  font-size: 16px;
+}
+
+.input-form-mobile {
+  font-size: 12px;
+  height: 400px;
+  resize: none;
 }
 
 .left-toolbar-container {

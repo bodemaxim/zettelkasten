@@ -1,23 +1,24 @@
 import { ref, computed } from 'vue'
-import type { Card, CardMinimal } from '@/api/types'
+import type { Card, CardShortInfo, Error } from '@/types'
 
-const cardTitles = ref<CardMinimal[]>([])
+const cardsShortInfo = ref<CardShortInfo[]>([])
 const definitions = ref<Card[]>([])
 const viewedCard = ref<Card | null>(null)
+const errorMessage = ref<Error | null>(null)
 
 export const useStore = () => {
   const setDefinitions = (newValue: Card[]) => {
     definitions.value = newValue
   }
 
-  const setCardTitles = (newValue: CardMinimal[]) => {
-    cardTitles.value = newValue
+  const setCardsShortInfo = (newValue: CardShortInfo[]) => {
+    cardsShortInfo.value = newValue
   }
 
   const isLoading = ref<boolean>(false)
 
-  const toggleLoading = () => {
-    isLoading.value = !isLoading.value
+  const setLoading = (value: boolean) => {
+    isLoading.value = value
   }
 
   const screenWidth = ref<number>(window.innerWidth)
@@ -34,17 +35,23 @@ export const useStore = () => {
     viewedCard.value = newValue
   }
 
+  const setErrorMessage = (newValue: Error | null) => {
+    errorMessage.value = newValue
+  }
+
   return {
     definitions,
     setDefinitions,
-    cardTitles,
-    setCardTitles,
+    cardsShortInfo,
+    setCardsShortInfo,
     screenWidth,
     setScreenWidth,
     isMobileView,
     isLoading,
-    toggleLoading,
+    setLoading,
     viewedCard,
-    setViewedCard
+    setViewedCard,
+    errorMessage,
+    setErrorMessage
   }
 }
