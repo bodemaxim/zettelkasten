@@ -17,7 +17,17 @@ const emits = defineEmits<{
   clickOnLink: [uuid: string]
 }>()
 
-const { isMobileView, isLoading, setLoading, definitions, viewedCard, setViewedCard } = useStore()
+const {
+  isMobileView,
+  isLoading,
+  setLoading,
+  definitions,
+  viewedCard,
+  setViewedCard,
+  cardsShortInfo,
+  setCardsShortInfo,
+  setDefinitions
+} = useStore()
 const confirm = useConfirm()
 
 const viewedCardUuid = defineModel<string | null>()
@@ -44,12 +54,7 @@ const viewCard = async (cardUuid: string | null | undefined): Promise<void> => {
   }
 
   setLoading(true)
-
-  try {
-    setViewedCard(await getCardByUuid(cardUuid))
-  } catch (e) {
-    console.error(e)
-  }
+  setViewedCard(await getCardByUuid(cardUuid))
   setLoading(false)
 }
 
@@ -72,11 +77,30 @@ const deleteCard = async () => {
 
 const deleteCardOnAccept = async () => {
   setLoading(true)
+
   if (viewedCard.value) {
-    //TODO: объединить запросы в один
-    await deleteCardByUuid(viewedCard.value.uuid)
-    await deleteLinksToCard(viewedCard.value)
+    await Promise.all([
+      deleteCardByUuid(viewedCard.value.uuid),
+      deleteLinksToCard(viewedCard.value)
+    ])
+
+    /*
+     TODO: в качестве будущей оптимизации,
+     можно написать методы deleteFromCardsShortInfo и deleteFromDefinitions
+    */
+    const newCardsShortInfo: CardShortInfo[] = cardsShortInfo.value.filter(
+      (item) => item.uuid !== viewedCard.value?.uuid
+    )
+    setCardsShortInfo(newCardsShortInfo)
+
+    if (viewedCard.value.type !== 'definition') return
+
+    const newDefinitions: Card[] = definitions.value.filter(
+      (item) => item.uuid !== viewedCard.value?.uuid
+    )
+    setDefinitions(newDefinitions)
   }
+
   viewedCard.value = null
   emits('deleted')
   setLoading(false)
@@ -86,6 +110,11 @@ const deleteLinksToCard = async (card: Card): Promise<void> => {
   if (!card.links.length) return
 
   const cardUuids = card.links.map((link) => link.uuid)
+
+  /*
+    TODO: в качестве будущей оптимизации, можно сделать проверку,
+    нет ли этих uuid в определениях
+   */
   const cards = await getCardsByUuid(cardUuids)
 
   const updatedCards = cards.map<Card>((item) => {

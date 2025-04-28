@@ -14,8 +14,8 @@ const onConfirm = () => {
 }
 
 const firstPartText = computed<string>(() => {
-  const divider = errorMessage.value.customText ? ': ' : ''
-  return `${errorMessage.value.customText}${divider}`
+  const divider = errorMessage.value?.customText ? ': ' : ''
+  return `${errorMessage.value?.customText}${divider}`
 })
 </script>
 
@@ -24,7 +24,7 @@ const firstPartText = computed<string>(() => {
     <div class="modal-content">
       <p>
         <span>{{ firstPartText }}</span>
-        <span v-if="errorMessage.message">{{ errorMessage.message }}</span>
+        <span v-if="errorMessage?.message">{{ errorMessage.message }}</span>
       </p>
       <div class="buttons-block">
         <Button type="button" label="ОК" @click="onConfirm"></Button>

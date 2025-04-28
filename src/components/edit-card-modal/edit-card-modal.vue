@@ -2,17 +2,24 @@
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Dialog, Button, InputText, Select } from 'primevue'
 import type { Card, CardEditable } from '@/types'
-import { createCard, updateCard, getCardsByUuid, updateCards } from '@/api'
+import {
+  createCard,
+  getCardsByUuid,
+  updateCards,
+  getAllDefinitions,
+  getCardsShortInfo
+} from '@/api'
 import { defaultCard, typeOptionsList, defaultType } from './edit-card-modal.consts'
 import CardsMultiselect from './components/cards-multiselect.vue'
 import { type TypeOption } from './edit-card-modal.types'
 import { useStore } from '@/use-store'
 import TextEditor from './components/text-editor.vue'
-import { getUuidsInString } from '@/utils'
+import { getUuidsInString, getAreArraysEqual } from '@/utils'
 
 const visible = defineModel<boolean>('visible')
 
-const { viewedCard, isMobileView, setLoading } = useStore()
+const { viewedCard, isMobileView, setLoading, cardsShortInfo, setDefinitions, setCardsShortInfo } =
+  useStore()
 
 const emits = defineEmits<{
   saved: []
@@ -36,37 +43,71 @@ const onCancel = () => {
   updatedCard.value = defaultCard
 }
 
+/**
+ * "Умно" обновляет связанные карточки, редактируемую карточку и панель поиска.
+ * @param targetCard - создаваемая/редактируемая карточка
+ * @param isNewCard - является ли карточка новой
+ */
+const updateAllIfNeeded = async (targetCard: Card, isNewCard: boolean) => {
+  if (isNewCard && !targetCard.links.length) return
+  else if (!isNewCard && getAreArraysEqual(targetCard.links, viewedCard.value?.links)) return
+
+  const linkedCards = await getLinkedCardsForUpdate(targetCard)
+  const cardsToUpdate = isNewCard ? linkedCards : [targetCard, ...linkedCards]
+  await updateCards(cardsToUpdate)
+
+  const areDefinitionsUpdated = getAreDefinitionsUpdated([targetCard, ...linkedCards])
+
+  if (!areDefinitionsUpdated) {
+    setCardsShortInfo(await getCardsShortInfo())
+    return
+  }
+
+  await Promise.all([
+    setDefinitions(await getAllDefinitions()),
+    setCardsShortInfo(await getCardsShortInfo())
+  ])
+}
+
 const onSave = async () => {
-  await addUuidHyperLinksFromText()
+  if (!updatedCard.value.title) {
+    alert('Заполните заголовок карточки')
+    return
+  }
+
+  setLoading(true)
 
   if (!viewedCard.value) {
+    addUuidHyperLinksFromText()
     const newCard = await createCard(updatedCard.value)
-    updateLinkedCards(newCard)
+    updateAllIfNeeded(newCard, true)
   } else {
+    addUuidHyperLinksFromText()
+
     const newValue: Card = {
       ...viewedCard.value,
       ...updatedCard.value,
       type: selectedType.value.value
     }
 
-    //TODO: можно объединить запросы в один
-    await updateCard(newValue)
-    await updateLinkedCards(newValue)
+    updateAllIfNeeded(newValue, false)
   }
 
   updatedCard.value = defaultCard
   visible.value = false
+
+  setLoading(false)
   emits('saved')
 }
 
-const updateLinkedCards = async (card: Card): Promise<void> => {
-  if (!card.links.length) return
+const getLinkedCardsForUpdate = async (card: Card): Promise<Card[]> => {
+  if (!card.links.length) return []
 
   const cardUuids = card.links.map((link) => link.uuid)
 
   const cards = await getCardsByUuid(cardUuids)
 
-  const updatedCards = cards.map<Card>((item) => {
+  const result = cards.map<Card>((item) => {
     const linkExists = item.links?.some((link) => link.uuid === card.uuid)
 
     if (linkExists) return item
@@ -77,29 +118,24 @@ const updateLinkedCards = async (card: Card): Promise<void> => {
     }
   })
 
-  await updateCards(updatedCards)
+  return result
 }
 
-const addUuidHyperLinksFromText = async () => {
+const addUuidHyperLinksFromText = () => {
   const uuids = getUuidsInString(updatedCard.value.text)
 
-  if (uuids.length) return
+  if (!uuids.length) return
 
   const existingUuids = new Set(updatedCard.value.links?.map((link) => link.uuid) || [])
   const newUuids = uuids.filter((uuid) => !existingUuids.has(uuid))
-
-  /*
-    TODO: ощущение, что сейчас запрос нужен только для правильного
-    обновления старых карточек. но для новых карточек можно брать
-    тайтлы карточек из text-editor при редактировании текста.
-  */
-  setLoading(true)
-  const hyperlinkCards = await getCardsByUuid(newUuids)
-  setLoading(false)
+  const hyperlinkCards = cardsShortInfo.value.filter((card) => newUuids.includes(card.uuid))
 
   const newLinks = hyperlinkCards.map((card) => ({ uuid: card.uuid, title: card.title }))
   updatedCard.value.links = [...(updatedCard.value.links || []), ...newLinks]
 }
+
+const getAreDefinitionsUpdated = (cards: Card[]): boolean =>
+  cards.some((card) => card.type === 'definition')
 
 watch(
   () => viewedCard.value,

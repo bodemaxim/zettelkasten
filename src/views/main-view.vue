@@ -40,7 +40,6 @@ const openModal = (isNewCard = false) => {
 }
 
 const onCardUpdate = async () => {
-  await fetchDefinitions()
   isNeedToRefreshSearchList.value = true
   setViewedCard(null)
 }

@@ -32,11 +32,10 @@ const searchResults = ref<CardShortInfo[]>([])
 const initData = async (): Promise<void> => {
   //TODO: Сейчас есть лишние вызовы при возврате на страницу поиска, даже когда
   // никаких изменений в карточках не было
-  console.log('initData')
+  //
   setLoading(true)
 
-  const response = await getCardsShortInfo()
-  setCardsShortInfo(response)
+  setCardsShortInfo(await getCardsShortInfo())
   searchResults.value = JSON.parse(JSON.stringify(cardsShortInfo.value))
 
   setLoading(false)
@@ -68,13 +67,10 @@ const parseSearchQuery = (str: string): string[] => {
   const query: string = str.trim()
   const result: string[] = []
 
-  //TODO: уточнить, не переиспользуется ли функция где-то еще
-  const containsSubstring = (mainString: string, subString: string): boolean => {
-    return mainString.toLowerCase().includes(subString.toLowerCase())
-  }
-
   cardsShortInfo.value.forEach((card) => {
-    if (containsSubstring(card.title, query)) result.push(card.uuid)
+    if (card.title.toLowerCase().includes(query.toLowerCase())) {
+      result.push(card.uuid)
+    }
   })
 
   return result

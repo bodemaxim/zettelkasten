@@ -12,19 +12,19 @@ const selectedCard = ref<CardShortInfo | null>()
 const suggestions = ref<CardShortInfo[]>([])
 
 const { cardsShortInfo } = useStore()
-const sortedCardTitles = computed<CardShortInfo>(() => [...cardsShortInfo.value].reverse())
+const sortedCardTitles = computed<CardShortInfo[]>(() => [...cardsShortInfo.value].reverse())
 
 const search = (event: AutoCompleteCompleteEvent) => {
   if (!event.query.trim()) {
     suggestions.value = sortedCardTitles.value
-  } else {
-    //TODO: здесь не надо ли utils
-    const filteredCards = cardsShortInfo.value.filter((card) =>
-      card.title.toLowerCase().includes(event.query.toLowerCase())
-    )
-
-    suggestions.value = [...filteredCards].reverse()
+    return
   }
+
+  const filteredCards = cardsShortInfo.value.filter((card) =>
+    card.title.toLowerCase().includes(event.query.toLowerCase())
+  )
+
+  suggestions.value = [...filteredCards].reverse()
 }
 
 const onValueChange = (event: CardShortInfo) => {
