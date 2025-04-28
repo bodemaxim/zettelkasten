@@ -89,6 +89,7 @@ const parseSearchQuery = (str: string): string[] => {
         v-tooltip="'Создать карточку'"
         icon="pi pi-file-plus"
         severity="primary"
+        size="small"
         @click="$emit('createCard')"
       />
     </div>

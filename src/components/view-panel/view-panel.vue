@@ -123,18 +123,21 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
           v-tooltip="'Редактировать карточку'"
           icon="pi pi-file-edit"
           severity="primary"
+          size="small"
           @click="$emit('edited')"
         />
         <Button
           v-tooltip="'Удалить карточку'"
           icon="pi pi-file-excel"
           severity="secondary"
+          size="small"
           @click="deleteCard()"
         />
         <Button
           v-if="isMobileView"
           icon="pi pi-arrow-left"
           severity="secondary"
+          size="small"
           @click="backToList"
         />
       </div>

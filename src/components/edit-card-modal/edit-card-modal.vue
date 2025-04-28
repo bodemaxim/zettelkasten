@@ -3,7 +3,7 @@ import { type StyleValue, ref, computed, watch } from 'vue'
 import { Dialog, Button, InputText, Select } from 'primevue'
 import type { Card, CardEditable } from '@/types'
 import { createCard, updateCard, getCardsByUuid, updateCards } from '@/api'
-import { defaultCard, typeOptionsList } from './edit-card-modal.consts'
+import { defaultCard, typeOptionsList, defaultType } from './edit-card-modal.consts'
 import CardsMultiselect from './components/cards-multiselect.vue'
 import { type TypeOption } from './edit-card-modal.types'
 import { useStore } from '@/use-store'
@@ -109,7 +109,7 @@ watch(
   }
 )
 
-const selectedType = ref<TypeOption>({ value: 'definition', label: 'Определение' })
+const selectedType = ref<TypeOption>(defaultType)
 const cardTypes = ref<TypeOption[]>(typeOptionsList)
 </script>
 

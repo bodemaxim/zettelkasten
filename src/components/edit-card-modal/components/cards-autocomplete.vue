@@ -12,12 +12,13 @@ const selectedCard = ref<CardShortInfo | null>()
 const suggestions = ref<CardShortInfo[]>([])
 
 const { cardsShortInfo } = useStore()
-const sortedCardTitles = computed(() => [...cardsShortInfo.value].reverse())
+const sortedCardTitles = computed<CardShortInfo>(() => [...cardsShortInfo.value].reverse())
 
 const search = (event: AutoCompleteCompleteEvent) => {
   if (!event.query.trim()) {
     suggestions.value = sortedCardTitles.value
   } else {
+    //TODO: здесь не надо ли utils
     const filteredCards = cardsShortInfo.value.filter((card) =>
       card.title.toLowerCase().includes(event.query.toLowerCase())
     )
@@ -26,9 +27,9 @@ const search = (event: AutoCompleteCompleteEvent) => {
   }
 }
 
-const onValueChange = (e: CardShortInfo) => {
-  if (!e || typeof e !== 'object') return
-  emits('updated', e)
+const onValueChange = (event: CardShortInfo) => {
+  if (!event || typeof event !== 'object') return
+  emits('updated', event)
 }
 </script>
 
@@ -43,3 +44,10 @@ const onValueChange = (e: CardShortInfo) => {
     @update:model-value="onValueChange"
   />
 </template>
+
+<style>
+/* TODO: изолировать стили */
+.p-autocomplete-overlay {
+  width: calc(100% - 100px);
+}
+</style>
