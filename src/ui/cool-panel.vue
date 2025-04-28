@@ -23,7 +23,7 @@
     width: 100%;
     border-radius: 0;
     border: none;
-    padding: 5px;
+    padding: 20px 0px 20px 20px;
   }
 }
 </style>
