@@ -72,14 +72,14 @@ onBeforeUnmount(() => {
 
 :deep(h2) {
   font-size: 22px;
-  color: rgb(116, 138, 236);
+  color: var(--accent-blue);
   margin: 15px 0;
   color: var(--accent-yellow);
 }
 
 :deep(h3) {
   font-size: 20px;
-  color: lightpink;
+  color: var(--accent-pink);
   margin: 15px 0 5px 10px;
   color: var(--accent-yellow);
 }
@@ -114,6 +114,10 @@ onBeforeUnmount(() => {
   margin: 10px 40px;
   max-width: calc(100% - 100px);
   overflow-y: auto;
+}
+
+:deep(a) {
+  color: var(--accent-azure);
 }
 
 @media (min-width: 320px) and (max-width: 768px) {

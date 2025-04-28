@@ -1,9 +1,10 @@
 import { ref, computed } from 'vue'
-import type { Card, CardShortInfo } from '@/types'
+import type { Card, CardShortInfo, Error } from '@/types'
 
 const cardsShortInfo = ref<CardShortInfo[]>([])
 const definitions = ref<Card[]>([])
 const viewedCard = ref<Card | null>(null)
+const errorMessage = ref<Error | null>(null)
 
 export const useStore = () => {
   const setDefinitions = (newValue: Card[]) => {
@@ -34,6 +35,10 @@ export const useStore = () => {
     viewedCard.value = newValue
   }
 
+  const setErrorMessage = (newValue: Error | null) => {
+    errorMessage.value = newValue
+  }
+
   return {
     definitions,
     setDefinitions,
@@ -45,6 +50,8 @@ export const useStore = () => {
     isLoading,
     setLoading,
     viewedCard,
-    setViewedCard
+    setViewedCard,
+    errorMessage,
+    setErrorMessage
   }
 }
