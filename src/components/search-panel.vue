@@ -7,24 +7,13 @@ import CoolSpinner from '@/ui/cool-spinner.vue'
 import CoolPanel from '@/ui/cool-panel.vue'
 import { useStore } from '@/use-store'
 
-const emits = defineEmits<{
-  viewedCardUuid: [value: string | null]
+const viewedCardUuid = defineModel<string | null>()
+
+defineEmits<{
   createCard: []
 }>()
 
 const { cardsShortInfo, setCardsShortInfo, isLoading, setLoading } = useStore()
-
-const isNeedToRefreshSearchList = defineModel<boolean>()
-
-watch(
-  () => isNeedToRefreshSearchList.value,
-  async () => {
-    if (!isNeedToRefreshSearchList.value) return
-
-    await initData()
-    isNeedToRefreshSearchList.value = false
-  }
-)
 
 const searchQuery = ref<string>('')
 const searchResults = ref<CardShortInfo[]>([])
@@ -36,7 +25,7 @@ const initData = async (): Promise<void> => {
   setLoading(true)
 
   setCardsShortInfo(await getCardsShortInfo())
-  searchResults.value = JSON.parse(JSON.stringify(cardsShortInfo.value))
+  searchResults.value = [...cardsShortInfo.value]
 
   setLoading(false)
 }
@@ -44,9 +33,9 @@ const initData = async (): Promise<void> => {
 onMounted(initData)
 
 const onSearch = async (): Promise<void> => {
-  if (searchQuery.value.length === 0) {
-    emits('viewedCardUuid', null)
-    searchResults.value = JSON.parse(JSON.stringify(cardsShortInfo.value))
+  if (!searchQuery.value.length) {
+    viewedCardUuid.value = null
+    searchResults.value = [...cardsShortInfo.value]
 
     return
   }
@@ -59,7 +48,7 @@ const onSearch = async (): Promise<void> => {
 }
 
 watch(
-  () => searchQuery.value,
+  () => [searchQuery.value, cardsShortInfo.value],
   () => onSearch()
 )
 
@@ -95,7 +84,7 @@ const parseSearchQuery = (str: string): string[] => {
         v-for="card in searchResults"
         :key="card.uuid"
         class="card-title"
-        @click="$emit('viewedCardUuid', card.uuid)"
+        @click="viewedCardUuid = card.uuid"
       >
         {{ card.title }}
       </li>

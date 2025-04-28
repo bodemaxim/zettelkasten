@@ -6,12 +6,11 @@ import ViewPanel from '@/components/view-panel/view-panel.vue'
 import EditCardModal from '@/components/edit-card-modal/edit-card-modal.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import CoolErrorDialog from '@/ui/cool-error-dialog.vue'
-import { getAllDefinitions } from '@/api'
+import { getAllDefinitions, getCardByUuid } from '@/api'
 import { useStore } from '@/use-store'
 
 const viewedCardUuid = ref<string | null>(null)
 const modalVisible = ref<boolean>(false)
-const isNeedToRefreshSearchList = ref<boolean>(false)
 
 const {
   definitions,
@@ -35,12 +34,14 @@ const isNewCard = true
 
 const openModal = (isNewCard = false) => {
   if (isNewCard) setViewedCard(null)
-
   modalVisible.value = true
 }
 
-const onCardUpdate = async () => {
-  isNeedToRefreshSearchList.value = true
+const onCardSave = async (uuid: string) => {
+  setViewedCard(await getCardByUuid(uuid))
+}
+
+const onCardDelete = () => {
   setViewedCard(null)
 }
 
@@ -69,28 +70,27 @@ watch(
   <div v-resize-observer="onResizeObserver" class="main-view">
     <CoolSpinner v-if="isLoading" />
     <CoolErrorDialog v-model:visible="isError" />
-    <EditCardModal v-model:visible="modalVisible" @saved="onCardUpdate" />
+    <EditCardModal v-model:visible="modalVisible" @saved="onCardSave" />
     <ViewPanel
       v-if="isMobileView && viewedCardUuid"
       v-model="viewedCardUuid"
       :class="['view-panel', { 'mobile-panel': isMobileView }]"
-      @deleted="onCardUpdate"
+      @deleted="onCardDelete"
       @edited="openModal"
       @click-on-link="viewedCardUuid = $event"
     />
     <div v-else class="panels-container">
       <SearchPanel
-        v-model="isNeedToRefreshSearchList"
+        v-model="viewedCardUuid"
         :class="['search-panel', { 'mobile-panel': isMobileView }]"
         :style="searchPanelStyles"
-        @viewed-card-uuid="viewedCardUuid = $event"
         @create-card="openModal(isNewCard)"
       />
       <ViewPanel
         v-if="!isMobileView"
         v-model="viewedCardUuid"
         :class="['view-panel', { 'mobile-panel': isMobileView }]"
-        @deleted="onCardUpdate"
+        @deleted="onCardDelete"
         @edited="openModal"
         @click-on-link="viewedCardUuid = $event"
       />

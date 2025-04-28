@@ -22,10 +22,10 @@ const { viewedCard, isMobileView, setLoading, cardsShortInfo, setDefinitions, se
   useStore()
 
 const emits = defineEmits<{
-  saved: []
+  saved: [UUID: string]
 }>()
 
-const updatedCard = ref<CardEditable>(defaultCard)
+const updatedCard = ref<CardEditable>({ ...defaultCard }) //Предотвращает предзаполнение данных
 
 const title = computed<string>(() =>
   viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
@@ -40,25 +40,11 @@ const dialogStyles = computed<StyleValue>(() => ({
 
 const onCancel = () => {
   visible.value = false
-  updatedCard.value = defaultCard
+  updatedCard.value = { ...defaultCard }
 }
 
-/**
- * "Умно" обновляет связанные карточки, редактируемую карточку и панель поиска.
- * @param targetCard - создаваемая/редактируемая карточка
- * @param isNewCard - является ли карточка новой
- */
-const updateAllIfNeeded = async (targetCard: Card, isNewCard: boolean) => {
-  if (isNewCard && !targetCard.links.length) return
-  else if (!isNewCard && getAreArraysEqual(targetCard.links, viewedCard.value?.links)) return
-
-  const linkedCards = await getLinkedCardsForUpdate(targetCard)
-  const cardsToUpdate = isNewCard ? linkedCards : [targetCard, ...linkedCards]
-  await updateCards(cardsToUpdate)
-
-  const areDefinitionsUpdated = getAreDefinitionsUpdated([targetCard, ...linkedCards])
-
-  if (!areDefinitionsUpdated) {
+const updateSearchPanel = async (areDefinitionsChanged: boolean) => {
+  if (!areDefinitionsChanged) {
     setCardsShortInfo(await getCardsShortInfo())
     return
   }
@@ -69,6 +55,33 @@ const updateAllIfNeeded = async (targetCard: Card, isNewCard: boolean) => {
   ])
 }
 
+/**
+ * Экономично обновляет связанные карточки, редактируемую карточку и панель поиска.
+ * @param targetCard - создаваемая/редактируемая карточка
+ * @param isNewCard - является ли карточка новой
+ */
+const updateAllNeeded = async (targetCard: Card, isNewCard: boolean) => {
+  const isNewCardWithoutLinks = isNewCard && !targetCard.links.length
+  let isCardWithoutChangedLinks = false
+
+  if (!isNewCardWithoutLinks) {
+    isCardWithoutChangedLinks =
+      !isNewCard && !getAreArraysEqual(targetCard.links, viewedCard.value?.links)
+  }
+
+  if (isNewCardWithoutLinks || isCardWithoutChangedLinks) {
+    await updateSearchPanel(targetCard.type === 'definition')
+    return
+  }
+
+  const linkedCards = await getLinkedCardsForUpdate(targetCard)
+  const cardsToUpdate = isNewCard ? linkedCards : [targetCard, ...linkedCards]
+  await updateCards(cardsToUpdate)
+
+  const areDefinitionsUpdated = getAreDefinitionsUpdated([targetCard, ...linkedCards])
+  await updateSearchPanel(areDefinitionsUpdated)
+}
+
 const onSave = async () => {
   if (!updatedCard.value.title) {
     alert('Заполните заголовок карточки')
@@ -76,28 +89,29 @@ const onSave = async () => {
   }
 
   setLoading(true)
+  let cardUuid = ''
+  addUuidHyperLinksFromText()
 
   if (!viewedCard.value) {
-    addUuidHyperLinksFromText()
     const newCard = await createCard(updatedCard.value)
-    updateAllIfNeeded(newCard, true)
+    cardUuid = newCard.uuid
+    await updateAllNeeded(newCard, true)
   } else {
-    addUuidHyperLinksFromText()
-
-    const newValue: Card = {
+    const cardForUpdate: Card = {
       ...viewedCard.value,
       ...updatedCard.value,
       type: selectedType.value.value
     }
+    cardUuid = cardForUpdate.uuid
 
-    updateAllIfNeeded(newValue, false)
+    await updateAllNeeded(cardForUpdate, false)
   }
 
-  updatedCard.value = defaultCard
+  updatedCard.value = { ...defaultCard }
   visible.value = false
 
   setLoading(false)
-  emits('saved')
+  emits('saved', cardUuid)
 }
 
 const getLinkedCardsForUpdate = async (card: Card): Promise<Card[]> => {
@@ -108,13 +122,20 @@ const getLinkedCardsForUpdate = async (card: Card): Promise<Card[]> => {
   const cards = await getCardsByUuid(cardUuids)
 
   const result = cards.map<Card>((item) => {
-    const linkExists = item.links?.some((link) => link.uuid === card.uuid)
+    const linksWithSameUuid = item.links?.filter((link) => link.uuid === card.uuid) || []
 
-    if (linkExists) return item
+    if (linksWithSameUuid.length === 0) {
+      return {
+        ...item,
+        links: [...(item.links || []), { uuid: card.uuid, title: card.title }]
+      }
+    }
+
+    const linksWithoutDuplicates = item.links?.filter((link) => link.uuid !== card.uuid) || []
 
     return {
       ...item,
-      links: [...(item.links || []), { uuid: card.uuid, title: card.title }]
+      links: [...linksWithoutDuplicates, { uuid: card.uuid, title: card.title }]
     }
   })
 
@@ -141,7 +162,7 @@ watch(
   () => viewedCard.value,
   () => {
     if (viewedCard.value) updatedCard.value = { ...viewedCard.value }
-    else updatedCard.value = defaultCard
+    else updatedCard.value = { ...defaultCard }
   }
 )
 
