@@ -43,6 +43,7 @@ const onCardSave = async (uuid: string) => {
 
 const onCardDelete = () => {
   setViewedCard(null)
+  viewedCardUuid.value = null
 }
 
 const searchPanelStyles = computed<StyleValue>(() => ({
