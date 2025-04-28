@@ -19,9 +19,6 @@ const searchQuery = ref<string>('')
 const searchResults = ref<CardShortInfo[]>([])
 
 const initData = async (): Promise<void> => {
-  //TODO: Сейчас есть лишние вызовы при возврате на страницу поиска, даже когда
-  // никаких изменений в карточках не было
-  //
   setLoading(true)
 
   setCardsShortInfo(await getCardsShortInfo())

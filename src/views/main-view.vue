@@ -80,7 +80,7 @@ watch(
       @edited="openModal"
       @click-on-link="viewedCardUuid = $event"
     />
-    <div v-else class="panels-container">
+    <div v-show="!isMobileView || !viewedCardUuid" class="panels-container">
       <SearchPanel
         v-model="viewedCardUuid"
         :class="['search-panel', { 'mobile-panel': isMobileView }]"
@@ -90,7 +90,7 @@ watch(
       <ViewPanel
         v-if="!isMobileView"
         v-model="viewedCardUuid"
-        :class="['view-panel', { 'mobile-panel': isMobileView }]"
+        class="view-panel"
         @deleted="onCardDelete"
         @edited="openModal"
         @click-on-link="viewedCardUuid = $event"
