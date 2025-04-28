@@ -22,7 +22,7 @@ const { viewedCard, isMobileView, setLoading, cardsShortInfo, setDefinitions, se
   useStore()
 
 const emits = defineEmits<{
-  saved: [UUID: string]
+  saved: [uuid: string]
 }>()
 
 const updatedCard = ref<CardEditable>({ ...defaultCard }) //Предотвращает предзаполнение данных
