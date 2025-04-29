@@ -68,7 +68,7 @@ const addHyperlinkToSelection = (hyperlink: CardShortInfo) => {
     <textarea
       ref="textareaRef"
       v-model="text"
-      :class="['input-form', { 'input-form-mobile': isMobileView }]"
+      class="input-form"
       @blur="saveCurrentSelection"
     ></textarea>
   </div>
@@ -84,16 +84,10 @@ const addHyperlinkToSelection = (hyperlink: CardShortInfo) => {
 }
 
 .input-form {
+  font-size: 16px;
   height: 400px;
   resize: none;
   margin: 10px 0;
-  font-size: 16px;
-}
-
-.input-form-mobile {
-  font-size: 12px;
-  height: 400px;
-  resize: none;
 }
 
 .left-toolbar-container {
