@@ -51,7 +51,6 @@ const addHyperlinkToSelection = (hyperlink: CardShortInfo) => {
       <template #start>
         <div class="left-toolbar-container">
           <Button
-            v-tooltip="'Выделите фразу и нажмите эту кнопку, чтобы добавить гиперссылку'"
             icon="pi pi-external-link"
             severity="primary"
             size="small"

@@ -15,11 +15,19 @@ import { type TypeOption } from './edit-card-modal.types'
 import { useStore } from '@/use-store'
 import TextEditor from './components/text-editor.vue'
 import { getUuidsInString, getAreArraysEqual } from '@/utils'
+import CoolSpinner from '@/ui/cool-spinner.vue'
 
 const visible = defineModel<boolean>('visible')
 
-const { viewedCard, isMobileView, setLoading, cardsShortInfo, setDefinitions, setCardsShortInfo } =
-  useStore()
+const {
+  isLoading,
+  viewedCard,
+  isMobileView,
+  setLoading,
+  cardsShortInfo,
+  setDefinitions,
+  setCardsShortInfo
+} = useStore()
 
 const emits = defineEmits<{
   saved: [uuid: string]
@@ -65,8 +73,7 @@ const updateAllNeeded = async (targetCard: Card, isNewCard: boolean) => {
   let isCardWithoutChangedLinks = false
 
   if (!isNewCardWithoutLinks) {
-    isCardWithoutChangedLinks =
-      !isNewCard && !getAreArraysEqual(targetCard.links, viewedCard.value?.links)
+    isCardWithoutChangedLinks = getAreArraysEqual(targetCard.links, viewedCard.value?.links)
   }
 
   if (isNewCardWithoutLinks || isCardWithoutChangedLinks) {
@@ -171,6 +178,7 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 </script>
 
 <template>
+  <CoolSpinner v-if="isLoading" />
   <Dialog
     v-model:visible="visible"
     modal
@@ -211,7 +219,7 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
       </div>
       <div class="buttons-block">
         <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
-        <Button type="button" label="Сохранить" @click="onSave"></Button>
+        <Button type="button" label="Сохранить" @click="onSave" :disabled="isLoading"></Button>
       </div>
     </div>
   </Dialog>
