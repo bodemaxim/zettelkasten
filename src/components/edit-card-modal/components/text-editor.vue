@@ -3,15 +3,12 @@ import { ref } from 'vue'
 import CardsAutocomplete from './cards-autocomplete.vue'
 import { Button, Toolbar } from 'primevue'
 import type { CardShortInfo } from '@/types'
-import { useStore } from '@/use-store'
 
 const text = defineModel<string>('text')
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const selectionRange = ref<{ start: number; end: number } | null>(null)
 const isHyperLinkEditorVisible = ref(false)
-
-const { isMobileView } = useStore()
 
 const toggleHyperLinkEditor = () => {
   isHyperLinkEditorVisible.value = !isHyperLinkEditorVisible.value

@@ -4,6 +4,7 @@ import { Dialog, Button, InputText, Select } from 'primevue'
 import type { Card, CardEditable } from '@/types'
 import {
   createCard,
+  updateCard,
   getCardsByUuid,
   updateCards,
   getAllDefinitions,
@@ -77,6 +78,7 @@ const updateAllNeeded = async (targetCard: Card, isNewCard: boolean) => {
   }
 
   if (isNewCardWithoutLinks || isCardWithoutChangedLinks) {
+    await updateCard(targetCard)
     await updateSearchPanel(targetCard.type === 'definition')
     return
   }
