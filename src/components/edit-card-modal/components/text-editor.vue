@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import CardsAutocomplete from './cards-autocomplete.vue'
 import { Button, Toolbar } from 'primevue'
 import type { CardShortInfo } from '@/types'
+import CardsAutocomplete from './cards-autocomplete.vue'
 
 const text = defineModel<string>('text')
 

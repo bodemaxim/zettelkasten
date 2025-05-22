@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { supabase } from '@/api/supabaseClient'
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import { supabase } from '@/api/supabaseClient'
 
 let localUser
 

@@ -1,6 +1,6 @@
 import { supabase } from '@/api/supabaseClient'
-import type { Card, CardShortInfo, CardEditable } from './types'
 import { useStore } from '@/use-store'
+import type { Card, CardShortInfo, CardEditable } from './types'
 
 const { setErrorMessage } = useStore()
 

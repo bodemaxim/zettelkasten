@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import type { CardShortInfo } from '@/types'
 import { Button, InputText } from 'primevue'
 import { getCardsShortInfo } from '@/api'
-import CoolSpinner from '@/ui/cool-spinner.vue'
+import type { CardShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
+import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 
 const viewedCardUuid = defineModel<string | null>()

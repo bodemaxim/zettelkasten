@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { MultiSelect, Button } from 'primevue'
-import { useStore } from '@/use-store'
 import type { CardShortInfo } from '@/types'
+import { useStore } from '@/use-store'
 
 const selectedCards = defineModel<CardShortInfo[]>()
 const { cardsShortInfo } = useStore()

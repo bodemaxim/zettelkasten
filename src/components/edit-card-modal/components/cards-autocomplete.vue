@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { type AutoCompleteCompleteEvent, AutoComplete } from 'primevue'
-import { useStore } from '@/use-store'
 import type { CardShortInfo } from '@/types'
+import { useStore } from '@/use-store'
 
 const emits = defineEmits<{
   updated: [value: CardShortInfo]

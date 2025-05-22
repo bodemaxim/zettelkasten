@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { login, seeUser } from '@/api/auth'
 import { InputText, Button, IftaLabel } from 'primevue'
+import { login, seeUser } from '@/api/auth'
 import router from '@/router'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'

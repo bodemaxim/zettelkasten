@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Dialog, Button } from 'primevue'
-
 import { useStore } from '@/use-store'
 
 const visible = defineModel<boolean>('visible')

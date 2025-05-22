@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Dialog, Button, InputText, Select } from 'primevue'
-import type { Card, CardEditable } from '@/types'
 import {
   createCard,
   updateCard,
@@ -10,13 +9,14 @@ import {
   getAllDefinitions,
   getCardsShortInfo
 } from '@/api'
-import { defaultCard, typeOptionsList, defaultType } from './edit-card-modal.consts'
-import CardsMultiselect from './components/cards-multiselect.vue'
-import { type TypeOption } from './edit-card-modal.types'
-import { useStore } from '@/use-store'
-import TextEditor from './components/text-editor.vue'
-import { getUuidsInString, getAreArraysEqual } from '@/utils'
+import type { Card, CardEditable } from '@/types'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import { useStore } from '@/use-store'
+import { getUuidsInString, getAreArraysEqual } from '@/utils'
+import CardsMultiselect from './components/cards-multiselect.vue'
+import TextEditor from './components/text-editor.vue'
+import { defaultCard, typeOptionsList, defaultType } from './edit-card-modal.consts'
+import { type TypeOption } from './edit-card-modal.types'
 
 const visible = defineModel<boolean>('visible')
 

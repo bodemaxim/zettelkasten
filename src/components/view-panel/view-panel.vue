@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
-import type { Card, CardShortInfo } from '@/types'
-import { Button } from 'primevue'
-import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
-import CoolSpinner from '@/ui/cool-spinner.vue'
-import TextViewer from './components/text-viewer.vue'
-import { ConfirmDialog } from 'primevue'
+import { Button , ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
+import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
+import type { Card, CardShortInfo } from '@/types'
+import CoolPanel from '@/ui/cool-panel.vue'
+import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString } from '@/utils'
-import CoolPanel from '@/ui/cool-panel.vue'
+import TextViewer from './components/text-viewer.vue'
 
 const emits = defineEmits<{
   deleted: []

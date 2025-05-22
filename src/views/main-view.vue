@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { type StyleValue, ref, onMounted, computed, watch } from 'vue'
 import { vResizeObserver } from '@vueuse/components'
+import { getAllDefinitions, getCardByUuid } from '@/api'
+import EditCardModal from '@/components/edit-card-modal/edit-card-modal.vue'
 import SearchPanel from '@/components/search-panel.vue'
 import ViewPanel from '@/components/view-panel/view-panel.vue'
-import EditCardModal from '@/components/edit-card-modal/edit-card-modal.vue'
-import CoolSpinner from '@/ui/cool-spinner.vue'
 import CoolErrorDialog from '@/ui/cool-error-dialog.vue'
-import { getAllDefinitions, getCardByUuid } from '@/api'
+import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 
 const viewedCardUuid = ref<string | null>(null)
