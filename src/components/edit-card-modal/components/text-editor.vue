@@ -74,22 +74,22 @@ const addHyperlinkToSelection = (hyperlink: CardShortInfo) => {
 .text-editor-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: left;
   gap: 4px;
+  justify-content: left;
   width: 100%;
 }
 
 .input-form {
-  font-size: 16px;
   height: 400px;
-  resize: none;
   margin: 10px 0;
+  font-size: 16px;
+  resize: none;
 }
 
 .left-toolbar-container {
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
   background-color: var(--bg-lighter);
 }
 </style>

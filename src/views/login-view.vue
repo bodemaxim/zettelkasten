@@ -65,29 +65,29 @@ onMounted(loginAutomatically)
 
 <style scoped>
 .login-view {
-  width: 100vw;
-  height: 100vh;
-  background: var(--bg-darker);
-  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  padding: 20px;
+  background: var(--bg-darker);
 }
 
 .form-container {
   width: 450px;
+  margin: auto;
+  padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: var(--bg-primary);
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin: auto;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 10%);
 }
 
 .form-title {
+  margin-bottom: 20px;
   text-align: center;
   color: var(--text-primary);
-  margin-bottom: 20px;
 }
 
 .input-container {
@@ -96,9 +96,9 @@ onMounted(loginAutomatically)
 
 .input {
   width: 100%;
-  background-color: var(--bg-dark);
+  margin: 5px 0 10px;
   color: var(--text-primary);
-  margin: 5px 0px 10px;
+  background-color: var(--bg-dark);
 }
 
 .submit-button {

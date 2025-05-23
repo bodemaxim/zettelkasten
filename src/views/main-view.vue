@@ -103,8 +103,8 @@ watch(
 .main-view {
   display: flex;
   flex-direction: column;
-  height: 100vh;
   width: 100vw;
+  height: 100vh;
   overflow-y: hidden;
 }
 
@@ -114,19 +114,19 @@ watch(
 }
 
 .search-panel {
-  margin: 3em 0 3em 2em;
   height: calc(100vh - 80px);
+  margin: 3em 0 3em 2em;
 }
 
 .view-panel {
-  margin: 3em 2em;
-  height: calc(100vh - 80px);
   position: relative;
   flex-grow: 1;
+  height: calc(100vh - 80px);
+  margin: 3em 2em;
 }
 
 .mobile-panel {
-  margin: 0;
   height: 100vh;
+  margin: 0;
 }
 </style>

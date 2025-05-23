@@ -56,44 +56,41 @@ onBeforeUnmount(() => {
 }
 
 :deep(img) {
+  display: block;
   max-width: calc(100% - 30px);
   margin: 30px auto;
-  display: block;
   border: 3px solid var(--bg-lighter);
   border-radius: 5px;
   box-shadow: 0 0 15px var(--accent-blue);
 }
 
 :deep(h1) {
-  font-size: 24px;
   margin: 15px 0;
+  font-size: 24px;
   color: var(--accent-yellow);
 }
 
 :deep(h2) {
-  font-size: 22px;
-  color: var(--accent-blue);
   margin: 15px 0;
+  font-size: 22px;
   color: var(--accent-yellow);
 }
 
 :deep(h3) {
-  font-size: 20px;
-  color: var(--accent-pink);
   margin: 15px 0 5px 10px;
+  font-size: 20px;
   color: var(--accent-yellow);
 }
 
 :deep(h4) {
-  font-size: 18px;
-  color: lightblue;
   margin: 10px 0 5px 20px;
+  font-size: 18px;
   color: var(--accent-yellow);
 }
 
 :deep(p) {
-  font-size: 16px;
   margin: 10px 0 10px 40px;
+  font-size: 16px;
 }
 
 :deep(ul) {
@@ -108,42 +105,42 @@ onBeforeUnmount(() => {
 
 :deep(pre) {
   display: inline-block;
-  background-color: var(--accent-blue);
-  border-radius: 8px;
-  padding: 15px 80px 15px 15px;
-  margin: 10px 40px;
   max-width: calc(100% - 100px);
   overflow-y: auto;
+  margin: 10px 40px;
+  padding: 15px 80px 15px 15px;
+  border-radius: 8px;
+  background-color: var(--accent-blue);
 }
 
 :deep(a) {
   color: var(--accent-azure);
 }
 
-@media (min-width: 320px) and (max-width: 768px) {
+@media (width >= 320px) and (width <= 768px) {
   :deep(h1) {
-    font-size: 17px;
     margin: 15px 0;
+    font-size: 17px;
   }
 
   :deep(h2) {
-    font-size: 16px;
     margin: 15px 0;
+    font-size: 16px;
   }
 
   :deep(h3) {
+    margin: 15px 0 5px;
     font-size: 15px;
-    margin: 15px 0 5px 0;
   }
 
   :deep(h4) {
-    font-size: 14px;
     margin: 10px 0 5px;
+    font-size: 14px;
   }
 
   :deep(p) {
-    font-size: 13px;
     margin: 10px 0;
+    font-size: 13px;
   }
 
   :deep(ul, ol) {
@@ -151,14 +148,14 @@ onBeforeUnmount(() => {
   }
 
   :deep(li) {
-    font-size: 12px;
     margin: 0 0 5px;
+    font-size: 12px;
   }
 
   :deep(pre) {
-    padding: 15px 20px 15px 15px;
-    margin: 10px 0;
     max-width: 100%;
+    margin: 10px 0;
+    padding: 15px 20px 15px 15px;
     font-size: 11px;
   }
 }

@@ -61,8 +61,8 @@ const isDropdownOpen = ref(false)
 }
 
 .header {
-  font-size: 16px;
   margin: 20px;
+  font-size: 16px;
 }
 
 .footer {
@@ -73,7 +73,7 @@ const isDropdownOpen = ref(false)
 </style>
 
 <style>
-/*TODO: Изолировать стиль*/
+/* TODO: Изолировать стиль */
 .p-multiselect-overlay {
   width: calc(100% - 100px);
 }

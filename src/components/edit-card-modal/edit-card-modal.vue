@@ -230,8 +230,8 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 <style scoped>
 .input-block {
   display: flex;
-  align-items: center;
   gap: 4px;
+  align-items: center;
   margin-bottom: 4px;
 }
 
@@ -241,8 +241,8 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 
 .buttons-block {
   display: flex;
-  justify-content: flex-end;
   gap: 2px;
+  justify-content: flex-end;
 }
 
 .input-label {

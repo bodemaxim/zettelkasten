@@ -193,12 +193,12 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
 <style scoped>
 .article {
   height: calc(100vh - 130px);
-  padding: 30px 15px 10px;
   overflow-y: auto;
+  padding: 30px 15px 10px;
   background-color: var(--bg-dark);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
   .article {
     height: 100%;
   }
@@ -208,8 +208,8 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
   display: flex;
   flex-direction: row;
   gap: 5px;
-  background-color: var(--bg-dark);
   float: right;
+  background-color: var(--bg-dark);
 }
 
 .links-container {
@@ -217,11 +217,11 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
 }
 
 .link {
-  cursor: pointer;
-  background-color: var(--bg-dark);
   margin-bottom: 5px;
-  color: var(--accent-azure);
   text-decoration: underline;
+  color: var(--accent-azure);
+  background-color: var(--bg-dark);
+  cursor: pointer;
 }
 
 .link:hover {

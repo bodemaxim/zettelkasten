@@ -94,11 +94,11 @@ const parseSearchQuery = (str: string): string[] => {
 .toolbar {
   display: flex;
   flex-direction: row;
+  gap: 5px;
   align-items: center;
   justify-content: space-between;
-  gap: 5px;
-  background-color: var(--bg-dark);
   padding-right: 20px;
+  background-color: var(--bg-dark);
 }
 
 .search-box {
@@ -107,8 +107,8 @@ const parseSearchQuery = (str: string): string[] => {
 
 .search-results-list {
   height: calc(100% - 50px);
-  background-color: var(--bg-dark);
   overflow-y: auto;
+  background-color: var(--bg-dark);
 }
 
 .card-title {
@@ -117,7 +117,7 @@ const parseSearchQuery = (str: string): string[] => {
 
 .card-title:hover {
   background-color: var(--bg-darker);
-  cursor: pointer;
   transition: 0.5;
+  cursor: pointer;
 }
 </style>

@@ -13,13 +13,13 @@ import { ProgressSpinner } from 'primevue'
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5) !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+  background-color: rgb(0 0 0 / 50%) !important;
   animation: fadeIn 0.3s ease-in-out forwards;
 }
 

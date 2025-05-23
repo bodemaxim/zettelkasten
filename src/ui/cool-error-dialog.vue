@@ -35,15 +35,15 @@ const firstPartText = computed<string>(() => {
 <style scoped>
 .buttons-block {
   display: flex;
-  justify-content: flex-end;
   gap: 2px;
+  justify-content: flex-end;
 }
 </style>
 
 <style>
 .error-modal.p-dialog {
-  background-color: var(--bg-primary);
   width: 90%;
   max-width: 500px;
+  background-color: var(--bg-primary);
 }
 </style>
