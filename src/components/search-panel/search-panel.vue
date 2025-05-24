@@ -6,10 +6,7 @@ import type { CardShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
-import { searchMenuItems } from './components/search-menu/search-menu.consts'
-import type { SearchMenuItem } from './components/search-menu/search-menu.types'
-import SearchMenu from './components/search-menu/search-menu.vue'
-import SearchSettings from './components/search-settings.vue'
+import BreadcrumbSelect from './components/breadcrumb-select.vue'
 
 const viewedCardUuid = defineModel<string | null>()
 
@@ -66,7 +63,7 @@ const parseSearchQuery = (str: string): string[] => {
   return result
 }
 
-const selectedMenuItem = ref<SearchMenuItem>(searchMenuItems[0])
+const isBreadcrumbSelectOpen = ref(false)
 </script>
 
 <template>
@@ -82,8 +79,8 @@ const selectedMenuItem = ref<SearchMenuItem>(searchMenuItems[0])
         @click="$emit('createCard')"
       />
     </div>
-    <SearchMenu v-model="selectedMenuItem" />
-    <div class="search-results-list" v-if="selectedMenuItem.id === 0">
+    <BreadcrumbSelect v-model:open="isBreadcrumbSelectOpen" class="breadcrumb" />
+    <div class="search-results-list" v-show="!isBreadcrumbSelectOpen">
       <ul v-if="!isLoading && searchResults.length">
         <li
           v-for="card in searchResults"
@@ -96,7 +93,6 @@ const selectedMenuItem = ref<SearchMenuItem>(searchMenuItems[0])
       </ul>
       <p v-else-if="!isLoading">Не найдено</p>
     </div>
-    <SearchSettings />
   </CoolPanel>
 </template>
 
@@ -115,8 +111,13 @@ const selectedMenuItem = ref<SearchMenuItem>(searchMenuItems[0])
   width: calc(100% - 50px);
 }
 
+.breadcrumb {
+  margin: 0 20px 0 0;
+  background-color: var(--bg-dark);
+}
+
 .search-results-list {
-  height: calc(100% - 70px);
+  height: calc(100% - 90px);
   overflow-y: auto;
   margin: 0;
   background-color: var(--bg-dark);

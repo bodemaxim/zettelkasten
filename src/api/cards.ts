@@ -18,7 +18,7 @@ export const getCardsShortInfo = async (): Promise<CardShortInfo[]> => {
   return data
 }
 
-export const getAllCards = async () => {
+export const getAllCards = async (): Promise<Card[]> => {
   const { error, data } = await supabase.from('cards').select('*')
 
   if (error) {
@@ -26,7 +26,7 @@ export const getAllCards = async () => {
       customText: 'Ошибка загрузки карточек',
       message: error.message
     })
-    return null
+    return []
   }
 
   return data
