@@ -10,4 +10,4 @@ export {
   updateCards,
   getCardsByUuid
 } from '@/api/cards'
-export { getAllFolders } from './folders'
+export { getAllFolders, getFoldersShortInfo } from './folders'

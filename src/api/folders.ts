@@ -1,6 +1,6 @@
 import { supabase } from '@/api/supabaseClient'
 import { useStore } from '@/use-store'
-import type { Folder } from './types'
+import type { Folder, FolderShortInfo } from './types'
 
 const { setErrorMessage } = useStore()
 
@@ -15,6 +15,19 @@ export const getAllFolders = async (): Promise<Folder[]> => {
     return []
   }
 
-  console.log(data)
+  return data
+}
+
+export const getFoldersShortInfo = async (): Promise<FolderShortInfo[]> => {
+  const { error, data } = await supabase.from('folders').select('uuid, name')
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка загрузки папок',
+      message: error.message
+    })
+    return []
+  }
+
   return data
 }

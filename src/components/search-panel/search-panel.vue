@@ -113,11 +113,10 @@ const isBreadcrumbSelectOpen = ref(false)
 
 .breadcrumb {
   margin: 0 20px 0 0;
-  background-color: var(--bg-dark);
 }
 
 .search-results-list {
-  height: calc(100% - 90px);
+  height: calc(100% - 70px);
   overflow-y: auto;
   margin: 0;
   background-color: var(--bg-dark);
