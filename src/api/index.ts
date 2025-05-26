@@ -8,6 +8,7 @@ export {
   deleteCardByUuid,
   updateCard,
   updateCards,
-  getCardsByUuid
+  getCardsByUuid,
+  getCardsShortInfoByFolder
 } from '@/api/cards'
 export { getAllFolders, getFoldersShortInfo } from './folders'

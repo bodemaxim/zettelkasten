@@ -8,6 +8,7 @@ export type Card = CardShortInfo & {
   text: string
   links: CardShortInfo[]
   type: 'definition' | 'article'
+  folders: string //приходит массив JSON в формате string
 }
 
 export type CardEditable = Omit<Card, 'uuid' | 'created_at'>

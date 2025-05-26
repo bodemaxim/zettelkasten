@@ -14,6 +14,7 @@ import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString, getAreArraysEqual } from '@/utils'
 import CardsMultiselect from './components/cards-multiselect.vue'
+import FoldersTreeselect from './components/folders-treeselect.vue'
 import TextEditor from './components/text-editor.vue'
 import { defaultCard, typeOptionsList, defaultType } from './edit-card-modal.consts'
 import { type TypeOption } from './edit-card-modal.types'
@@ -218,6 +219,10 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
       <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
         <p class="input-label">Ссылки</p>
         <CardsMultiselect v-model="updatedCard.links" />
+      </div>
+      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
+        <p class="input-label">Выбор папок</p>
+        <FoldersTreeselect v-model="updatedCard.folders" />
       </div>
       <div class="buttons-block">
         <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>

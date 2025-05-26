@@ -5,7 +5,8 @@ export const defaultCard: CardEditable = {
   title: '',
   text: '',
   links: [],
-  type: 'definition'
+  type: 'definition',
+  folders: ''
 }
 
 export const typeOptionsList: TypeOption[] = [

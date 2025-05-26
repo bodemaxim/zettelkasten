@@ -9,6 +9,9 @@ import type { Folder, FolderShortInfo } from '@/types'
 // также есть вариант все равно загружать данные сразу, чтобы не было лоадинга
 // при первом нажатии на элемент
 
+const isSelectOpen = defineModel<boolean>('open')
+const folderUuid = defineModel<string | null>('folderUuid')
+
 const defaultPath: FolderShortInfo[] = [
   {
     uuid: 'home',
@@ -23,7 +26,6 @@ onMounted(async () => {
 })
 
 const currentPath = ref<FolderShortInfo[]>(defaultPath)
-const isSelectOpen = defineModel('open')
 
 const selectItems = computed<FolderShortInfo[]>(() => {
   const lastPathItem = currentPath.value.at(-1)
@@ -40,6 +42,7 @@ const onMenuItemClick = (uuid: string) => {
       currentPath.value = currentPath.value.slice(0, clickedIndex + 1)
     }
 
+    folderUuid.value = currentPath.value.length > 1 ? currentPath.value.at(-1)?.uuid : null
     isSelectOpen.value = false
     return
   }
@@ -47,6 +50,7 @@ const onMenuItemClick = (uuid: string) => {
   //закрыть при клике на home
   if (uuid === 'home' && isSelectOpen.value) {
     isSelectOpen.value = false
+    folderUuid.value = null
     return
   }
 
@@ -67,6 +71,7 @@ const onSelectValueChange = (folderAddedToPath: Folder) => {
   })
 
   isSelectOpen.value = false
+  folderUuid.value = currentPath.value.length > 1 ? currentPath.value.at(-1)?.uuid : null
 }
 
 //приделать закрытие листбокса при клике вовне

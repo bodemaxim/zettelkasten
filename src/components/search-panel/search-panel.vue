@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { Button, InputText } from 'primevue'
-import { getCardsShortInfo } from '@/api'
+import { getCardsShortInfo, getCardsShortInfoByFolder } from '@/api'
 import type { CardShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
@@ -22,7 +22,9 @@ const searchResults = ref<CardShortInfo[]>([])
 const initData = async (): Promise<void> => {
   setLoading(true)
 
-  setCardsShortInfo(await getCardsShortInfo())
+  if (!folderUuid.value) setCardsShortInfo(await getCardsShortInfo())
+  else setCardsShortInfo(await getCardsShortInfoByFolder(folderUuid.value))
+
   searchResults.value = [...cardsShortInfo.value]
 
   setLoading(false)
@@ -30,7 +32,8 @@ const initData = async (): Promise<void> => {
 
 onMounted(initData)
 
-const onSearch = async (): Promise<void> => {
+const onSearch = (): void => {
+  //TODO: с ростом базы можно реализовать поиск при помощи запросов на бэк getCardsByStrAndFolder(str, folder)
   if (!searchQuery.value.length) {
     viewedCardUuid.value = null
     searchResults.value = [...cardsShortInfo.value]
@@ -64,6 +67,12 @@ const parseSearchQuery = (str: string): string[] => {
 }
 
 const isBreadcrumbSelectOpen = ref(false)
+const folderUuid = ref<string | null>(null)
+
+watch(
+  () => folderUuid.value,
+  () => initData()
+)
 </script>
 
 <template>
@@ -79,7 +88,11 @@ const isBreadcrumbSelectOpen = ref(false)
         @click="$emit('createCard')"
       />
     </div>
-    <BreadcrumbSelect v-model:open="isBreadcrumbSelectOpen" class="breadcrumb" />
+    <BreadcrumbSelect
+      v-model:open="isBreadcrumbSelectOpen"
+      v-model:folder-uuid="folderUuid"
+      class="breadcrumb"
+    />
     <div class="search-results-list" v-show="!isBreadcrumbSelectOpen">
       <ul v-if="!isLoading && searchResults.length">
         <li

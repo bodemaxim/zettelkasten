@@ -32,6 +32,24 @@ export const getAllCards = async (): Promise<Card[]> => {
   return data
 }
 
+export const getCardsShortInfoByFolder = async (folderUuid: string): Promise<CardShortInfo[]> => {
+  const { data, error } = await supabase
+    .from('cards')
+    .select('uuid, title')
+    .like('folders', `%${folderUuid}%`)
+  console.log(data)
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка загрузки сокращенной информации карточек',
+      message: error.message
+    })
+    return []
+  }
+
+  return data
+}
+
 export const getAllDefinitions = async (): Promise<Card[]> => {
   const { data, error } = await supabase.from('cards').select('*').eq('type', 'definition')
 
@@ -72,7 +90,8 @@ export const updateCard = async (card: Card): Promise<void> => {
       title: card.title,
       text: card.text,
       links: card.links,
-      type: card.type
+      type: card.type,
+      folders: card.folders
     })
     .eq('uuid', card.uuid)
 
