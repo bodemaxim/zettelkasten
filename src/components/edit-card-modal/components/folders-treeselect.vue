@@ -83,7 +83,6 @@ const getSelectedValues = (uuidsStringifiedJson: string): SelectedValues => {
       @update:modelValue="onValueChange"
     />
   </div>
-  <button @click="console.log(selectedFolders)">тест</button>
 </template>
 
 <style scoped>
