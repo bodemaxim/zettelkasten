@@ -1,25 +1,45 @@
+import type { PostgrestError } from '@supabase/supabase-js'
 import { supabase } from '@/api/supabaseClient'
 import { useStore } from '@/use-store'
-import type { Card, CardShortInfo, CardEditable, Pagination, ResponseWithCount } from './types'
+import type {
+  Card,
+  CardShortInfo,
+  CardEditable,
+  ResponseWithCount,
+  CardsShortInfoRequest
+} from './types'
 
 const { setErrorMessage } = useStore()
 
 export const getCardsShortInfo = async (
-  pagination: Pagination = null
+  request: CardsShortInfoRequest
 ): Promise<ResponseWithCount<CardShortInfo[]>> => {
-  let data = null
-  let error = null
+  let data: CardShortInfo[] | null = null
   let count: number | null = null
+  let error: PostgrestError | null = null
+
+  const { pagination, searchQuery, sorting, folderUuid } = request
+
+  let query = supabase.from('cards').select('uuid, title', { count: 'exact', head: false })
+
+  if (searchQuery) {
+    query = query.ilike('title', `%${searchQuery}%`)
+  }
+
+  if (sorting?.field) {
+    query = query.order(sorting.field, { ascending: sorting.order })
+  }
 
   if (pagination) {
-    ;({ data, error, count } = await supabase
-      .from('cards')
-      .select('uuid, title', { count: 'exact', head: false })
-      .order('uuid', { ascending: true }) //TODO: добавить в параметры
-      .range(pagination.from, pagination.to))
-  } else {
-    ;({ data, error, count } = await supabase.from('cards').select('uuid, title'))
+    query = query.range(pagination.from, pagination.to)
+    if (!sorting) query = query.order('title', { ascending: true })
   }
+
+  if (folderUuid) {
+    query = query.like('folders', `%${folderUuid}%`)
+  }
+
+  ;({ data, error, count } = await query)
 
   if (error) {
     setErrorMessage({
@@ -50,37 +70,6 @@ export const getAllCards = async (): Promise<Card[]> => {
   }
 
   return data
-}
-
-export const getCardsShortInfoByFolder = async (
-  folderUuid: string,
-  pagination: Pagination = null
-): Promise<CardShortInfo[]> => {
-  let data = null
-  let error = null
-
-  if (pagination) {
-    ;({ data, error } = await supabase
-      .from('cards')
-      .select('uuid, title')
-      .like('folders', `%${folderUuid}%`)
-      .range(pagination.from, pagination.to))
-  } else {
-    ;({ data, error } = await supabase
-      .from('cards')
-      .select('uuid, title')
-      .like('folders', `%${folderUuid}%`))
-  }
-
-  if (error) {
-    setErrorMessage({
-      customText: 'Ошибка загрузки сокращенной информации карточек',
-      message: error.message
-    })
-    return []
-  }
-
-  return data || []
 }
 
 export const getAllDefinitions = async (): Promise<Card[]> => {

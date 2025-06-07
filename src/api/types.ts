@@ -1,8 +1,3 @@
-export type Pagination = {
-  from: number
-  to: number
-} | null
-
 export type CardShortInfo = {
   uuid: string
   title: string
@@ -33,4 +28,21 @@ export type Folder = FolderShortInfo & {
 export type ResponseWithCount<T> = {
   data: T
   count: number
+}
+
+export type Pagination = {
+  from: number
+  to: number
+} | null
+
+export type Sorting = {
+  field: string
+  order: boolean
+}
+
+export type CardsShortInfoRequest = {
+  searchQuery?: string
+  pagination?: Pagination
+  sorting?: Sorting
+  folderUuid?: string
 }

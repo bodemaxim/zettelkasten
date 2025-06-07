@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+import { debounce } from 'lodash'
 import { Button, InputText, Paginator } from 'primevue'
-import { getCardsShortInfo, getCardsShortInfoByFolder } from '@/api'
+import { getCardsShortInfo } from '@/api'
 import type { CardShortInfo, Pagination } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
@@ -23,11 +24,15 @@ const initData = async (): Promise<void> => {
   setLoading(true)
 
   if (!folderUuid.value) {
-    const result = await getCardsShortInfo(pagination.value)
+    const result = await getCardsShortInfo({
+      pagination: pagination.value
+    })
     setCardsShortInfo(result.data)
     recordsTotal.value = result.count
   } else {
-    setCardsShortInfo(await getCardsShortInfoByFolder(folderUuid.value, pagination.value)) //TODO добавить count  в апи
+    setCardsShortInfo(
+      (await getCardsShortInfo({ folderUuid: folderUuid.value, pagination: pagination.value })).data
+    ) //TODO: убрать else
   }
   searchResults.value = [...cardsShortInfo.value]
 
@@ -36,8 +41,7 @@ const initData = async (): Promise<void> => {
 
 onMounted(initData)
 
-const onSearch = (): void => {
-  //TODO: с ростом базы можно реализовать поиск при помощи запросов на бэк getCardsByStrAndFolder(str, folder)
+const performSearch = async (): Promise<void> => {
   if (!searchQuery.value.length) {
     viewedCardUuid.value = null
     searchResults.value = [...cardsShortInfo.value]
@@ -45,30 +49,21 @@ const onSearch = (): void => {
     return
   }
 
-  const uuids: string[] = parseSearchQuery(searchQuery.value)
+  const { data } = await getCardsShortInfo({
+    searchQuery: searchQuery.value.toLowerCase().trim(),
+    folderUuid: folderUuid.value || undefined,
+    sorting: { field: 'title', order: true }
+  })
 
-  searchResults.value = cardsShortInfo.value.filter((item: CardShortInfo) =>
-    uuids.includes(item.uuid)
-  )
+  searchResults.value = [...data]
 }
+
+const onSearch = debounce(performSearch, 300)
 
 watch(
   () => [searchQuery.value, cardsShortInfo.value],
   () => onSearch()
 )
-
-const parseSearchQuery = (str: string): string[] => {
-  const query: string = str.trim()
-  const result: string[] = []
-
-  cardsShortInfo.value.forEach((card) => {
-    if (card.title.toLowerCase().includes(query.toLowerCase())) {
-      result.push(card.uuid)
-    }
-  })
-
-  return result
-}
 
 const isBreadcrumbSelectOpen = ref(false)
 const folderUuid = ref<string | null>(null)

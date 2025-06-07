@@ -55,13 +55,13 @@ const onCancel = () => {
 
 const updateSearchPanel = async (areDefinitionsChanged: boolean) => {
   if (!areDefinitionsChanged) {
-    setCardsShortInfo((await getCardsShortInfo({ from: 0, to: 99 })).data) //TODO брать актуальную пагинацию
+    setCardsShortInfo((await getCardsShortInfo({ pagination: { from: 0, to: 99 } })).data) //TODO брать актуальную пагинацию
     return
   }
 
   await Promise.all([
     setDefinitions(await getAllDefinitions()),
-    setCardsShortInfo((await getCardsShortInfo({ from: 0, to: 99 })).data) //TODO брать актуальную пагинацию
+    setCardsShortInfo((await getCardsShortInfo({ pagination: { from: 0, to: 99 } })).data) //TODO брать актуальную пагинацию
   ])
 }
 
