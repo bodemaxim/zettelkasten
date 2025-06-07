@@ -1,3 +1,8 @@
+export type Pagination = {
+  from: number
+  to: number
+} | null
+
 export type CardShortInfo = {
   uuid: string
   title: string
@@ -23,4 +28,9 @@ export type Folder = FolderShortInfo & {
   description: string
   defaultDisplay: string
   path: FolderShortInfo[]
+}
+
+export type ResponseWithCount<T> = {
+  data: T
+  count: number
 }
