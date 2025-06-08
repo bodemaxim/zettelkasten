@@ -4,14 +4,14 @@ export type CardShortInfo = {
 }
 
 export type Card = CardShortInfo & {
-  created_at: string
+  createdAt: string
   text: string
   links: CardShortInfo[]
   type: 'definition' | 'article'
   folders: string //приходит массив JSON в формате string
 }
 
-export type CardEditable = Omit<Card, 'uuid' | 'created_at'>
+export type CardEditable = Omit<Card, 'uuid' | 'createdAt'>
 
 export type FolderShortInfo = {
   uuid: string
@@ -19,7 +19,7 @@ export type FolderShortInfo = {
 }
 
 export type Folder = FolderShortInfo & {
-  created_at: string
+  createdAt: string
   description: string
   defaultDisplay: string
   path: FolderShortInfo[]

@@ -3,7 +3,7 @@ import { ref, watch, onMounted } from 'vue'
 import { debounce } from 'lodash'
 import { Button, InputText, Paginator } from 'primevue'
 import { getCardsShortInfo } from '@/api'
-import type { CardShortInfo, Pagination } from '@/types'
+import type { CardShortInfo, CardsShortInfoRequest, Pagination } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
@@ -23,23 +23,36 @@ const searchResults = ref<CardShortInfo[]>([])
 const initData = async (): Promise<void> => {
   setLoading(true)
 
-  if (!folderUuid.value) {
-    const result = await getCardsShortInfo({
-      pagination: pagination.value
-    })
-    setCardsShortInfo(result.data)
-    recordsTotal.value = result.count
-  } else {
-    setCardsShortInfo(
-      (await getCardsShortInfo({ folderUuid: folderUuid.value, pagination: pagination.value })).data
-    ) //TODO: убрать else
+  const request: CardsShortInfoRequest = {
+    pagination: pagination.value
   }
+
+  if (folderUuid.value) request.folderUuid = folderUuid.value
+
+  const result = await getCardsShortInfo(request)
+
+  setCardsShortInfo(result.data)
+  recordsTotal.value = result.count
+
   searchResults.value = [...cardsShortInfo.value]
 
   setLoading(false)
 }
 
-onMounted(initData)
+const setFolderFromStorage = () => {
+  const storedValue = localStorage.getItem('folderUuid')
+  folderUuid.value = storedValue !== null ? removeQuotes(JSON.parse(storedValue)) : null
+}
+
+const removeQuotes = (str: string) => {
+  if (str.startsWith('"') && str.endsWith('"')) return str.slice(1, -1)
+  return str
+}
+
+onMounted(async () => {
+  setFolderFromStorage()
+  await initData()
+})
 
 const performSearch = async (): Promise<void> => {
   if (!searchQuery.value.length) {
@@ -49,6 +62,7 @@ const performSearch = async (): Promise<void> => {
     return
   }
 
+  setLoading(true)
   const { data } = await getCardsShortInfo({
     searchQuery: searchQuery.value.toLowerCase().trim(),
     folderUuid: folderUuid.value || undefined,
@@ -56,6 +70,7 @@ const performSearch = async (): Promise<void> => {
   })
 
   searchResults.value = [...data]
+  setLoading(false)
 }
 
 const onSearch = debounce(performSearch, 300)

@@ -4,11 +4,6 @@ import { Breadcrumb, Button, Listbox } from 'primevue'
 import { getAllFolders } from '@/api'
 import type { Folder, FolderShortInfo } from '@/types'
 
-// при инициализации запрашиваю объект меню из localStorage
-// если не получается, инициализирую как корень (для этого данные вообще не нужны)
-// также есть вариант все равно загружать данные сразу, чтобы не было лоадинга
-// при первом нажатии на элемент
-
 const isSelectOpen = defineModel<boolean>('open')
 const folderUuid = defineModel<string | null>('folderUuid')
 
@@ -23,6 +18,7 @@ const folders = ref<Folder[]>()
 
 onMounted(async () => {
   folders.value = await getAllFolders()
+  initPath()
 })
 
 const currentPath = ref<FolderShortInfo[]>(defaultPath)
@@ -42,7 +38,7 @@ const onMenuItemClick = (uuid: string) => {
       currentPath.value = currentPath.value.slice(0, clickedIndex + 1)
     }
 
-    folderUuid.value = currentPath.value.length > 1 ? currentPath.value.at(-1)?.uuid : null
+    saveFolderUuid(currentPath.value.length > 1 ? (currentPath.value.at(-1)?.uuid ?? null) : null)
     isSelectOpen.value = false
     return
   }
@@ -50,7 +46,7 @@ const onMenuItemClick = (uuid: string) => {
   //закрыть при клике на home
   if (uuid === 'home' && isSelectOpen.value) {
     isSelectOpen.value = false
-    folderUuid.value = null
+    saveFolderUuid(null)
     return
   }
 
@@ -64,17 +60,39 @@ const onMenuItemClick = (uuid: string) => {
   isSelectOpen.value = true
 }
 
-const onSelectValueChange = (folderAddedToPath: Folder) => {
+const addFolderToPath = (folder: Folder) => {
   currentPath.value.push({
-    uuid: folderAddedToPath.uuid,
-    name: folderAddedToPath.name
+    uuid: folder.uuid,
+    name: folder.name
   })
 
   isSelectOpen.value = false
-  folderUuid.value = currentPath.value.length > 1 ? currentPath.value.at(-1)?.uuid : null
+  saveFolderUuid(currentPath.value.length > 1 ? (currentPath.value.at(-1)?.uuid ?? null) : null)
 }
 
-//приделать закрытие листбокса при клике вовне
+const saveFolderUuid = (value: string | null) => {
+  folderUuid.value = value
+  localStorage.setItem('folderUuid', JSON.stringify(value ?? ''))
+}
+
+const initPath = () => {
+  console.log(0, folderUuid.value)
+
+  const currentFolder: Folder | undefined = folders.value?.find(
+    (item) => item.uuid === folderUuid.value
+  )
+
+  if (!currentFolder) return
+
+  const currentFolderShortInfo: FolderShortInfo = {
+    uuid: currentFolder.uuid,
+    name: currentFolder.name
+  }
+
+  currentPath.value = [...defaultPath, ...currentFolder.path, currentFolderShortInfo]
+}
+
+//TODO: приделать закрытие листбокса при клике вовне
 </script>
 
 <template>
@@ -101,13 +119,14 @@ const onSelectValueChange = (folderAddedToPath: Folder) => {
       </template>
     </Breadcrumb>
     <Listbox
+      class="mew"
       v-if="isSelectOpen"
       :options="selectItems"
       optionLabel="name"
       :pt="{
         root: 'listbox-root'
       }"
-      @update:model-value="onSelectValueChange"
+      @update:model-value="addFolderToPath"
     />
   </div>
 </template>
