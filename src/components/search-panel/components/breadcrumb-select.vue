@@ -76,8 +76,6 @@ const saveFolderUuid = (value: string | null) => {
 }
 
 const initPath = () => {
-  console.log(0, folderUuid.value)
-
   const currentFolder: Folder | undefined = folders.value?.find(
     (item) => item.uuid === folderUuid.value
   )

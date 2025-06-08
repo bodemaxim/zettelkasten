@@ -131,9 +131,9 @@ const changePage = (firstRow: number) => {
       v-model:folder-uuid="folderUuid"
       class="breadcrumb"
     />
-    <div class="search-results-list" v-show="!isBreadcrumbSelectOpen">
-      <div v-if="!isLoading && searchResults.length">
-        <ul>
+    <div class="search-results-container" v-show="!isBreadcrumbSelectOpen">
+      <div v-if="!isLoading && searchResults.length" class="search-results-list">
+        <ul class="search-results-list">
           <li
             v-for="card in searchResults"
             :key="card.uuid"
@@ -148,7 +148,9 @@ const changePage = (firstRow: number) => {
           :first="first"
           @update:first="changePage"
           :totalRecords="recordsTotal"
+          class="lib-paginator"
         >
+          >
           <template
             #container="{ first, last, page, prevPageCallback, nextPageCallback, totalRecords }"
           >
@@ -190,10 +192,14 @@ const changePage = (firstRow: number) => {
   margin: 0 20px 0 0;
 }
 
-.search-results-list {
+.search-results-container {
   height: calc(100% - 70px);
   overflow-y: auto;
   margin: 0;
+  background-color: var(--bg-dark);
+}
+
+.search-results-list {
   background-color: var(--bg-dark);
 }
 
@@ -216,11 +222,18 @@ const changePage = (firstRow: number) => {
   padding: 0.25rem 0.5rem;
   border: 1px solid var(--primary-color);
   border-radius: 9999px;
-  background-color: transparent;
+  background-color: var(--bg-darker);
 }
 
 .paginator-text {
   font-size: 12px;
   color: var(--accent-yellow);
+}
+</style>
+
+<style>
+.lib-paginator .p-paginator {
+  margin-right: 20px;
+  background-color: var(--bg-dark);
 }
 </style>
