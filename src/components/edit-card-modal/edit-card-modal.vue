@@ -72,13 +72,15 @@ const updateSearchPanel = async (areDefinitionsChanged: boolean) => {
  */
 const updateAllNeeded = async (targetCard: Card, isNewCard: boolean) => {
   const isNewCardWithoutLinks = isNewCard && !targetCard.links.length
-  let isCardWithoutChangedLinks = false
+  let isNoChangeInLinksOrTitle = false
 
   if (!isNewCardWithoutLinks) {
-    isCardWithoutChangedLinks = getAreArraysEqual(targetCard.links, viewedCard.value?.links)
+    isNoChangeInLinksOrTitle =
+      getAreArraysEqual(targetCard.links, viewedCard.value?.links) &&
+      targetCard.title === viewedCard.value?.title
   }
 
-  if (isNewCardWithoutLinks || isCardWithoutChangedLinks) {
+  if (isNewCardWithoutLinks || isNoChangeInLinksOrTitle) {
     await updateCard(targetCard)
     await updateSearchPanel(targetCard.type === 'definition')
     return
@@ -86,6 +88,7 @@ const updateAllNeeded = async (targetCard: Card, isNewCard: boolean) => {
 
   const linkedCards = await getLinkedCardsForUpdate(targetCard)
   const cardsToUpdate = isNewCard ? linkedCards : [targetCard, ...linkedCards]
+  console.log(1, cardsToUpdate)
   await updateCards(cardsToUpdate)
 
   const areDefinitionsUpdated = getAreDefinitionsUpdated([targetCard, ...linkedCards])
@@ -228,6 +231,7 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
         <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
         <Button type="button" label="Сохранить" @click="onSave" :disabled="isLoading"></Button>
       </div>
+      <button @click="console.log(updatedCard.links)">тест</button>
     </div>
   </Dialog>
 </template>
@@ -251,7 +255,7 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 }
 
 .input-label {
-  width: 100px;
+  min-width: 100px;
 }
 
 .input-element {
