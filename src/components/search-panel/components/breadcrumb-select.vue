@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import { Breadcrumb, Button, Listbox } from 'primevue'
 import { getAllFolders } from '@/api'
 import type { Folder, FolderShortInfo } from '@/types'
+import { useStore } from '@/use-store'
 
 const isSelectOpen = defineModel<boolean>('open')
 const folderUuid = defineModel<string | null>('folderUuid')
@@ -16,8 +17,11 @@ const defaultPath: FolderShortInfo[] = [
 
 const folders = ref<Folder[]>()
 
+const { setFolders } = useStore()
+
 onMounted(async () => {
   folders.value = await getAllFolders()
+  setFolders(folders.value)
   initPath()
 })
 

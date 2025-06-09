@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
-import { Button , ConfirmDialog } from 'primevue'
+import { Button, ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
-import type { Card, CardShortInfo } from '@/types'
+import type { Card, CardShortInfo, FolderShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
@@ -25,7 +25,8 @@ const {
   setViewedCard,
   cardsShortInfo,
   setCardsShortInfo,
-  setDefinitions
+  setDefinitions,
+  folders
 } = useStore()
 const confirm = useConfirm()
 
@@ -140,6 +141,29 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
 
   return cards.filter((card) => !uuidsInText.includes(card.uuid))
 })
+
+const foldersText = computed<string>(() => {
+  const uuidsStr = viewedCard.value?.folders
+
+  if (!uuidsStr || typeof uuidsStr !== 'string') return ''
+
+  try {
+    const parsedFolderUuids: string[] = JSON.parse(uuidsStr)
+
+    const parsedFolders: FolderShortInfo[] = folders.value.filter((folder) =>
+      parsedFolderUuids.includes(folder.uuid)
+    )
+
+    return Array.isArray(parsedFolders)
+      ? parsedFolders
+          .filter((folder) => folder?.name)
+          .map((folder) => folder.name)
+          .join(', ')
+      : ''
+  } catch {
+    return ''
+  }
+})
 </script>
 
 <template>
@@ -174,6 +198,7 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
       <TextViewer v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
       <hr />
       <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
+      <p>Папки: {{ foldersText }}</p>
       <div v-if="cardsInBottomList.length > 0" class="links-container">
         <h3>Еще связанные карточки</h3>
         <div
