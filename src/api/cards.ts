@@ -32,7 +32,7 @@ export const getCardsShortInfo = async (
 
   if (pagination) {
     query = query.range(pagination.from, pagination.to)
-    if (!sorting) query = query.order('title', { ascending: true })
+    if (!sorting) query = query.order('createdAt', { ascending: false })
   }
 
   if (folderUuid) {
