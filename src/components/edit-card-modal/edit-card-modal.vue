@@ -231,7 +231,6 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
         <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
         <Button type="button" label="Сохранить" @click="onSave" :disabled="isLoading"></Button>
       </div>
-      <button @click="console.log(updatedCard.links)">тест</button>
     </div>
   </Dialog>
 </template>

@@ -1,31 +1,37 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
+import { debounce } from 'lodash'
 import { type AutoCompleteCompleteEvent, AutoComplete } from 'primevue'
+import { getCardsShortInfo } from '@/api'
 import type { CardShortInfo } from '@/types'
 import { useStore } from '@/use-store'
+
+const { setLoading } = useStore()
 
 const emits = defineEmits<{
   updated: [value: CardShortInfo]
 }>()
 
 const selectedCard = ref<CardShortInfo | null>()
-const suggestions = ref<CardShortInfo[]>([])
+const options = ref<CardShortInfo[]>([])
 
-const { cardsShortInfo } = useStore()
-const sortedCardTitles = computed<CardShortInfo[]>(() => [...cardsShortInfo.value].reverse())
+const performSearch = async (str: string): Promise<void> => {
+  if (str.length < 2) return
 
-const search = (event: AutoCompleteCompleteEvent) => {
-  if (!event.query.trim()) {
-    suggestions.value = sortedCardTitles.value
-    return
-  }
+  setLoading(true)
+  const { data } = await getCardsShortInfo({
+    searchQuery: str.toLowerCase().trim(),
+    sorting: { field: 'createdAt', order: false }
+  })
 
-  const filteredCards = cardsShortInfo.value.filter((card) =>
-    card.title.toLowerCase().includes(event.query.toLowerCase())
-  )
-
-  suggestions.value = [...filteredCards].reverse()
+  options.value = data
+  setLoading(false)
 }
+
+const onSearch = debounce((event: AutoCompleteCompleteEvent) => {
+  console.log(event.query)
+  performSearch(event.query)
+}, 300)
 
 const onValueChange = (event: CardShortInfo) => {
   if (!event || typeof event !== 'object') return
@@ -37,10 +43,10 @@ const onValueChange = (event: CardShortInfo) => {
   <AutoComplete
     :model-value="selectedCard"
     dropdown
-    :suggestions="suggestions"
+    :suggestions="options"
     optionLabel="title"
     data-key="uuid"
-    @complete="search"
+    @complete="onSearch"
     @update:model-value="onValueChange"
   />
 </template>

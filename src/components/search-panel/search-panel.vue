@@ -55,7 +55,7 @@ onMounted(async () => {
 })
 
 const performSearch = async (): Promise<void> => {
-  if (!searchQuery.value.length) {
+  if (searchQuery.value.length < 2) {
     viewedCardUuid.value = null
     searchResults.value = [...cardsShortInfo.value]
 

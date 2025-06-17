@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { debounce } from 'lodash'
 import { MultiSelect } from 'primevue'
 import { getCardsShortInfo } from '@/api'
 import type { CardShortInfo } from '@/types'
@@ -7,63 +8,53 @@ import { useStore } from '@/use-store'
 
 const selectedCards = defineModel<CardShortInfo[]>()
 
-const allCardsShortInfo = ref<CardShortInfo[]>([])
+const options = ref<CardShortInfo[]>([])
 
 const isDropdownOpen = ref(false)
 
 const { setLoading } = useStore()
 
-/**
- * TODO: возможно это все можно удалить
- * Скрипт ниже: фикс последствий бага, из-за которого была нарушена цельность данных.
- * Есть ощущение, что проблема связана не с переименованиями, а с наличием
- * необходимых юидов в опшнс. Если это так, то надо при инициализации компонента
- * брать опции для выбранных компонентов запросом, чтобы они точно отображались
- */
-const brokenLinks = ref<CardShortInfo[]>([])
+const initOptions = () => {
+  if (selectedCards.value) {
+    options.value = [...selectedCards.value]
+  }
+}
 
-const brokenLinksText = computed<string>(() => {
-  return brokenLinks.value.map((link) => link.title).join(', ')
-})
+onMounted(() => initOptions())
 
-const fixBrokenLinks = async () => {
-  if (!selectedCards.value) {
-    brokenLinks.value = []
+const performSearch = async (str: string): Promise<void> => {
+  if (str.length < 2) {
+    initOptions()
     return
   }
 
-  //TODO: переделать инициализацию опций автокомплита под более большие данные
   setLoading(true)
-  allCardsShortInfo.value = (await getCardsShortInfo({})).data
+  const { data } = await getCardsShortInfo({
+    searchQuery: str.toLowerCase().trim(),
+    sorting: { field: 'createdAt', order: false }
+  })
+
+  const selectedIds = selectedCards.value?.map((card) => card.uuid) || []
+  const filteredData = data.filter((card) => !selectedIds.includes(card.uuid))
+
+  if (selectedCards.value?.length) {
+    options.value = [...filteredData, ...selectedCards.value]
+  } else {
+    options.value = [...filteredData]
+  }
   setLoading(false)
-
-  brokenLinks.value = selectedCards.value.reduce<CardShortInfo[]>((acc, card) => {
-    const maybeRenamedCard: CardShortInfo | undefined = allCardsShortInfo.value.find(
-      (item) => item.uuid === card.uuid
-    )
-
-    if (maybeRenamedCard && card.title !== maybeRenamedCard.title) {
-      acc.push({ ...maybeRenamedCard })
-
-      //и сразу фиксим
-      const cardIndex = selectedCards.value!.findIndex((c) => c.uuid === card.uuid)
-      if (cardIndex !== -1) {
-        selectedCards.value![cardIndex] = maybeRenamedCard
-      }
-    }
-
-    return acc
-  }, [])
 }
 
-onMounted(fixBrokenLinks)
+const onSearch = debounce((str: string) => {
+  performSearch(str)
+}, 300)
 </script>
 
 <template>
   <div class="wrapper">
     <MultiSelect
       v-model="selectedCards"
-      :options="allCardsShortInfo"
+      :options="options"
       optionLabel="title"
       filter
       placeholder="Выберите связанные карточки"
@@ -73,6 +64,7 @@ onMounted(fixBrokenLinks)
       class="card-multiselect"
       @before-show="isDropdownOpen = true"
       @before-hide="isDropdownOpen = false"
+      @filter="onSearch($event.value)"
     >
       <template #dropdownicon>
         <i :class="isDropdownOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" />
@@ -84,9 +76,6 @@ onMounted(fixBrokenLinks)
         <p class="header">Доступные карточки</p>
       </template>
     </MultiSelect>
-    <p v-if="brokenLinks.length">
-      При сохранении будут восстановлены нарушенные связи: {{ brokenLinksText }}
-    </p>
   </div>
 </template>
 
@@ -121,7 +110,8 @@ onMounted(fixBrokenLinks)
 /* TODO: изолировать */
 .p-multiselect-overlay {
   width: calc(100% - 100px);
-  transform: translateX(-40px);
+
+  /* transform: translateX(-40px); //TODO: применить изолированно */
 }
 
 .card-multiselect .p-multiselect-label {
@@ -134,7 +124,8 @@ onMounted(fixBrokenLinks)
 @media (width <= 768px) {
   .p-multiselect-overlay {
     width: calc(100% - 60px);
-    transform: translateX(30px);
+
+    /* transform: translateX(30px); //TODO: применить изолированно */
   }
 }
 </style>
