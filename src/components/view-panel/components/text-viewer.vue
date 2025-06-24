@@ -117,6 +117,58 @@ onBeforeUnmount(() => {
   color: var(--accent-azure);
 }
 
+:deep(table) {
+  width: 100%;
+  max-width: calc(100% - 80px);
+  overflow: hidden;
+  margin: 20px 40px;
+  border: 2px solid var(--bg-lighter);
+  border-radius: 8px;
+  border-spacing: 0;
+  border-collapse: separate;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+}
+
+:deep(th) {
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--bg-lighter);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--text-light);
+  background-color: var(--accent-blue);
+}
+
+:deep(th:not(:last-child)) {
+  border-right: 1px solid var(--bg-lighter);
+}
+
+:deep(td) {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--bg-lighter);
+  font-size: 14px;
+}
+
+:deep(td:not(:last-child)) {
+  border-right: 1px solid var(--bg-lighter);
+}
+
+:deep(tr:last-child td) {
+  border-bottom: none;
+}
+
+:deep(tbody tr) {
+  transition: background-color 0.2s ease;
+}
+
+:deep(tbody tr:nth-child(even)) {
+  background-color: rgb(255 255 255 / 2%);
+}
+
+:deep(tbody tr:hover) {
+  background-color: var(--bg-lighter) !important;
+}
+
 @media (width >= 320px) and (width <= 768px) {
   :deep(h1) {
     margin: 15px 0;
@@ -156,6 +208,22 @@ onBeforeUnmount(() => {
     max-width: 100%;
     margin: 10px 0;
     padding: 15px 20px 15px 15px;
+    font-size: 11px;
+  }
+
+  :deep(table) {
+    max-width: 100%;
+    margin: 15px 0;
+    font-size: 12px;
+  }
+
+  :deep(th) {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  :deep(td) {
+    padding: 6px 12px;
     font-size: 11px;
   }
 }
