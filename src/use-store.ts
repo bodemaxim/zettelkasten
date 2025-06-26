@@ -6,6 +6,7 @@ const definitions = ref<Card[]>([])
 const viewedCard = ref<Card | null>(null)
 const errorMessage = ref<Error | null>(null)
 const folders = ref<Folder[]>([])
+const currentFolderUuid = ref<string | null>(null)
 
 export const useStore = () => {
   const setDefinitions = (newValue: Card[]) => {
@@ -44,6 +45,10 @@ export const useStore = () => {
     folders.value = newValue
   }
 
+  const setCurrentFolderUuid = (newValue: string | null) => {
+    currentFolderUuid.value = newValue
+  }
+
   return {
     definitions,
     setDefinitions,
@@ -59,6 +64,8 @@ export const useStore = () => {
     errorMessage,
     setErrorMessage,
     folders,
-    setFolders
+    setFolders,
+    currentFolderUuid,
+    setCurrentFolderUuid
   }
 }

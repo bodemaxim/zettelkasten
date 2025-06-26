@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type StyleValue, ref, computed, watch } from 'vue'
+import { type StyleValue, ref, computed, watch, onMounted } from 'vue'
 import { Dialog, Button, InputText, Select } from 'primevue'
 import {
   createCard,
@@ -9,7 +9,7 @@ import {
   getAllDefinitions,
   getCardsShortInfo
 } from '@/api'
-import type { Card, CardEditable } from '@/types'
+import type { Card, CardEditable, CardsShortInfoRequest } from '@/types'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString, getAreArraysEqual } from '@/utils'
@@ -28,14 +28,15 @@ const {
   setLoading,
   cardsShortInfo,
   setDefinitions,
-  setCardsShortInfo
+  setCardsShortInfo,
+  currentFolderUuid
 } = useStore()
 
 const emits = defineEmits<{
   saved: [uuid: string]
 }>()
 
-const updatedCard = ref<CardEditable>({ ...defaultCard }) //Предотвращает предзаполнение данных
+const updatedCard = ref<CardEditable>({ ...defaultCard })
 
 const title = computed<string>(() =>
   viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
@@ -54,14 +55,20 @@ const onCancel = () => {
 }
 
 const updateSearchPanel = async (areDefinitionsChanged: boolean) => {
+  const request: CardsShortInfoRequest = {
+    pagination: { from: 0, to: 99 } //TODO брать актуальную пагинацию
+  }
+
+  if (currentFolderUuid.value) request.folderUuid = currentFolderUuid.value
+
   if (!areDefinitionsChanged) {
-    setCardsShortInfo((await getCardsShortInfo({ pagination: { from: 0, to: 99 } })).data) //TODO брать актуальную пагинацию
+    setCardsShortInfo((await getCardsShortInfo(request)).data)
     return
   }
 
   await Promise.all([
     setDefinitions(await getAllDefinitions()),
-    setCardsShortInfo((await getCardsShortInfo({ pagination: { from: 0, to: 99 } })).data) //TODO брать актуальную пагинацию
+    setCardsShortInfo((await getCardsShortInfo(request)).data)
   ])
 }
 
@@ -113,7 +120,7 @@ const onSave = async () => {
     const cardForUpdate: Card = {
       ...viewedCard.value,
       ...updatedCard.value,
-      type: selectedType.value.value
+      type: selectedType.value?.value ?? defaultType.value
     }
     cardUuid = cardForUpdate.uuid
 
@@ -179,7 +186,25 @@ watch(
   }
 )
 
-const selectedType = ref<TypeOption>(defaultType)
+const selectedType = ref<TypeOption | null>(null)
+
+watch(
+  () => viewedCard.value,
+  () => {
+    switch (viewedCard.value?.type) {
+      case 'definition':
+        selectedType.value = { ...typeOptionsList[0] }
+        break
+      case 'article':
+        selectedType.value = { ...typeOptionsList[1] }
+        break
+      default:
+        selectedType.value = { ...defaultType }
+        break
+    }
+  }
+)
+
 const cardTypes = ref<TypeOption[]>(typeOptionsList)
 </script>
 

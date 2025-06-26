@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { debounce } from 'lodash'
 import { Button, InputText, Paginator } from 'primevue'
 import { getCardsShortInfo } from '@/api'
@@ -15,7 +15,14 @@ defineEmits<{
   createCard: []
 }>()
 
-const { cardsShortInfo, setCardsShortInfo, isLoading, setLoading } = useStore()
+const {
+  cardsShortInfo,
+  setCardsShortInfo,
+  isLoading,
+  setLoading,
+  currentFolderUuid,
+  setCurrentFolderUuid
+} = useStore()
 
 const searchQuery = ref<string>('')
 const searchResults = ref<CardShortInfo[]>([])
@@ -27,7 +34,7 @@ const initData = async (): Promise<void> => {
     pagination: pagination.value
   }
 
-  if (folderUuid.value) request.folderUuid = folderUuid.value
+  if (currentFolderUuid.value) request.folderUuid = currentFolderUuid.value
 
   const result = await getCardsShortInfo(request)
 
@@ -41,7 +48,8 @@ const initData = async (): Promise<void> => {
 
 const setFolderFromStorage = () => {
   const storedValue = localStorage.getItem('folderUuid')
-  folderUuid.value = storedValue !== null ? removeQuotes(JSON.parse(storedValue)) : null
+  const newValue = storedValue !== null ? removeQuotes(JSON.parse(storedValue)) : null
+  setCurrentFolderUuid(newValue)
 }
 
 const removeQuotes = (str: string) => {
@@ -65,7 +73,7 @@ const performSearch = async (): Promise<void> => {
   setLoading(true)
   const { data } = await getCardsShortInfo({
     searchQuery: searchQuery.value.toLowerCase().trim(),
-    folderUuid: folderUuid.value || undefined,
+    folderUuid: currentFolderUuid.value || undefined,
     sorting: { field: 'title', order: true }
   })
 
@@ -81,10 +89,9 @@ watch(
 )
 
 const isBreadcrumbSelectOpen = ref(false)
-const folderUuid = ref<string | null>(null)
 
 watch(
-  () => folderUuid.value,
+  () => currentFolderUuid.value,
   () => initData()
 )
 
@@ -110,7 +117,13 @@ const changePage = (firstRow: number) => {
   }
 
   initData()
+  console.log(pagination.value?.to, recordsTotal.value)
 }
+
+const nextPaginationBtnDisabled = computed<boolean>(() => {
+  if (!pagination.value) return true
+  return pagination.value.to >= recordsTotal.value
+})
 </script>
 
 <template>
@@ -126,11 +139,7 @@ const changePage = (firstRow: number) => {
         @click="$emit('createCard')"
       />
     </div>
-    <BreadcrumbSelect
-      v-model:open="isBreadcrumbSelectOpen"
-      v-model:folder-uuid="folderUuid"
-      class="breadcrumb"
-    />
+    <BreadcrumbSelect v-model:open="isBreadcrumbSelectOpen" class="breadcrumb" />
     <div class="search-results-container" v-show="!isBreadcrumbSelectOpen">
       <div v-if="!isLoading && searchResults.length" class="search-results-list">
         <ul class="search-results-list">
@@ -159,11 +168,17 @@ const changePage = (firstRow: number) => {
                 icon="pi pi-chevron-left"
                 rounded
                 text
-                @click="prevPageCallback"
                 :disabled="page === 0"
+                @click="prevPageCallback"
               />
               <div class="paginator-text">{{ first }}—{{ last }} из {{ totalRecords }}</div>
-              <Button icon="pi pi-chevron-right" rounded text @click="nextPageCallback" />
+              <Button
+                icon="pi pi-chevron-right"
+                rounded
+                text
+                :disabled="nextPaginationBtnDisabled"
+                @click="nextPageCallback"
+              />
             </div>
           </template>
         </Paginator>
@@ -219,7 +234,7 @@ const changePage = (firstRow: number) => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0;
   border: 1px solid var(--primary-color);
   border-radius: 9999px;
   background-color: var(--bg-darker);
@@ -228,12 +243,13 @@ const changePage = (firstRow: number) => {
 .paginator-text {
   font-size: 12px;
   color: var(--accent-yellow);
+  background-color: var(--bg-darker);
 }
 </style>
 
 <style>
 .lib-paginator .p-paginator {
   margin-right: 20px;
-  background-color: var(--bg-dark);
+  padding: 0;
 }
 </style>

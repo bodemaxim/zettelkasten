@@ -6,7 +6,6 @@ import type { Folder, FolderShortInfo } from '@/types'
 import { useStore } from '@/use-store'
 
 const isSelectOpen = defineModel<boolean>('open')
-const folderUuid = defineModel<string | null>('folderUuid')
 
 const defaultPath: FolderShortInfo[] = [
   {
@@ -17,7 +16,7 @@ const defaultPath: FolderShortInfo[] = [
 
 const folders = ref<Folder[]>()
 
-const { setFolders } = useStore()
+const { setFolders, currentFolderUuid, setCurrentFolderUuid } = useStore()
 
 onMounted(async () => {
   folders.value = await getAllFolders()
@@ -75,13 +74,13 @@ const addFolderToPath = (folder: Folder) => {
 }
 
 const saveFolderUuid = (value: string | null) => {
-  folderUuid.value = value
+  setCurrentFolderUuid(value)
   localStorage.setItem('folderUuid', JSON.stringify(value ?? ''))
 }
 
 const initPath = () => {
   const currentFolder: Folder | undefined = folders.value?.find(
-    (item) => item.uuid === folderUuid.value
+    (item) => item.uuid === currentFolderUuid.value
   )
 
   if (!currentFolder) return
@@ -121,13 +120,10 @@ const initPath = () => {
       </template>
     </Breadcrumb>
     <Listbox
-      class="mew"
       v-if="isSelectOpen"
       :options="selectItems"
       optionLabel="name"
-      :pt="{
-        root: 'listbox-root'
-      }"
+      :scroll-height="'calc(100vh - 240px)'"
       @update:model-value="addFolderToPath"
     />
   </div>
@@ -138,10 +134,6 @@ const initPath = () => {
   margin: 5px 0;
   padding: 0;
   background-color: var(--bg-dark);
-}
-
-.listbox-root {
-  overflow: hidden;
 }
 
 .clickable-item {
