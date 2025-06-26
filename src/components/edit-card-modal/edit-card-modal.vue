@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type StyleValue, ref, computed, watch, onMounted } from 'vue'
+import { type StyleValue, ref, computed, watch } from 'vue'
 import { Dialog, Button, InputText, Select } from 'primevue'
 import {
   createCard,

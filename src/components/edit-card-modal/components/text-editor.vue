@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Button, Toolbar } from 'primevue'
+import { Toolbar } from 'primevue'
 import type { CardShortInfo } from '@/types'
 import CardsAutocomplete from './cards-autocomplete.vue'
 
@@ -8,11 +8,6 @@ const text = defineModel<string>('text')
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const selectionRange = ref<{ start: number; end: number } | null>(null)
-const isHyperLinkEditorVisible = ref(false)
-
-const toggleHyperLinkEditor = () => {
-  isHyperLinkEditorVisible.value = !isHyperLinkEditorVisible.value
-}
 
 const saveCurrentSelection = () => {
   const textarea = textareaRef.value
@@ -43,20 +38,13 @@ const addHyperlinkToSelection = (hyperlink: CardShortInfo) => {
 
 <template>
   <div class="text-editor-wrapper">
-    <p>*выдели слово в редакторе и выбери гиперссылку на статью Z10n</p>
     <Toolbar class="text-editor-toolbar">
       <template #start>
         <div class="left-toolbar-container">
-          <Button
-            icon="pi pi-external-link"
-            severity="primary"
-            size="small"
-            class="button"
-            @click="toggleHyperLinkEditor"
-          />
           <CardsAutocomplete
-            v-if="isHyperLinkEditorVisible"
             @updated="addHyperlinkToSelection($event)"
+            placeholder="Выдели текст, выбери ссылку"
+            class="autocomplete"
           />
         </div>
       </template>
@@ -77,6 +65,10 @@ const addHyperlinkToSelection = (hyperlink: CardShortInfo) => {
   gap: 4px;
   justify-content: left;
   width: 100%;
+}
+
+.autocomplete {
+  width: 300px;
 }
 
 .input-form {

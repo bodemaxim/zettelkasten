@@ -29,7 +29,6 @@ const performSearch = async (str: string): Promise<void> => {
 }
 
 const onSearch = debounce((event: AutoCompleteCompleteEvent) => {
-  console.log(event.query)
   performSearch(event.query)
 }, 300)
 
@@ -46,14 +45,17 @@ const onValueChange = (event: CardShortInfo) => {
     :suggestions="options"
     optionLabel="title"
     data-key="uuid"
+    :pt="{
+      listContainer: 'list-container'
+    }"
     @complete="onSearch"
     @update:model-value="onValueChange"
   />
 </template>
 
 <style>
-/* TODO: изолировать стили */
-.p-autocomplete-overlay {
-  width: calc(100% - 100px);
+.list-container {
+  width: 100vw;
+  padding: 5px;
 }
 </style>
