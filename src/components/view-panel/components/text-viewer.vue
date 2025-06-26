@@ -83,7 +83,7 @@ onBeforeUnmount(() => {
 }
 
 :deep(h4) {
-  margin: 10px 0 5px 20px;
+  margin: 10px 0 5px 25px;
   font-size: 18px;
   color: var(--accent-yellow);
 }
@@ -111,6 +111,10 @@ onBeforeUnmount(() => {
   padding: 15px 80px 15px 15px;
   border-radius: 8px;
   background-color: var(--accent-blue);
+}
+
+:deep(code:not(pre > code)) {
+  color: var(--accent-pink);
 }
 
 :deep(a) {

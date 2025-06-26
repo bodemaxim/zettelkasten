@@ -39,7 +39,7 @@ body {
   --accent-blue: #3f388f;
   --accent-yellow: #f7dc6f;
   --accent-red: #f22;
-  --accent-pink: lightpink;
+  --accent-pink: #ffd8e0;
   --grad-dark-to-light: linear-gradient(to bottom, var(--primary-dark), var(--bg-lighter));
   --grad-accent-to-dark: linear-gradient(to bottom, var(--primary-accent), var(--primary-dark));
 }
