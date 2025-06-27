@@ -91,11 +91,7 @@ const toggle = (event: Event) => {
     <Toolbar class="text-editor-toolbar">
       <template #start>
         <div class="left-toolbar-container">
-          <CardsAutocomplete
-            @updated="addHyperlinkToSelection($event)"
-            placeholder="Выдели текст, выбери ссылку"
-            class="autocomplete"
-          />
+          <CardsAutocomplete @updated="addHyperlinkToSelection($event)" class="autocomplete" />
           <div class="table-button-container">
             <Button
               type="button"
@@ -147,6 +143,7 @@ const toggle = (event: Event) => {
   background-color: var(--bg-lighter);
 }
 
+.autocomplete,
 .table-button-container {
   background-color: var(--bg-lighter);
 }
