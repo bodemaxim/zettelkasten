@@ -4,48 +4,29 @@ import { TreeSelect } from 'primevue'
 import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
 import type { Folder } from '@/types'
-
-const nodes = ref<TreeNode[]>([])
-
-type SelectedValues = {
-  [key: string]: true
-}
-
-type ChangedValue = {
-  uuid: string
-  isSelected: boolean
-}
-
-const previouslySelectedUuids = ref<string[]>([])
-
-const getChangedValue = (prevValues: string[], newValues: string[]): ChangedValue => {
-  if (prevValues.length < newValues.length) {
-    const uuid = newValues.find((uuid) => !prevValues.includes(uuid))
-
-    return {
-      uuid: uuid ?? '',
-      isSelected: true
-    }
-  } else {
-    const uuid = prevValues.find((uuid) => !newValues.includes(uuid))
-
-    return {
-      uuid: uuid ?? '',
-      isSelected: false
-    }
-  }
-}
+import type { ChangedValue, SelectedValues } from './folders-treeselect.types'
 
 /**
  * JSON с массивом юидов в формате строки.
  */
 const selectedUuidsStringifiedJSON = defineModel<string>()
 
-const selectedFolders = ref<SelectedValues>()
-
+const nodes = ref<TreeNode[]>([])
 const folders = ref<Folder[]>([])
+const selectedFolders = ref<SelectedValues>()
+const previouslySelectedUuids = ref<string[]>([])
 
-onMounted(async () => {
+const getSelectedValues = (uuidsStringifiedJson: string): SelectedValues => {
+  const uuids: string[] = JSON.parse(uuidsStringifiedJson)
+
+  const result: SelectedValues = {}
+  uuids.forEach((uuid) => {
+    result[uuid] = true
+  })
+  return result
+}
+
+const initData = async () => {
   folders.value = await getAllFolders()
   nodes.value = buildFolderTree(folders.value)
   selectedFolders.value = selectedUuidsStringifiedJSON.value
@@ -55,7 +36,9 @@ onMounted(async () => {
   if (selectedFolders.value) {
     previouslySelectedUuids.value = Object.keys(selectedFolders.value)
   }
-})
+}
+
+onMounted(initData)
 
 /**
  * Строит дерево папок из плоского массива.
@@ -84,6 +67,24 @@ const buildFolderTree = (folders: Folder[], parentUuid: string | null = null): T
   })
 }
 
+const getChangedValue = (prevValues: string[], newValues: string[]): ChangedValue => {
+  if (prevValues.length < newValues.length) {
+    const uuid = newValues.find((uuid) => !prevValues.includes(uuid))
+
+    return {
+      uuid: uuid ?? '',
+      isSelected: true
+    }
+  } else {
+    const uuid = prevValues.find((uuid) => !newValues.includes(uuid))
+
+    return {
+      uuid: uuid ?? '',
+      isSelected: false
+    }
+  }
+}
+
 /**
  * При селекте папки автоматом выбираются родители.
  * При деселекте родителя происходит деселект дочерних папок.
@@ -92,65 +93,51 @@ const onValueChange = (e: SelectedValues) => {
   let arr = Object.keys(e)
 
   const changedValue: ChangedValue = getChangedValue(previouslySelectedUuids.value, arr)
-  previouslySelectedUuids.value = [...arr]
 
   if (!changedValue.isSelected) {
     arr = getUuidsWithOddDeleted(arr, changedValue.uuid)
   } else {
-    arr = addParentFolderUuids(arr)
+    arr = addParentFolderUuids(arr, changedValue.uuid)
   }
 
-  selectedFolders.value = arr.reduce((acc, folderUuid) => {
+  previouslySelectedUuids.value = [...arr]
+
+  selectedFolders.value = arr.reduce<SelectedValues>((acc, folderUuid) => {
     acc[folderUuid] = true
     return acc
-  }, {} as SelectedValues)
+  }, {})
 
   selectedUuidsStringifiedJSON.value = JSON.stringify(arr)
 }
 
-const addParentFolderUuids = (selectedUuids: string[]): string[] => {
+const addParentFolderUuids = (selectedUuids: string[], newUuid: string): string[] => {
+  const folder = folders.value.find((folder) => folder.uuid === newUuid)
+
+  if (!folder) return selectedUuids
+
   const allUuids = new Set(selectedUuids)
 
-  selectedUuids.forEach((uuid) => {
-    const folder = folders.value.find((f) => f.uuid === uuid)
-    if (folder && folder.path.length > 0) {
-      folder.path.forEach((pathItem) => {
-        allUuids.add(pathItem.uuid)
-      })
-    }
-  })
+  if (folder.path.length) {
+    folder.path.forEach((pathItem) => {
+      allUuids.add(pathItem.uuid)
+    })
+  }
+
   return Array.from(allUuids)
 }
 
 /**
- * Для деселекта папки с дочерними папками.
+ * Вызывается при деселекте папки для деселекта дочерних папок.
  * @return массив выбранных юидов папок.
  */
 const getUuidsWithOddDeleted = (selectedUuids: string[], parentUuid: string): string[] => {
-  const result = [...selectedUuids]
+  const selectedFolders = folders.value.filter((folder) => selectedUuids.includes(folder.uuid))
 
-  const childFolders = folders.value.filter((folder) =>
-    folder.path.some((pathItem) => pathItem.uuid === parentUuid)
+  const filteredFolders = selectedFolders.filter(
+    (folder) => !folder.path.some((pathItem) => pathItem.uuid === parentUuid)
   )
 
-  childFolders.forEach((childFolder) => {
-    const index = result.indexOf(childFolder.uuid)
-    if (index > -1) {
-      result.splice(index, 1)
-    }
-  })
-
-  return result
-}
-
-const getSelectedValues = (uuidsStringifiedJson: string): SelectedValues => {
-  const uuids: string[] = JSON.parse(uuidsStringifiedJson)
-
-  const result: SelectedValues = {}
-  uuids.forEach((uuid) => {
-    result[uuid] = true
-  })
-  return result
+  return filteredFolders.map((folder) => folder.uuid)
 }
 </script>
 
