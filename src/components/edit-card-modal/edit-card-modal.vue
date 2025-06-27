@@ -15,7 +15,7 @@ import { useStore } from '@/use-store'
 import { getUuidsInString, getAreArraysEqual } from '@/utils'
 import CardsMultiselect from './components/cards-multiselect.vue'
 import FoldersTreeselect from './components/folders-treeselect.vue'
-import TextEditor from './components/text-editor.vue'
+import TextEditor from './components/text-editor/text-editor.vue'
 import { defaultCard, typeOptionsList, defaultType } from './edit-card-modal.consts'
 import { type TypeOption } from './edit-card-modal.types'
 
