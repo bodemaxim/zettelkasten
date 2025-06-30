@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { vOnClickOutside } from '@vueuse/components'
 import { Breadcrumb, Button, Listbox } from 'primevue'
 import { getAllFolders } from '@/api'
 import type { Folder, FolderShortInfo } from '@/types'
@@ -93,7 +94,9 @@ const initPath = () => {
   currentPath.value = [...defaultPath, ...currentFolder.path, currentFolderShortInfo]
 }
 
-//TODO: приделать закрытие листбокса при клике вовне
+const closeSelect = () => {
+  isSelectOpen.value = false
+}
 </script>
 
 <template>
@@ -121,6 +124,7 @@ const initPath = () => {
     </Breadcrumb>
     <Listbox
       v-if="isSelectOpen"
+      v-on-click-outside="closeSelect"
       :options="selectItems"
       optionLabel="name"
       :scroll-height="'calc(100vh - 240px)'"

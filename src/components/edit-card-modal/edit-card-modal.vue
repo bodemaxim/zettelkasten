@@ -95,7 +95,6 @@ const updateAllNeeded = async (targetCard: Card, isNewCard: boolean) => {
 
   const linkedCards = await getLinkedCardsForUpdate(targetCard)
   const cardsToUpdate = isNewCard ? linkedCards : [targetCard, ...linkedCards]
-  console.log(1, cardsToUpdate)
   await updateCards(cardsToUpdate)
 
   const areDefinitionsUpdated = getAreDefinitionsUpdated([targetCard, ...linkedCards])

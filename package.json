@@ -17,7 +17,7 @@
   "dependencies": {
     "@primeuix/themes": "^1.0.0",
     "@supabase/supabase-js": "^2.49.1",
-    "@vueuse/components": "^11.1.0",
+    "@vueuse/components": "^11.3.0",
     "@vueuse/core": "^11.1.0",
     "highlight.js": "^11.11.1",
     "lodash": "^4.17.21",

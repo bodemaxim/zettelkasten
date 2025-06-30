@@ -20,7 +20,7 @@ const initOptions = () => {
   }
 }
 
-onMounted(() => initOptions())
+onMounted(initOptions)
 
 const performSearch = async (str: string): Promise<void> => {
   if (str.length < 2) {
