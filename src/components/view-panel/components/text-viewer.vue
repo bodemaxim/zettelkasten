@@ -11,6 +11,7 @@ const emits = defineEmits<{
 
 const parsedMarkdown = computed<string>(() => {
   const result = marked.parse(markdownText.value ?? '')
+  console.log(result)
   return typeof result === 'string' ? result : ''
 })
 
@@ -64,6 +65,20 @@ onBeforeUnmount(() => {
   box-shadow: 0 0 15px var(--accent-blue);
 }
 
+:deep(pre) {
+  display: inline-block;
+  max-width: calc(100% - 100px);
+  overflow-y: auto;
+  margin: 10px 40px;
+  padding: 15px 80px 15px 15px;
+  border-radius: 8px;
+  background-color: var(--accent-blue);
+}
+
+:deep(code:not(pre > code)) {
+  color: var(--accent-pink);
+}
+
 :deep(h1) {
   margin: 15px 0;
   font-size: 24px;
@@ -101,20 +116,6 @@ onBeforeUnmount(() => {
 :deep(ol) {
   margin: 12px 50px;
   list-style: decimal;
-}
-
-:deep(pre) {
-  display: inline-block;
-  max-width: calc(100% - 100px);
-  overflow-y: auto;
-  margin: 10px 40px;
-  padding: 15px 80px 15px 15px;
-  border-radius: 8px;
-  background-color: var(--accent-blue);
-}
-
-:deep(code:not(pre > code)) {
-  color: var(--accent-pink);
 }
 
 :deep(a) {
@@ -171,6 +172,27 @@ onBeforeUnmount(() => {
 
 :deep(tbody tr:hover) {
   background-color: var(--bg-lighter) !important;
+}
+
+:deep(blockquote) {
+  position: relative;
+  margin: 15px 0 15px 40px;
+}
+
+:deep(blockquote::before) {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 20px;
+  width: 4px;
+  border-radius: 2px;
+  background-color: var(--accent-green);
+  content: '';
+}
+
+:deep(blockquote > *) {
+  font-size: 13px;
+  font-style: italic;
 }
 
 @media (width >= 320px) and (width <= 768px) {
