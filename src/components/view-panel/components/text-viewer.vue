@@ -11,7 +11,6 @@ const emits = defineEmits<{
 
 const parsedMarkdown = computed<string>(() => {
   const result = marked.parse(markdownText.value ?? '')
-  console.log(result)
   return typeof result === 'string' ? result : ''
 })
 
@@ -251,6 +250,14 @@ onBeforeUnmount(() => {
   :deep(td) {
     padding: 6px 12px;
     font-size: 11px;
+  }
+
+  :deep(blockquote > *) {
+    font-size: 12px;
+  }
+
+  :deep(blockquote::before) {
+    left: -12px;
   }
 }
 </style>
