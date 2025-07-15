@@ -1,9 +1,2 @@
-#!/bin/sh
-. "$(dirname "$0")/husky.sh"
-
-# Запускаем линтеры перед коммитом
-npm run lint
-npm run stylelint
-
-# После исправлений добавляем файлы в коммит, если есть изменения
-git add .
+#!/usr/bin/env sh
+. "$(dirname "$0")/h"
