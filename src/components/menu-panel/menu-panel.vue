@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, type StyleValue } from 'vue'
+import { vOnClickOutside } from '@vueuse/components'
 import { useStore } from '@/use-store'
 import ExpandMenuButton from './expand-menu-button/expand-menu-button.vue'
 import { MENU_HEIGHT } from './menu-panel.consts'
 
-const { isMobileView, isMenuExpanded } = useStore()
+const { isMobileView, isMenuExpanded, setIsMenuExpanded } = useStore()
 
 const menuStyles = computed<StyleValue>(() => ({
   minHeight: `${MENU_HEIGHT}px`
@@ -18,7 +19,13 @@ const menuStyles = computed<StyleValue>(() => ({
   <div v-if="isMenuExpanded && !isMobileView" :style="menuStyles" class="expanded-desktop">
     меню
   </div>
-  <div v-if="isMenuExpanded && isMobileView" class="expanded-mobile">мобильное меню</div>
+  <div
+    v-if="isMenuExpanded && isMobileView"
+    class="expanded-mobile"
+    v-on-click-outside="() => setIsMenuExpanded(false)"
+  >
+    мобильное меню
+  </div>
 </template>
 
 <style scoped>

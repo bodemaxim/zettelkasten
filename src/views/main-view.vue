@@ -21,7 +21,8 @@ const {
   setScreenWidth,
   isLoading,
   setViewedCard,
-  errorMessage
+  errorMessage,
+  isMenuExpanded
 } = useStore()
 
 const fetchDefinitions = async () => {
@@ -54,7 +55,7 @@ const searchPanelStyles = computed<StyleValue>(() => {
 
   if (isMobileView.value) {
     heightValue = '100vh'
-  } else if (menuExpanded.value) {
+  } else if (isMenuExpanded.value) {
     heightValue = `calc(100vh - 100px - ${MENU_HEIGHT}px + 20px)`
   } else {
     heightValue = 'calc(100vh - 80px)'
@@ -69,7 +70,7 @@ const searchPanelStyles = computed<StyleValue>(() => {
 
 //TODO: понять почему нужна загадочная поправка на 20px
 const viewPanelStyles = computed<StyleValue>(() => ({
-  height: menuExpanded.value
+  height: isMenuExpanded.value
     ? `calc(100vh - 100px - ${MENU_HEIGHT}px + 20px)`
     : 'calc(100vh - 80px)'
 }))
@@ -89,8 +90,6 @@ watch(
     isError.value = !!errorMessage.value
   }
 )
-
-const menuExpanded = ref(false)
 </script>
 
 <template>
