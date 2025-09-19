@@ -3,6 +3,8 @@ import { type StyleValue, ref, onMounted, computed, watch } from 'vue'
 import { vResizeObserver } from '@vueuse/components'
 import { getAllDefinitions, getCardByUuid } from '@/api'
 import EditCardModal from '@/components/edit-card-modal/edit-card-modal.vue'
+import { MENU_HEIGHT } from '@/components/menu-panel/menu-panel.consts'
+import MenuPanel from '@/components/menu-panel/menu-panel.vue'
 import SearchPanel from '@/components/search-panel/search-panel.vue'
 import ViewPanel from '@/components/view-panel/view-panel.vue'
 import CoolErrorDialog from '@/ui/cool-error-dialog.vue'
@@ -46,15 +48,37 @@ const onCardDelete = () => {
   viewedCardUuid.value = null
 }
 
-const searchPanelStyles = computed<StyleValue>(() => ({
-  width: isMobileView.value ? '100%' : '300px',
-  minWidth: isMobileView.value ? undefined : '300px'
+//TODO: понять почему нужна загадочная поправка на 20px
+const searchPanelStyles = computed<StyleValue>(() => {
+  let heightValue: string
+
+  if (isMobileView.value) {
+    heightValue = '100vh'
+  } else if (menuExpanded.value) {
+    heightValue = `calc(100vh - 100px - ${MENU_HEIGHT}px + 20px)`
+  } else {
+    heightValue = 'calc(100vh - 80px)'
+  }
+
+  return {
+    width: isMobileView.value ? '100%' : '300px',
+    minWidth: isMobileView.value ? undefined : '300px',
+    height: heightValue
+  }
+})
+
+//TODO: понять почему нужна загадочная поправка на 20px
+const viewPanelStyles = computed<StyleValue>(() => ({
+  height: menuExpanded.value
+    ? `calc(100vh - 100px - ${MENU_HEIGHT}px + 20px)`
+    : 'calc(100vh - 80px)'
 }))
 
 const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
   const [entry] = entries
   const { width } = entry.contentRect
   setScreenWidth(width)
+  console.log(width)
 }
 
 const isError = ref<boolean>(false)
@@ -65,6 +89,8 @@ watch(
     isError.value = !!errorMessage.value
   }
 )
+
+const menuExpanded = ref(false)
 </script>
 
 <template>
@@ -72,6 +98,9 @@ watch(
     <CoolSpinner v-if="isLoading" />
     <CoolErrorDialog v-model:visible="isError" />
     <EditCardModal v-model:visible="modalVisible" @saved="onCardSave" />
+    <MenuPanel />
+
+    <!--мобильная версия-->
     <ViewPanel
       v-if="isMobileView && viewedCardUuid"
       v-model="viewedCardUuid"
@@ -80,6 +109,8 @@ watch(
       @edited="openModal"
       @click-on-link="viewedCardUuid = $event"
     />
+
+    <!--десктопная версия-->
     <div v-show="!isMobileView || !viewedCardUuid" class="panels-container">
       <SearchPanel
         v-model="viewedCardUuid"
@@ -90,6 +121,7 @@ watch(
       <ViewPanel
         v-if="!isMobileView"
         v-model="viewedCardUuid"
+        :style="viewPanelStyles"
         class="view-panel"
         @deleted="onCardDelete"
         @edited="openModal"

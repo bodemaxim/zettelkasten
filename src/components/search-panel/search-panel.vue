@@ -7,6 +7,7 @@ import type { CardShortInfo, CardsShortInfoRequest, Pagination } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
+import ExpandMenuButton from '../menu-panel/expand-menu-button/expand-menu-button.vue'
 import BreadcrumbSelect from './breadcrumb-select/breadcrumb-select.vue'
 
 const viewedCardUuid = defineModel<string | null>()
@@ -21,7 +22,8 @@ const {
   isLoading,
   setLoading,
   currentFolderUuid,
-  setCurrentFolderUuid
+  setCurrentFolderUuid,
+  isMobileView
 } = useStore()
 
 const searchQuery = ref<string>('')
@@ -138,6 +140,7 @@ const nextPaginationBtnDisabled = computed<boolean>(() => {
         size="small"
         @click="$emit('createCard')"
       />
+      <ExpandMenuButton v-if="isMobileView" />
     </div>
     <BreadcrumbSelect v-model:open="isBreadcrumbSelectOpen" class="breadcrumb" />
     <div class="search-results-container" v-show="!isBreadcrumbSelectOpen">

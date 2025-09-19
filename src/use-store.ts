@@ -7,6 +7,12 @@ const viewedCard = ref<Card | null>(null)
 const errorMessage = ref<Error | null>(null)
 const folders = ref<Folder[]>([])
 const currentFolderUuid = ref<string | null>(null)
+const isMenuExpanded = ref(false)
+
+const screenWidth = ref<number>(window.innerWidth)
+const isMobileView = computed(() => {
+  return screenWidth.value < 768
+})
 
 export const useStore = () => {
   const setDefinitions = (newValue: Card[]) => {
@@ -23,15 +29,9 @@ export const useStore = () => {
     isLoading.value = value
   }
 
-  const screenWidth = ref<number>(window.innerWidth)
-
   const setScreenWidth = (newValue: number) => {
     screenWidth.value = newValue
   }
-
-  const isMobileView = computed(() => {
-    return screenWidth.value < 768
-  })
 
   const setViewedCard = (newValue: Card | null) => {
     viewedCard.value = newValue
@@ -47,6 +47,10 @@ export const useStore = () => {
 
   const setCurrentFolderUuid = (newValue: string | null) => {
     currentFolderUuid.value = newValue
+  }
+
+  const setIsMenuExpanded = (newValue: boolean) => {
+    isMenuExpanded.value = newValue
   }
 
   return {
@@ -66,6 +70,8 @@ export const useStore = () => {
     folders,
     setFolders,
     currentFolderUuid,
-    setCurrentFolderUuid
+    setCurrentFolderUuid,
+    isMenuExpanded,
+    setIsMenuExpanded
   }
 }
