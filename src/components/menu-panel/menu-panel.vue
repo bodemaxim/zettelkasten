@@ -24,7 +24,10 @@ const menuStyles = computed<StyleValue>(() => ({
     class="expanded-mobile"
     v-on-click-outside="() => setIsMenuExpanded(false)"
   >
-    мобильное меню
+    <div class="expand-button-mobile-container">
+      <div>мобильное меню</div>
+      <ExpandMenuButton class="expand-button-mobile" />
+    </div>
   </div>
 </template>
 
@@ -48,6 +51,22 @@ const menuStyles = computed<StyleValue>(() => ({
   background-color: transparent;
 }
 
+.expand-button-mobile-container > * {
+  background-color: transparent;
+}
+
+.expand-button-mobile-container {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  margin: 4px;
+  padding: 10px 15px;
+  background-color: transparent;
+}
+
+.expand-button-mobile,
 .expand-button-desktop {
   background-color: transparent;
 }

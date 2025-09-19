@@ -26,9 +26,3 @@ const buttonIcon = computed(() => {
     ></Button>
   </div>
 </template>
-
-<style scoped>
-.menu-button {
-  z-index: 2;
-}
-</style>
