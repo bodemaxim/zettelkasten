@@ -8,7 +8,7 @@ import CoolPanel from '@/ui/cool-panel.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString } from '@/utils'
-import TextViewer from './components/text-viewer.vue'
+import TextViewer from './text-viewer/text-viewer.vue'
 
 const emits = defineEmits<{
   deleted: []

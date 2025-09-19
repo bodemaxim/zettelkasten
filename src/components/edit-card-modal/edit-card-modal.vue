@@ -13,11 +13,11 @@ import type { Card, CardEditable, CardsShortInfoRequest } from '@/types'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString, getAreArraysEqual } from '@/utils'
-import CardsMultiselect from './components/cards-multiselect.vue'
-import FoldersTreeselect from './components/folders-treeselect/folders-treeselect.vue'
-import TextEditor from './components/text-editor/text-editor.vue'
+import CardsMultiselect from './cards-multiselect/cards-multiselect.vue'
 import { defaultCard, typeOptionsList, defaultType } from './edit-card-modal.consts'
 import { type TypeOption } from './edit-card-modal.types'
+import FoldersTreeselect from './folders-treeselect/folders-treeselect.vue'
+import TextEditor from './text-editor/text-editor.vue'
 
 const visible = defineModel<boolean>('visible')
 

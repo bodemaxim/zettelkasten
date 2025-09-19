@@ -7,7 +7,7 @@ import type { CardShortInfo, CardsShortInfoRequest, Pagination } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
-import BreadcrumbSelect from './components/breadcrumb-select.vue'
+import BreadcrumbSelect from './breadcrumb-select/breadcrumb-select.vue'
 
 const viewedCardUuid = defineModel<string | null>()
 
