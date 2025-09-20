@@ -33,7 +33,7 @@ export async function login(email: string, password: string) {
 
 export async function seeUser() {
   const localUser = await supabase.auth.getSession()
-  console.log(localUser.data.session)
+  return localUser
 }
 
 export async function logout() {

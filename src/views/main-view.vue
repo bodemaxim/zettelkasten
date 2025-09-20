@@ -79,7 +79,6 @@ const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
   const [entry] = entries
   const { width } = entry.contentRect
   setScreenWidth(width)
-  console.log(width)
 }
 
 const isError = ref<boolean>(false)

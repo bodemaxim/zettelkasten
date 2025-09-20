@@ -119,7 +119,6 @@ const changePage = (firstRow: number) => {
   }
 
   initData()
-  console.log(pagination.value?.to, recordsTotal.value)
 }
 
 const nextPaginationBtnDisabled = computed<boolean>(() => {

@@ -46,3 +46,10 @@ export type CardsShortInfoRequest = {
   sorting?: Sorting
   folderUuid?: string
 }
+
+export type Profile = {
+  uuid: string
+  first_name: string
+  last_name: string
+  created_at: string
+}

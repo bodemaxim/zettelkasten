@@ -50,7 +50,6 @@ export const useStore = () => {
   }
 
   const setIsMenuExpanded = (newValue: boolean) => {
-    console.log(1)
     isMenuExpanded.value = newValue
   }
 
