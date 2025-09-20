@@ -1,13 +1,22 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { InputText, Button, IftaLabel } from 'primevue'
-import { login, seeUser } from '@/api/auth'
+import { computed, onMounted, ref } from 'vue'
+import { Button } from 'primevue'
+import { createAccount, login, seeUser } from '@/api/auth'
 import router from '@/router'
+import type { NewUser } from '@/types'
+import CoolForm from '@/ui/cool-form.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 
+const isNewUser = ref(false)
+
 const email = ref('')
 const password = ref('')
+
+const passwordConfirm = ref('')
+const firstName = ref('')
+const lastName = ref('')
+
 const { isLoading, setLoading } = useStore()
 
 const handleSignIn = async () => {
@@ -33,32 +42,84 @@ const loginAutomatically = () => {
 }
 
 onMounted(loginAutomatically)
+
+const isPasswordMismatch = computed<boolean>(() =>
+  Boolean(password.value && passwordConfirm.value && password.value !== passwordConfirm.value)
+)
+
+const handleCreateNew = async () => {
+  if (isPasswordMismatch.value) return
+
+  setLoading(true)
+
+  const request: NewUser = {
+    email: email.value,
+    password: password.value,
+    first_name: firstName.value,
+    last_name: lastName.value
+  }
+
+  await createAccount(request)
+  await login(email.value, password.value)
+
+  setLoading(false)
+
+  localStorage.setItem('email', email.value)
+  localStorage.setItem('password', password.value)
+
+  router.push('/')
+}
+
+const title = computed<string>(() => (isNewUser.value ? 'Создать аккаунт' : 'Войти'))
+
+const handleSubmit = () => {
+  if (isNewUser.value) handleCreateNew()
+  else handleSignIn()
+}
+
+const question = computed<string>(() => (isNewUser.value ? 'Уже есть аккаунт?' : 'Впервые тут?'))
+const suggestedAction = computed<string>(() => (isNewUser.value ? 'Войти' : 'Создать аккаунт'))
 </script>
 
 <template>
   <div class="login-view">
     <CoolSpinner v-if="isLoading" />
     <div v-else class="form-container">
-      <h1 class="form-title">Войти</h1>
+      <h1 class="form-title">{{ title }}</h1>
 
-      <form @submit.prevent="handleSignIn">
-        <IftaLabel for="email" class="input-container">
-          <label for="email">эл. почта:</label>
-          <InputText id="email" v-model="email" autocomplete="email" required class="input" />
-        </IftaLabel>
-        <IftaLabel for="password" class="input-container">
-          <label for="password">Пароль:</label>
-          <InputText
-            id="password"
-            type="password"
-            v-model="password"
-            autocomplete="password"
-            required
-            class="input"
-          />
-        </IftaLabel>
-        <Button @click="handleSignIn" class="submit-button">войти</Button>
-      </form>
+      <CoolForm v-model="email" label="Эл. почта" id="email" autocomplete="email" required />
+      <CoolForm id="password" v-model="password" autocomplete="password" required label="Пароль" />
+      <CoolForm
+        v-if="isNewUser"
+        v-model="passwordConfirm"
+        label="Подтвердите пароль"
+        id="passwordConfirm"
+        type="text"
+        required
+        :invalid="isPasswordMismatch"
+        error-message="Пароли не совпадают"
+      />
+      <CoolForm
+        v-if="isNewUser"
+        v-model="firstName"
+        label="Имя"
+        id="firstName"
+        type="text"
+        required
+      />
+      <CoolForm
+        v-if="isNewUser"
+        v-model="lastName"
+        label="Фамилия"
+        id="lastName"
+        type="text"
+        required
+      />
+      <Button @click="handleSubmit" class="submit-button">{{ title }}</Button>
+      <div class="alternative-offer">
+        {{ question }}
+        <span class="alternative-link" @click="isNewUser = !isNewUser">{{ suggestedAction }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -103,5 +164,16 @@ onMounted(loginAutomatically)
 
 .submit-button {
   width: 100%;
+}
+
+.alternative-offer {
+  width: 100%;
+  margin: 20px 0 0;
+  text-align: center;
+}
+
+.alternative-link {
+  color: var(--accent-yellow);
+  cursor: pointer;
 }
 </style>

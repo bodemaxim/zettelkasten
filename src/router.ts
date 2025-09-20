@@ -6,7 +6,6 @@ let localUser
 
 const MainView = () => import('@/views/main-view.vue')
 const LoginView = () => import('@/views/login-view.vue')
-const UnauthorizedView = () => import('@/views/unauthorized-view.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,18 +20,13 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView
-    },
-    {
-      path: '/unauthorized',
-      name: 'unauthorized',
-      component: UnauthorizedView
     }
   ]
 })
 
 async function getUser(next: NavigationGuardNext) {
   localUser = await supabase.auth.getSession()
-  if (localUser.data.session == null) next('/unauthorized')
+  if (localUser.data.session == null) next('/login')
   else next()
 }
 

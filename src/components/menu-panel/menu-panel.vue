@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, type StyleValue } from 'vue'
+import { useRouter } from 'vue-router'
 import { vOnClickOutside } from '@vueuse/components'
-import { seeUser } from '@/api'
+import { Button } from 'primevue'
+import { logout, seeUser } from '@/api'
 import { getProfileByUuid } from '@/api/profiles'
 import type { Profile } from '@/types'
 import { useStore } from '@/use-store'
 import ExpandMenuButton from './expand-menu-button/expand-menu-button.vue'
 import { MENU_HEIGHT } from './menu-panel.consts'
+
+const router = useRouter()
 
 const { isMobileView, isMenuExpanded, setIsMenuExpanded } = useStore()
 
@@ -29,9 +33,19 @@ onMounted(async () => {
   const userId = data.session.user.id
   profile.value = await getProfileByUuid(userId)
 })
+
+const exitProfile = () => {
+  localStorage.removeItem('email')
+  localStorage.removeItem('password')
+
+  logout()
+
+  router.push('login')
+}
 </script>
 
 <template>
+  <!--Десктопная-->
   <div v-if="!isMobileView">
     <div v-if="!isMenuExpanded" class="collapsed-menu_mobile">
       <ExpandMenuButton class="expand-button_desktop" />
@@ -40,11 +54,20 @@ onMounted(async () => {
       <div class="left-block">
         <img src="/public/favicon.ico" alt="лого" />
         <div class="user-name_desktop">{{ userName }}</div>
+        <Button
+          type="button"
+          icon="pi pi-sign-out"
+          size="small"
+          severity="secondary"
+          class="menu-button"
+          @click="exitProfile"
+        ></Button>
       </div>
       <ExpandMenuButton class="expand-button_desktop" />
     </div>
   </div>
 
+  <!--Мобильная-->
   <div
     v-if="isMenuExpanded && isMobileView"
     class="expanded-menu_mobile"
@@ -102,8 +125,12 @@ onMounted(async () => {
 .expand-button_desktop,
 .first-row,
 .first-row > *,
-.left-block > * {
+.user-name_desktop {
   background-color: transparent;
+}
+
+.user-name_desktop {
+  margin-left: 20px;
 }
 
 .expanded-menu_mobile {

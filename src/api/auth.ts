@@ -1,14 +1,17 @@
-import { supabase } from '@/api/supabaseClient'
 //import type { User } from '@supabase/supabase-js'
+import { supabase } from '@/api/supabaseClient'
+import type { NewUser } from './types'
 
-// пока не нужна
-export async function createAccount(email: string, password: string, firstName: string) {
+export async function createAccount(newUser: NewUser) {
+  const { email, password, first_name, last_name } = newUser
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: {
-        first_name: firstName
+        first_name,
+        last_name
       }
     }
   })
