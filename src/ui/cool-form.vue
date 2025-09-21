@@ -1,39 +1,56 @@
 <script setup lang="ts">
-import { useAttrs } from 'vue'
-import { IftaLabel, InputText, Message, type InputTextPassThroughAttributes } from 'primevue'
+import { computed } from 'vue'
+import { IftaLabel, InputText, Message } from 'primevue'
 
 const inputValue = defineModel<string>({ required: true })
 
-const attrs: InputTextPassThroughAttributes = useAttrs()
+type CoolFormProps = {
+  id: string
+  label: string
+  invalid?: boolean | null
+  type?: string
+  errorMessage?: string
+}
+
+const props = withDefaults(defineProps<CoolFormProps>(), {
+  id: '',
+  label: '',
+  invalid: null,
+  type: 'text',
+  errorMessage: ''
+})
+
+const showError = computed(() => props.invalid && props.errorMessage)
 </script>
 
 <template>
-  <IftaLabel :for="attrs.id" class="input-container">
-    <label :for="attrs.id">{{ attrs.label }}</label>
+  <IftaLabel :for="id" class="input-container">
+    <label :for="id" class="label">{{ label }} </label>
     <InputText
-      :id="attrs.id"
+      :id="id"
       v-model="inputValue"
-      v-bind="attrs"
-      :invalid="attrs.invalid"
+      v-bind="$attrs"
+      :invalid="invalid"
+      :type="type"
       class="input"
     />
-    <Message
-      v-if="attrs.invalid && attrs.errorMessage"
-      severity="error"
-      :text="attrs.errorMessage"
-    />
+    <Message v-if="showError" severity="error" class="error-message">{{ errorMessage }}</Message>
   </IftaLabel>
 </template>
 
 <style scoped>
-.input-container {
-  margin-bottom: 15px;
-}
-
 .input {
   width: 100%;
-  margin: 5px 0 10px;
+  margin: 0;
   color: var(--text-primary);
   background-color: var(--bg-dark);
+}
+
+.label {
+  padding-top: 2px !important;
+}
+
+.error-message {
+  margin: 8px 0 0;
 }
 </style>

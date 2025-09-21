@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { Button } from 'primevue'
 import { createAccount, login, seeUser } from '@/api/auth'
+import { setProfileByUuid } from '@/api/profiles'
 import router from '@/router'
 import type { NewUser } from '@/types'
+import CoolErrorDialog from '@/ui/cool-error-dialog.vue'
 import CoolForm from '@/ui/cool-form.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
@@ -17,7 +19,7 @@ const passwordConfirm = ref('')
 const firstName = ref('')
 const lastName = ref('')
 
-const { isLoading, setLoading } = useStore()
+const { isLoading, setLoading, errorMessage } = useStore()
 
 const handleSignIn = async () => {
   setLoading(true)
@@ -47,6 +49,8 @@ const isPasswordMismatch = computed<boolean>(() =>
   Boolean(password.value && passwordConfirm.value && password.value !== passwordConfirm.value)
 )
 
+const successfulUserCreationText = ref<string | null>(null)
+
 const handleCreateNew = async () => {
   if (isPasswordMismatch.value) return
 
@@ -59,15 +63,24 @@ const handleCreateNew = async () => {
     last_name: lastName.value
   }
 
-  await createAccount(request)
-  await login(email.value, password.value)
+  const data = await createAccount(request)
+
+  if (!data?.user) {
+    setLoading(false)
+    return
+  }
+  successfulUserCreationText.value =
+    'Профиль успешно создан. Зайдите на указанную почту для подтверждения'
+
+  const userId = data.user.id
+
+  setLoading(true)
+  await setProfileByUuid(userId, {
+    first_name: firstName.value,
+    last_name: lastName.value
+  })
 
   setLoading(false)
-
-  localStorage.setItem('email', email.value)
-  localStorage.setItem('password', password.value)
-
-  router.push('/')
 }
 
 const title = computed<string>(() => (isNewUser.value ? 'Создать аккаунт' : 'Войти'))
@@ -79,25 +92,44 @@ const handleSubmit = () => {
 
 const question = computed<string>(() => (isNewUser.value ? 'Уже есть аккаунт?' : 'Впервые тут?'))
 const suggestedAction = computed<string>(() => (isNewUser.value ? 'Войти' : 'Создать аккаунт'))
+
+const isError = ref<boolean>(false)
+
+watch(
+  () => errorMessage.value,
+  () => {
+    isError.value = !!errorMessage.value
+  }
+)
 </script>
 
 <template>
   <div class="login-view">
+    <CoolErrorDialog v-model:visible="isError" />
     <CoolSpinner v-if="isLoading" />
     <div v-else class="form-container">
       <h1 class="form-title">{{ title }}</h1>
 
       <CoolForm v-model="email" label="Эл. почта" id="email" autocomplete="email" required />
-      <CoolForm id="password" v-model="password" autocomplete="password" required label="Пароль" />
+      <CoolForm
+        id="password"
+        v-model="password"
+        autocomplete="password"
+        type="password"
+        required
+        label="Пароль"
+        class="input-form"
+      />
       <CoolForm
         v-if="isNewUser"
         v-model="passwordConfirm"
         label="Подтвердите пароль"
         id="passwordConfirm"
-        type="text"
+        type="password"
         required
         :invalid="isPasswordMismatch"
         error-message="Пароли не совпадают"
+        class="input-form"
       />
       <CoolForm
         v-if="isNewUser"
@@ -106,6 +138,7 @@ const suggestedAction = computed<string>(() => (isNewUser.value ? 'Войти' :
         id="firstName"
         type="text"
         required
+        class="input-form"
       />
       <CoolForm
         v-if="isNewUser"
@@ -114,12 +147,16 @@ const suggestedAction = computed<string>(() => (isNewUser.value ? 'Войти' :
         id="lastName"
         type="text"
         required
+        class="input-form"
       />
       <Button @click="handleSubmit" class="submit-button">{{ title }}</Button>
       <div class="alternative-offer">
         {{ question }}
         <span class="alternative-link" @click="isNewUser = !isNewUser">{{ suggestedAction }}</span>
       </div>
+      <p v-if="successfulUserCreationText" class="successful-creation">
+        {{ successfulUserCreationText }}
+      </p>
     </div>
   </div>
 </template>
@@ -155,21 +192,23 @@ const suggestedAction = computed<string>(() => (isNewUser.value ? 'Войти' :
   margin-bottom: 15px;
 }
 
-.input {
-  width: 100%;
+.input-form {
   margin: 5px 0 10px;
-  color: var(--text-primary);
-  background-color: var(--bg-dark);
 }
 
 .submit-button {
   width: 100%;
 }
 
+.successful-creation,
 .alternative-offer {
   width: 100%;
   margin: 20px 0 0;
   text-align: center;
+}
+
+.successful-creation {
+  color: lightgreen;
 }
 
 .alternative-link {

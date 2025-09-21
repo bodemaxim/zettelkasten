@@ -18,3 +18,25 @@ export const getProfileByUuid = async (uuid: string): Promise<Profile | null> =>
 
   return data
 }
+
+export const setProfileByUuid = async (
+  uuid: string,
+  profileData: Partial<Profile>
+): Promise<Profile | null> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert({ ...profileData, user_uuid: uuid })
+    .select('*')
+    .single()
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка обновления профиля',
+      message: error.message
+    })
+
+    return null
+  }
+
+  return data
+}
