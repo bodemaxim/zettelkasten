@@ -43,7 +43,6 @@ const showError = computed(() => props.invalid && props.errorMessage)
   width: 100%;
   margin: 0;
   color: var(--text-primary);
-  background-color: var(--bg-dark);
 }
 
 .label {

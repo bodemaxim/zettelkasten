@@ -221,10 +221,12 @@ const nextPaginationBtnDisabled = computed<boolean>(() => {
 }
 
 .card-title {
-  margin: 10px 0;
+  margin: 10px 4px 10px 0;
+  padding: 0 var(--x1);
 }
 
 .card-title:hover {
+  border-radius: var(--x1);
   background-color: var(--bg-darker);
   transition: 0.5s;
   cursor: pointer;

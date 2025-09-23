@@ -3,6 +3,7 @@ import type { TypeOption } from './edit-card-modal.types'
 
 export const defaultCard: CardEditable = {
   title: '',
+  createdAt: '',
   text: '',
   links: [],
   type: 'definition',

@@ -101,11 +101,6 @@ const exitProfile = () => {
   background-color: gray;
 }
 
-.expanded-menu-container_mobile > *,
-.expanded-menu_desktop > * {
-  background-color: transparent;
-}
-
 .expaned-menu-container_mobile {
   display: flex;
   gap: 4px;
@@ -114,18 +109,6 @@ const exitProfile = () => {
   width: 100%;
   margin: 4px;
   padding: 10px 15px;
-  background-color: transparent;
-}
-
-.expaned-menu-container_mobile > * {
-  background-color: transparent;
-}
-
-.expand-button_mobile,
-.expand-button_desktop,
-.first-row,
-.first-row > *,
-.user-name_desktop {
   background-color: transparent;
 }
 
@@ -140,14 +123,14 @@ const exitProfile = () => {
   width: 60%;
   height: 100vh;
   padding: 20px;
-  background-color: gray;
+  background-color: var(--bg-lighter);
 }
 
 .collapsed-menu_mobile {
   position: fixed;
   top: 4px;
   right: 0;
-  z-index: 10;
+  z-index: 1;
   display: flex;
   justify-content: flex-end;
   width: 100%;

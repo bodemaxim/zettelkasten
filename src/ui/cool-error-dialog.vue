@@ -44,6 +44,5 @@ const firstPartText = computed<string>(() => {
 .error-modal.p-dialog {
   width: 90%;
   max-width: 500px;
-  background-color: var(--bg-primary);
 }
 </style>

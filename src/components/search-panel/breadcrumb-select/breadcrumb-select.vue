@@ -114,6 +114,7 @@ const closeSelect = () => {
             icon="pi pi-home"
             severity="secondary"
             size="small"
+            :pt="{ root: 'button-root' }"
             @click="onMenuItemClick(item.uuid)"
           />
           <span v-else @click="onMenuItemClick(item.uuid)" class="clickable-item">{{
@@ -144,5 +145,9 @@ const closeSelect = () => {
   text-decoration: underline;
   color: var(--accent-azure);
   cursor: pointer;
+}
+
+.button-root {
+  overflow: hidden;
 }
 </style>

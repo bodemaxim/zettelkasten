@@ -12,8 +12,16 @@ body {
   background-color: var(--bg-darker);
 }
 
+@font-face {
+  font-family: Inter;
+  font-style: normal;
+  font-weight: 600;
+  src: url('/fonts/Inter/Inter_18pt-SemiBold.ttf') format('ttf');
+  font-display: auto;
+}
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: Inter, Arial, sans-serif;
   font-size: 15px;
   line-height: 1.6;
   transition:
@@ -26,7 +34,6 @@ body {
 
 /* Переменные цвета */
 :root {
-  --bg-primary: #212121;
   --bg-dark: #1a1a1a;
   --bg-darker: #000;
   --bg-lighter: #333;
@@ -42,6 +49,17 @@ body {
   --accent-pink: #ffd8e0;
   --grad-dark-to-light: linear-gradient(to bottom, var(--primary-dark), var(--bg-lighter));
   --grad-accent-to-dark: linear-gradient(to bottom, var(--primary-accent), var(--primary-dark));
+  --x1: 0.25rem;
+  --x2: 0.5rem;
+  --x2-5: 0.625rem;
+  --x3: 0.75rem;
+  --x4: 1rem;
+  --x5: 1.25rem;
+  --x6: 1.5rem;
+  --x7: 1.75rem;
+  --x8: 2rem;
+  --x9: 2.25rem;
+  --x10: 2.5rem;
 }
 
 div {

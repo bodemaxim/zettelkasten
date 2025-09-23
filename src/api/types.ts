@@ -11,7 +11,7 @@ export type Card = CardShortInfo & {
   folders: string //приходит массив JSON в формате string
 }
 
-export type CardEditable = Omit<Card, 'uuid' | 'createdAt'>
+export type CardEditable = Omit<Card, 'uuid'>
 
 export type FolderShortInfo = {
   uuid: string

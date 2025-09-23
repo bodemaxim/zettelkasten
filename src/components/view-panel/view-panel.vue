@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
+import { format } from 'date-fns'
 import { Button, ConfirmDialog } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
@@ -164,6 +165,11 @@ const foldersText = computed<string>(() => {
     return ''
   }
 })
+
+const formattedDate = computed<string>(() => {
+  if (!viewedCard.value?.createdAt) return ''
+  return format(viewedCard.value.createdAt, 'dd.MM.yy HH:mm')
+})
 </script>
 
 <template>
@@ -197,8 +203,11 @@ const foldersText = computed<string>(() => {
       <h2>{{ viewedCard?.title }}</h2>
       <TextViewer v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
       <hr />
-      <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
-      <p>Папки: {{ foldersText }}</p>
+      <div class="info">
+        <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
+        <p v-if="foldersText">Папки: {{ foldersText }}</p>
+        <p>{{ formattedDate }}</p>
+      </div>
       <div v-if="cardsInBottomList.length > 0" class="links-container">
         <h3>Еще связанные карточки</h3>
         <div
@@ -251,5 +260,13 @@ const foldersText = computed<string>(() => {
 
 .link:hover {
   background-color: var(--bg-darker);
+}
+
+.info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-dark);
 }
 </style>

@@ -178,8 +178,8 @@ watch(
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  background-color: var(--bg-primary);
   box-shadow: 0 4px 10px rgb(0 0 0 / 10%);
+  background-color: var(--bg-dark);
 }
 
 .form-title {
@@ -212,7 +212,7 @@ watch(
 }
 
 .alternative-link {
-  color: var(--accent-yellow);
+  color: var(--accent-azure);
   cursor: pointer;
 }
 </style>

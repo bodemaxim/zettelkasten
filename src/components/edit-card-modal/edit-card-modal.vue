@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
-import { Dialog, Button, InputText, Select } from 'primevue'
+import { Dialog, Button, InputText, Select, DatePicker } from 'primevue'
 import {
   createCard,
   updateCard,
@@ -42,11 +42,8 @@ const title = computed<string>(() =>
   viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
 )
 
-const dialogStyles = computed<StyleValue>(() => ({
-  width: isMobileView ? '100%' : 'calc(100% - 20px)',
-  height: '100%',
-  padding: '10px',
-  overflow: 'hidden'
+const containerStyles = computed<StyleValue>(() => ({
+  padding: isMobileView.value ? '8px' : '20px'
 }))
 
 const onCancel = () => {
@@ -106,6 +103,11 @@ const onSave = async () => {
     alert('Заполните заголовок карточки')
     return
   }
+
+  updatedCard.value.createdAt = datetime.value
+    ? datetime.value.toISOString()
+    : new Date().toISOString()
+  console.log(updatedCard.value.createdAt)
 
   setLoading(true)
   let cardUuid = ''
@@ -205,61 +207,91 @@ watch(
 )
 
 const cardTypes = ref<TypeOption[]>(typeOptionsList)
+
+const defaultDatetime = new Date()
+
+const datetime = ref<Date | null>(defaultDatetime)
 </script>
 
 <template>
-  <CoolSpinner v-if="isLoading" />
-  <Dialog
-    v-model:visible="visible"
-    modal
-    :header="title"
-    class="edit-card-modal"
-    :style="dialogStyles"
-  >
-    <div class="modal-content">
-      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-        <p class="input-label">Заголовок</p>
-        <InputText
-          v-model="updatedCard.title"
-          autocomplete="off"
-          id="username"
-          class="input-element"
-        />
+  <div v-if="visible">
+    <CoolSpinner v-if="isLoading" />
+    <div class="edit-card-modal" :style="containerStyles">
+      <div class="button-close">
+        <Button
+          type="button"
+          icon="pi pi-times"
+          size="small"
+          severity="secondary"
+          class="menu-button"
+          @click="visible = false"
+        ></Button>
       </div>
-      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-        <p class="input-label">Тип</p>
-        <Select
-          v-model="selectedType"
-          :options="cardTypes"
-          optionLabel="label"
-          placeholder="Выберите тип карточки"
-          class="input-element"
-        />
-      </div>
-      <div
-        :class="['input-block', { 'input-block-mobile': isMobileView }]"
-        :style="{ alignItems: 'start' }"
-      >
-        <p class="input-label">Текст</p>
-        <TextEditor v-model:text="updatedCard.text" />
-      </div>
-      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-        <p class="input-label">Ссылки</p>
-        <CardsMultiselect v-model="updatedCard.links" />
-      </div>
-      <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-        <p class="input-label">Выбор папок</p>
-        <FoldersTreeselect v-model="updatedCard.folders" />
-      </div>
-      <div class="buttons-block">
-        <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
-        <Button type="button" label="Сохранить" @click="onSave" :disabled="isLoading"></Button>
+      <div v-if="visible" modal :header="title">
+        <div class="modal-content">
+          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
+            <p class="input-label">Заголовок</p>
+            <InputText
+              v-model="updatedCard.title"
+              autocomplete="off"
+              id="username"
+              class="input-element"
+            />
+          </div>
+          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
+            <p class="input-label">Дата</p>
+            <DatePicker id="datepicker-from" v-model="datetime" show-time hour-format="24" fluid />
+          </div>
+          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
+            <p class="input-label">Тип</p>
+            <Select
+              v-model="selectedType"
+              :options="cardTypes"
+              optionLabel="label"
+              placeholder="Выберите тип карточки"
+              class="input-element"
+            />
+          </div>
+          <div
+            :class="['input-block', { 'input-block-mobile': isMobileView }]"
+            :style="{ alignItems: 'start' }"
+          >
+            <p class="input-label">Текст</p>
+            <TextEditor v-model:text="updatedCard.text" />
+          </div>
+          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
+            <p class="input-label">Ссылки</p>
+            <CardsMultiselect v-model="updatedCard.links" />
+          </div>
+          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
+            <p class="input-label">Выбор папок</p>
+            <FoldersTreeselect v-model="updatedCard.folders" />
+          </div>
+          <div class="buttons-block">
+            <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
+            <Button type="button" label="Сохранить" @click="onSave" :disabled="isLoading"></Button>
+          </div>
+        </div>
       </div>
     </div>
-  </Dialog>
+  </div>
 </template>
 
 <style scoped>
+.button-close {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.edit-card-modal {
+  position: absolute;
+  z-index: 2;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: var(--bg-darker);
+}
+
 .input-block {
   display: flex;
   gap: 4px;
@@ -273,7 +305,7 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 
 .buttons-block {
   display: flex;
-  gap: 2px;
+  gap: var(--x2);
   justify-content: flex-end;
 }
 
@@ -283,11 +315,5 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 
 .input-element {
   width: 100%;
-}
-</style>
-
-<style>
-.edit-card-modal.p-dialog {
-  background-color: var(--bg-primary);
 }
 </style>
