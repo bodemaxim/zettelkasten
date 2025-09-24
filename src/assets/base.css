@@ -1,5 +1,6 @@
-@import url('tailwindcss');
-
+/* stylelint-disable-next-line */
+@import 'tailwindcss';
+/* stylelint-disable-next-line */
 /* @import 'tailwindcss-primeui'; */
 
 * {
