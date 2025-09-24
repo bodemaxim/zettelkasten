@@ -17,7 +17,7 @@ const containerStyles = computed<StyleValue>(() => ({
     <CoolSpinner v-if="isLoading" />
     <div class="modal" :style="containerStyles">
       <div class="header">
-        <div>{{ title }}</div>
+        <div class="text-xl">{{ title }}</div>
         <Button
           type="button"
           icon="pi pi-times"

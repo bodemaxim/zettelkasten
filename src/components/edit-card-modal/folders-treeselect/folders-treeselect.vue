@@ -142,22 +142,12 @@ const getUuidsWithOddDeleted = (selectedUuids: string[], parentUuid: string): st
 </script>
 
 <template>
-  <div>
-    <TreeSelect
-      v-model="selectedFolders"
-      :options="nodes"
-      selectionMode="multiple"
-      display="chip"
-      placeholder="Выберите папки"
-      class="folders-treeselect"
-      @update:modelValue="onValueChange"
-    />
-  </div>
+  <TreeSelect
+    v-model="selectedFolders"
+    :options="nodes"
+    selectionMode="multiple"
+    display="chip"
+    placeholder="Выберите папки"
+    @update:modelValue="onValueChange"
+  />
 </template>
-
-<style scoped>
-.folders-treeselect {
-  min-width: 300px;
-  margin: 10px 0;
-}
-</style>

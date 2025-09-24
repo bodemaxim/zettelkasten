@@ -51,44 +51,33 @@ const onSearch = debounce((str: string) => {
 </script>
 
 <template>
-  <div class="wrapper">
-    <MultiSelect
-      v-model="selectedCards"
-      :options="options"
-      optionLabel="title"
-      filter
-      placeholder="Выберите связанные карточки"
-      display="chip"
-      fluid
-      :selectionLimit="8"
-      class="card-multiselect"
-      @before-show="isDropdownOpen = true"
-      @before-hide="isDropdownOpen = false"
-      @filter="onSearch($event.value)"
-    >
-      <template #dropdownicon>
-        <i :class="isDropdownOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" />
-      </template>
-      <template #filtericon>
-        <i class="pi pi-search" />
-      </template>
-      <template #header>
-        <p class="header">Доступные карточки</p>
-      </template>
-    </MultiSelect>
-  </div>
+  <MultiSelect
+    v-model="selectedCards"
+    :options="options"
+    optionLabel="title"
+    filter
+    placeholder="Выберите связанные карточки"
+    display="chip"
+    fluid
+    :selectionLimit="8"
+    class="card-multiselect"
+    @before-show="isDropdownOpen = true"
+    @before-hide="isDropdownOpen = false"
+    @filter="onSearch($event.value)"
+  >
+    <template #dropdownicon>
+      <i :class="isDropdownOpen ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" />
+    </template>
+    <template #filtericon>
+      <i class="pi pi-search" />
+    </template>
+    <template #header>
+      <p class="header">Доступные карточки</p>
+    </template>
+  </MultiSelect>
 </template>
 
 <style scoped>
-.wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
-.card-multiselect {
-  margin: 10px 0;
-}
-
 .option {
   display: flex;
   align-items: center;

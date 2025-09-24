@@ -123,6 +123,7 @@ const toggle = (event: Event) => {
   gap: 4px;
   justify-content: left;
   width: 100%;
+  background-color: var(--bg-lighter);
 }
 
 .autocomplete {
@@ -151,6 +152,7 @@ const toggle = (event: Event) => {
 
 <style>
 .text-editor-toolbar.p-toolbar {
+  margin: 4px;
   background-color: var(--bg-lighter);
 }
 </style>
