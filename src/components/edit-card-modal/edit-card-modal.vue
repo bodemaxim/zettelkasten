@@ -225,43 +225,43 @@ const datetime = ref<Date | null>(defaultDatetime)
     <div class="edit-card-modal" :style="containerStyles">
       <div v-if="visible">
         <div class="modal-content">
-          <div class="flex-b my-4">
+          <div :class="isMobileView ? '' : 'flex-b space-x-4 my-4'">
             <CoolForm
               id="title"
               v-model="updatedCard.title"
               type="text"
               label="Заголовок"
-              class="w-1/2"
+              class="w-full md:w-1/2"
             />
 
-            <Select
-              v-model="selectedType"
-              id="cardtype"
-              :options="cardTypes"
-              optionLabel="label"
-              placeholder="Выберите тип карточки"
-              class="w-1/4 h-[60px]"
-            />
+            <div :class="isMobileView ? 'flex-b w-full my-2' : 'flex-b w-1/2 space-x-4 '">
+              <Select
+                v-model="selectedType"
+                id="cardtype"
+                :options="cardTypes"
+                optionLabel="label"
+                placeholder="Выберите тип карточки"
+                class="w-1/2 h-[60px] md:w-1/2"
+              />
 
-            <IftaLabel for="datetime" class="w-1/4">
-              <label for="datetime" class="label">Дата</label>
-              <DatePicker id="datetime" v-model="datetime" show-time hour-format="24" fluid />
-            </IftaLabel>
+              <IftaLabel for="datetime" class="w-1/2">
+                <label for="datetime" class="label">Дата</label>
+                <DatePicker id="datetime" v-model="datetime" show-time hour-format="24" fluid />
+              </IftaLabel>
+            </div>
           </div>
 
           <TextEditor v-model:text="updatedCard.text" class="my-5" />
 
           <div :class="{ 'bottom-container': !isMobileView }" class="my-5">
-            <div :class="isMobileView ? 'my-2' : 'flex-b'">
+            <div :class="isMobileView ? 'my-2' : 'flex-b w-full'">
               <CardsMultiselect
                 v-model="updatedCard.links"
-                :class="isMobileView ? 'w-full my-2' : 'lg:xl:w-[300px] md:w-2/3'"
-                class="h-[44px]"
+                class="w-full my-2 md:my-0 md:w-2/3 h-[44px]"
               />
               <FoldersTreeselect
                 v-model="updatedCard.folders"
-                :class="isMobileView ? 'w-full my-2' : 'lg:xl:w-[300px]  md:w-1/3'"
-                class="h-[44px]"
+                class="w-full my-2 md:my-0 md:w-1/3 h-[44px]"
               />
             </div>
 
@@ -271,14 +271,14 @@ const datetime = ref<Date | null>(defaultDatetime)
                 label="Отмена"
                 severity="secondary"
                 @click="onCancel"
-                :class="isMobileView ? 'w-1/2' : 'lg:xl:w-40 md:w-1/2'"
+                class="w-1/2 lg:w-40"
               ></Button>
               <Button
                 type="button"
                 label="Сохранить"
                 @click="onSave"
                 :disabled="isLoading"
-                :class="isMobileView ? 'w-1/2' : 'lg:xl:w-40 md:w-1/2'"
+                class="w-1/2 lg:w-40"
               ></Button>
             </div>
           </div>

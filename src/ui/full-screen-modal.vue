@@ -16,7 +16,7 @@ const containerStyles = computed<StyleValue>(() => ({
   <div v-if="visible">
     <CoolSpinner v-if="isLoading" />
     <div class="modal" :style="containerStyles">
-      <div class="header">
+      <div class="header m-2 md:mx-10 mt-10">
         <div class="text-xl">{{ title }}</div>
         <Button
           type="button"
