@@ -1,0 +1,4 @@
+//заместо объекта отвалившихся зависимостей eslint
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+}

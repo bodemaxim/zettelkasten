@@ -72,3 +72,46 @@ ul {
   padding: 0;
   list-style: none;
 }
+
+/*
+  Утилиты флекс контейнеров. Свойство gap
+  при необходимости можно переопределять через
+  tailwind-утилиту space-x-<your-value>
+  */
+.flex-s {
+  display: flex;
+  gap: var(--x2);
+  align-items: center;
+  justify-content: start;
+}
+
+.flex-b {
+  display: flex;
+  gap: var(--x2);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-c {
+  display: flex;
+  gap: var(--x2);
+  align-items: center;
+  justify-content: center;
+}
+
+/* Утилиты основных цветов приложения из UTM */
+.utm-bg-primary {
+  background-color: var(--utm-bg-primary);
+}
+
+.utm-bg-secondary {
+  background-color: var(--utm-bg-secondary);
+}
+
+.utm-text-primary {
+  color: var(--utm-text-primary);
+}
+
+.utm-text-secondary {
+  color: var(--utm-text-secondary);
+}

@@ -1,0 +1,51 @@
+<script setup lang="ts">
+import { type StyleValue, computed } from 'vue'
+import { Button } from 'primevue'
+import CoolSpinner from '@/ui/cool-spinner.vue'
+
+const visible = defineModel<boolean>('visible')
+
+const props = defineProps<{ isLoading: boolean; isMobileView: boolean; title: string }>()
+
+const containerStyles = computed<StyleValue>(() => ({
+  padding: props.isMobileView ? '8px' : '40px'
+}))
+</script>
+
+<template>
+  <div v-if="visible">
+    <CoolSpinner v-if="isLoading" />
+    <div class="modal" :style="containerStyles">
+      <div class="header">
+        <div>{{ title }}</div>
+        <Button
+          type="button"
+          icon="pi pi-times"
+          size="small"
+          severity="secondary"
+          class="menu-button"
+          @click="visible = false"
+        ></Button>
+      </div>
+      <slot />
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.modal {
+  position: absolute;
+  z-index: 2;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: var(--bg-darker);
+}
+
+.header {
+  display: flex;
+  gap: var(--x2);
+  align-items: center;
+  justify-content: space-between;
+}
+</style>

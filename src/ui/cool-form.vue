@@ -24,7 +24,7 @@ const showError = computed(() => props.invalid && props.errorMessage)
 </script>
 
 <template>
-  <IftaLabel :for="id" class="input-container">
+  <IftaLabel :for="id">
     <label :for="id" class="label">{{ label }} </label>
     <InputText
       :id="id"

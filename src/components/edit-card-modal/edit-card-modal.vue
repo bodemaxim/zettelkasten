@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
-import { Dialog, Button, InputText, Select, DatePicker } from 'primevue'
+import { Dialog, Button, InputText, Select, DatePicker, IftaLabel } from 'primevue'
 import {
   createCard,
   updateCard,
@@ -10,7 +10,9 @@ import {
   getCardsShortInfo
 } from '@/api'
 import type { Card, CardEditable, CardsShortInfoRequest } from '@/types'
+import CoolForm from '@/ui/cool-form.vue'
 import CoolSpinner from '@/ui/cool-spinner.vue'
+import FullScreenModal from '@/ui/full-screen-modal.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString, getAreArraysEqual } from '@/utils'
 import CardsMultiselect from './cards-multiselect/cards-multiselect.vue'
@@ -43,7 +45,7 @@ const title = computed<string>(() =>
 )
 
 const containerStyles = computed<StyleValue>(() => ({
-  padding: isMobileView.value ? '8px' : '20px'
+  padding: isMobileView.value ? '8px' : '40px'
 }))
 
 const onCancel = () => {
@@ -214,84 +216,55 @@ const datetime = ref<Date | null>(defaultDatetime)
 </script>
 
 <template>
-  <div v-if="visible">
-    <CoolSpinner v-if="isLoading" />
+  <FullScreenModal
+    v-model:visible="visible"
+    :title="title"
+    :is-loading="isLoading"
+    :is-mobile-view="isMobileView"
+  >
     <div class="edit-card-modal" :style="containerStyles">
-      <div class="button-close">
-        <Button
-          type="button"
-          icon="pi pi-times"
-          size="small"
-          severity="secondary"
-          class="menu-button"
-          @click="visible = false"
-        ></Button>
-      </div>
-      <div v-if="visible" modal :header="title">
+      <div v-if="visible">
         <div class="modal-content">
-          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-            <p class="input-label">Заголовок</p>
-            <InputText
+          <div class="flex-b">
+            <CoolForm
+              id="title"
               v-model="updatedCard.title"
-              autocomplete="off"
-              id="username"
-              class="input-element"
+              type="text"
+              label="Заголовок"
+              class="input-form"
             />
-          </div>
-          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-            <p class="input-label">Дата</p>
-            <DatePicker id="datepicker-from" v-model="datetime" show-time hour-format="24" fluid />
-          </div>
-          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-            <p class="input-label">Тип</p>
+
             <Select
               v-model="selectedType"
+              id="cardtype"
               :options="cardTypes"
               optionLabel="label"
               placeholder="Выберите тип карточки"
               class="input-element"
             />
+
+            <IftaLabel for="datetime" class="input-container">
+              <label for="datetime" class="label">Дата </label>
+              <DatePicker id="datetime" v-model="datetime" show-time hour-format="24" fluid />
+            </IftaLabel>
           </div>
-          <div
-            :class="['input-block', { 'input-block-mobile': isMobileView }]"
-            :style="{ alignItems: 'start' }"
-          >
-            <p class="input-label">Текст</p>
-            <TextEditor v-model:text="updatedCard.text" />
-          </div>
-          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-            <p class="input-label">Ссылки</p>
-            <CardsMultiselect v-model="updatedCard.links" />
-          </div>
-          <div :class="['input-block', { 'input-block-mobile': isMobileView }]">
-            <p class="input-label">Выбор папок</p>
-            <FoldersTreeselect v-model="updatedCard.folders" />
-          </div>
+
+          <TextEditor v-model:text="updatedCard.text" />
+
+          <CardsMultiselect v-model="updatedCard.links" />
+
+          <FoldersTreeselect v-model="updatedCard.folders" />
+
           <div class="buttons-block">
             <Button type="button" label="Отмена" severity="secondary" @click="onCancel"></Button>
             <Button type="button" label="Сохранить" @click="onSave" :disabled="isLoading"></Button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
+      </div></div
+  ></FullScreenModal>
 </template>
 
 <style scoped>
-.button-close {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.edit-card-modal {
-  position: absolute;
-  z-index: 2;
-  width: 100vw;
-  height: 100vh;
-  overflow-y: auto;
-  background-color: var(--bg-darker);
-}
-
 .input-block {
   display: flex;
   gap: 4px;
