@@ -1,7 +1,7 @@
 /* stylelint-disable-next-line */
 @import 'tailwindcss';
 /* stylelint-disable-next-line */
-/* @import 'tailwindcss-primeui'; */
+@import 'tailwindcss-primeui';
 
 * {
   box-sizing: border-box;

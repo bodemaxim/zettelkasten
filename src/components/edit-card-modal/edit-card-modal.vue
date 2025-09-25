@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
-import { Dialog, Button, InputText, Select, DatePicker, IftaLabel } from 'primevue'
+import { Button, Select, DatePicker, IftaLabel } from 'primevue'
 import {
   createCard,
   updateCard,
@@ -11,7 +11,6 @@ import {
 } from '@/api'
 import type { Card, CardEditable, CardsShortInfoRequest } from '@/types'
 import CoolForm from '@/ui/cool-form.vue'
-import CoolSpinner from '@/ui/cool-spinner.vue'
 import FullScreenModal from '@/ui/full-screen-modal.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString, getAreArraysEqual } from '@/utils'
@@ -213,6 +212,8 @@ const cardTypes = ref<TypeOption[]>(typeOptionsList)
 const defaultDatetime = new Date()
 
 const datetime = ref<Date | null>(defaultDatetime)
+
+const isTypeSelectOnFocus = ref(false)
 </script>
 
 <template>
@@ -235,18 +236,35 @@ const datetime = ref<Date | null>(defaultDatetime)
             />
 
             <div :class="isMobileView ? 'flex-b w-full my-2' : 'flex-b w-1/2 space-x-4 '">
-              <Select
-                v-model="selectedType"
-                id="cardtype"
-                :options="cardTypes"
-                optionLabel="label"
-                placeholder="Выберите тип карточки"
-                class="w-1/2 h-[60px] md:w-1/2"
-              />
+              <div class="w-1/2 h-[60px] md:w-1/2 relative">
+                <p
+                  class="text-xs absolute left-3 top-2 z-1"
+                  :class="isTypeSelectOnFocus ? 'text-primary-500' : 'text-muted-color'"
+                >
+                  Выберите тип карточки
+                </p>
+                <Select
+                  v-model="selectedType"
+                  id="cardtype"
+                  :options="cardTypes"
+                  optionLabel="label"
+                  :pt="{ label: 'type-select-label' }"
+                  class="h-full w-full"
+                  @before-show="isTypeSelectOnFocus = true"
+                  @before-hide="isTypeSelectOnFocus = false"
+                />
+              </div>
 
               <IftaLabel for="datetime" class="w-1/2">
                 <label for="datetime" class="label">Дата</label>
-                <DatePicker id="datetime" v-model="datetime" show-time hour-format="24" fluid />
+                <DatePicker
+                  id="datetime"
+                  v-model="datetime"
+                  show-time
+                  hour-format="24"
+                  fluid
+                  :pt="{ pcInputText: 'datepicker-label' }"
+                />
               </IftaLabel>
             </div>
           </div>
@@ -289,6 +307,17 @@ const datetime = ref<Date | null>(defaultDatetime)
 </template>
 
 <style scoped>
+:deep(.type-select-label) {
+  display: flex;
+  align-items: flex-end;
+}
+
+:deep(.datepicker-label) {
+  display: flex;
+  align-items: flex-end;
+  background-color: yellow !important;
+}
+
 .flex-mobile {
   display: flex;
   flex-direction: column;
