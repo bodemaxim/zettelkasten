@@ -88,25 +88,22 @@ const toggle = (event: Event) => {
 
 <template>
   <div class="text-editor-wrapper">
-    <Toolbar class="text-editor-toolbar">
-      <template #start>
-        <div class="left-toolbar-container">
-          <CardsAutocomplete @updated="addHyperlinkToSelection($event)" class="autocomplete" />
-          <div class="table-button-container">
-            <Button
-              type="button"
-              severity="secondary"
-              size="small"
-              icon="pi pi-table"
-              @click="toggle"
-              aria-haspopup="true"
-              aria-controls="overlay_menu"
-            />
-            <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
-          </div>
-        </div>
-      </template>
-    </Toolbar>
+    <div class="flex-s px-3 py-2">
+      <CardsAutocomplete @updated="addHyperlinkToSelection($event)" class="autocomplete" />
+      <div class="table-button-container">
+        <Button
+          type="button"
+          severity="secondary"
+          size="small"
+          icon="pi pi-table"
+          @click="toggle"
+          aria-haspopup="true"
+          aria-controls="overlay_menu"
+        />
+        <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
+      </div>
+    </div>
+
     <textarea
       ref="textareaRef"
       v-model="text"
@@ -135,13 +132,6 @@ const toggle = (event: Event) => {
   margin: 10px 0;
   font-size: 16px;
   resize: none;
-}
-
-.left-toolbar-container {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  background-color: var(--bg-lighter);
 }
 
 .autocomplete,
