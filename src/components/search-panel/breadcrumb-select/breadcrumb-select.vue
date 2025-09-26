@@ -148,6 +148,7 @@ const closeSelect = () => {
 }
 
 .button-root {
+  height: var(--x8);
   overflow: hidden;
 }
 </style>

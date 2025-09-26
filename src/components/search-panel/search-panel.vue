@@ -131,12 +131,13 @@ const nextPaginationBtnDisabled = computed<boolean>(() => {
   <CoolPanel>
     <CoolSpinner v-if="isLoading" />
     <div class="toolbar">
-      <InputText type="text" v-model="searchQuery" class="search-box" />
+      <InputText type="text" v-model="searchQuery" class="search-box h-8" />
       <Button
         v-tooltip="'Создать карточку'"
         icon="pi pi-file-plus"
         severity="primary"
         size="small"
+        class="h-8"
         @click="$emit('createCard')"
       />
       <ExpandMenuButton v-if="isMobileView" />
@@ -167,6 +168,8 @@ const nextPaginationBtnDisabled = computed<boolean>(() => {
           >
             <div class="paginator">
               <Button
+                size="small"
+                class="h-8"
                 icon="pi pi-chevron-left"
                 rounded
                 text
@@ -175,6 +178,8 @@ const nextPaginationBtnDisabled = computed<boolean>(() => {
               />
               <div class="paginator-text">{{ first }}—{{ last }} из {{ totalRecords }}</div>
               <Button
+                size="small"
+                class="h-8"
                 icon="pi pi-chevron-right"
                 rounded
                 text

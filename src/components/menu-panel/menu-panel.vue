@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, type StyleValue } from 'vue'
 import { useRouter } from 'vue-router'
 import { vOnClickOutside } from '@vueuse/components'
-import { Button } from 'primevue'
+import { Button, Divider } from 'primevue'
 import { logout, seeUser } from '@/api'
 import { getProfileByUuid } from '@/api/profiles'
 import type { Profile } from '@/types'
@@ -59,9 +59,17 @@ const exitProfile = () => {
           icon="pi pi-sign-out"
           size="small"
           severity="secondary"
-          class="menu-button"
+          class="menu-button h-8"
           @click="exitProfile"
         ></Button>
+        <div class="flex items-center text-md ml-10">
+          <span class="pi pi-folder mr-3"></span>
+          Папки
+        </div>
+        <div class="flex items-center text-md ml-5">
+          <span class="pi pi-cog mr-3"></span>
+          Настройки
+        </div>
       </div>
       <ExpandMenuButton class="expand-button_desktop" />
     </div>
@@ -73,12 +81,35 @@ const exitProfile = () => {
     class="expanded-menu_mobile"
     v-on-click-outside="() => setIsMenuExpanded(false)"
   >
-    <div class="first-row">
-      <div class="left-block">
+    <div class="flex-b">
+      <div class="flex-s">
         <img src="/public/favicon.ico" alt="лого" />
-        <div class="user-name_desktop">{{ userName }}</div>
+        <div class="text-xl">Z10N</div>
       </div>
       <ExpandMenuButton class="expand-button_mobile" />
+    </div>
+
+    <Divider />
+
+    <div class="flex items-center text-md my-3">
+      <span class="pi pi-folder mr-3"></span>
+      Папки
+    </div>
+    <div class="flex items-center text-md my-3">
+      <span class="pi pi-cog mr-3"></span>
+      Настройки
+    </div>
+
+    <div class="flex justify-between flex-grow items-end">
+      <div class="user-name_desktop">{{ userName }}</div>
+      <Button
+        type="button"
+        icon="pi pi-sign-out"
+        size="small"
+        severity="secondary"
+        class="menu-button h-8"
+        @click="exitProfile"
+      ></Button>
     </div>
   </div>
 </template>
@@ -101,17 +132,6 @@ const exitProfile = () => {
   background-color: gray;
 }
 
-.expaned-menu-container_mobile {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin: 4px;
-  padding: 10px 15px;
-  background-color: transparent;
-}
-
 .user-name_desktop {
   margin-left: 20px;
 }
@@ -120,6 +140,8 @@ const exitProfile = () => {
   position: absolute;
   right: 0;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
   width: 60%;
   height: 100vh;
   padding: 20px;
@@ -137,12 +159,6 @@ const exitProfile = () => {
   margin-right: 4px;
   padding: 0;
   background-color: transparent;
-}
-
-.first-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .left-block {

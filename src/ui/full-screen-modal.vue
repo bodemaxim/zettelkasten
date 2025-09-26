@@ -23,7 +23,7 @@ const containerStyles = computed<StyleValue>(() => ({
           icon="pi pi-times"
           size="small"
           severity="secondary"
-          class="menu-button"
+          class="h-8"
           @click="visible = false"
         ></Button>
       </div>

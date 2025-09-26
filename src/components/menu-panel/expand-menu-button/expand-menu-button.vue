@@ -21,7 +21,7 @@ const buttonIcon = computed(() => {
       :icon="buttonIcon"
       size="small"
       severity="secondary"
-      class="menu-button"
+      class="h-8"
       @click="setIsMenuExpanded(!isMenuExpanded)"
     ></Button>
   </div>

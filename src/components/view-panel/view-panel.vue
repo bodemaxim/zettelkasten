@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, watch, computed } from 'vue'
 import { format } from 'date-fns'
-import { Button, ConfirmDialog } from 'primevue'
+import { Button, ConfirmDialog, Divider } from 'primevue'
 import { useConfirm } from 'primevue/useconfirm'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
 import type { Card, CardShortInfo, FolderShortInfo } from '@/types'
@@ -183,6 +183,7 @@ const formattedDate = computed<string>(() => {
           icon="pi pi-file-edit"
           severity="primary"
           size="small"
+          class="h-8"
           @click="$emit('edited')"
         />
         <Button
@@ -190,6 +191,7 @@ const formattedDate = computed<string>(() => {
           icon="pi pi-file-excel"
           severity="secondary"
           size="small"
+          class="h-8"
           @click="deleteCard()"
         />
         <Button
@@ -197,12 +199,13 @@ const formattedDate = computed<string>(() => {
           icon="pi pi-arrow-left"
           severity="secondary"
           size="small"
+          class="h-8"
           @click="backToList"
         />
       </div>
-      <h2>{{ viewedCard?.title }}</h2>
+      <h2 class="text-xl">{{ viewedCard?.title }}</h2>
       <TextViewer v-model="viewedCard.text" @clickOnLink="$emit('clickOnLink', $event)" />
-      <hr />
+      <Divider />
       <div class="info">
         <p>Тип: {{ viewedCard.type === 'definition' ? 'определение' : 'статья' }}</p>
         <p v-if="foldersText">Папки: {{ foldersText }}</p>

@@ -96,9 +96,10 @@ const toggle = (event: Event) => {
           severity="secondary"
           size="small"
           icon="pi pi-table"
-          @click="toggle"
+          class="h-8"
           aria-haspopup="true"
           aria-controls="overlay_menu"
+          @click="toggle"
         />
         <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
       </div>
