@@ -62,9 +62,10 @@ const exitProfile = () => {
           class="menu-button h-8"
           @click="exitProfile"
         ></Button>
+        <!--TODO: возможно использовать компонент Menu. Возможно вынести в отдельный компонент -->
         <div class="flex items-center text-md ml-10">
           <span class="pi pi-folder mr-3"></span>
-          Папки
+          <router-link to="/folders"> Папки </router-link>
         </div>
         <div class="flex items-center text-md ml-5">
           <span class="pi pi-cog mr-3"></span>
@@ -93,7 +94,7 @@ const exitProfile = () => {
 
     <div class="flex items-center text-md my-3">
       <span class="pi pi-folder mr-3"></span>
-      Папки
+      <router-link to="/folders"> Папки </router-link>
     </div>
     <div class="flex items-center text-md my-3">
       <span class="pi pi-cog mr-3"></span>

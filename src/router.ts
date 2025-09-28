@@ -6,6 +6,7 @@ let localUser
 
 const MainView = () => import('@/views/main-view.vue')
 const LoginView = () => import('@/views/login-view.vue')
+const FoldersView = () => import('@/views/folders-view.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,6 +21,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: LoginView
+    },
+    {
+      path: '/folders',
+      name: 'folders',
+      component: FoldersView
     }
   ]
 })

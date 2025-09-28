@@ -4,7 +4,10 @@ import { TreeSelect } from 'primevue'
 import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
 import type { Folder } from '@/types'
+import { useFolders } from '@/use-folders'
 import type { ChangedValue, SelectedValues } from './folders-treeselect.types'
+
+const { buildFolderTree } = useFolders()
 
 /**
  * JSON с массивом юидов в формате строки.
@@ -39,33 +42,6 @@ const initData = async () => {
 }
 
 onMounted(initData)
-
-/**
- * Строит дерево папок из плоского массива.
- * @param folders - массив всех папок
- * @param parentUuid - uuid родительской папки (для рекурсии), по умолчанию null для корня
- * @returns массив папок с вложенными children
- */
-const buildFolderTree = (folders: Folder[], parentUuid: string | null = null): TreeNode[] => {
-  const children = folders.filter((folder) => {
-    if (parentUuid === null) {
-      return folder.path.length === 0
-    } else {
-      return folder.path.length > 0 && folder.path[folder.path.length - 1].uuid === parentUuid
-    }
-  })
-
-  return children.map((folder) => {
-    const folderChildren = buildFolderTree(folders, folder.uuid)
-    return {
-      //TODO: рефакторинг: удалить поле uuid, name
-      key: folder.uuid,
-      label: folder.name,
-      ...folder,
-      ...(folderChildren.length > 0 && { children: folderChildren })
-    }
-  })
-}
 
 const getChangedValue = (prevValues: string[], newValues: string[]): ChangedValue => {
   if (prevValues.length < newValues.length) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Toolbar, Button, Menu } from 'primevue'
+import { Button, Menu } from 'primevue'
 import type { CardShortInfo } from '@/types'
 import CardsAutocomplete from '../cards-autocomplete/cards-autocomplete.vue'
 import { tables } from './text-editor.consts'
