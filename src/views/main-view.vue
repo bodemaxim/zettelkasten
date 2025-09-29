@@ -11,8 +11,7 @@ import { useStore } from '@/use-store'
 const viewedCardUuid = ref<string | null>(null)
 const modalVisible = ref<boolean>(false)
 
-const { definitions, setDefinitions, isMobileView, setScreenWidth, setViewedCard, isMenuExpanded } =
-  useStore()
+const { definitions, setDefinitions, isMobileView, setViewedCard, isMenuExpanded } = useStore()
 
 const fetchDefinitions = async () => {
   if (!definitions.value.length) {
@@ -63,16 +62,10 @@ const viewPanelStyles = computed<StyleValue>(() => ({
     ? `calc(100vh - 100px - ${MENU_HEIGHT}px + 20px)`
     : 'calc(100vh - 80px)'
 }))
-
-const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
-  const [entry] = entries
-  const { width } = entry.contentRect
-  setScreenWidth(width)
-}
 </script>
 
 <template>
-  <div v-resize-observer="onResizeObserver" class="main-view">
+  <div class="main-view">
     <EditCardModal v-model:visible="modalVisible" @saved="onCardSave" />
     <MenuPanel />
 
