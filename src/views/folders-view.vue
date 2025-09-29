@@ -8,21 +8,10 @@ import { getAllFolders } from '@/api'
 import type { Folder } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import { useFolders } from '@/use-folders'
-import { useStore } from '@/use-store'
 
-const { isMobileView, isLoading } = useStore()
 const { buildFolderTree } = useFolders()
 
-const router = useRouter()
-
 //TODO: написать обертку?
-const containerStyles = computed<StyleValue>(() => ({
-  padding: isMobileView ? '8px' : '40px'
-}))
-
-const close = () => {
-  router.push('/')
-}
 
 const folders = ref<Folder[] | null>(null)
 
@@ -35,16 +24,36 @@ const initData = async () => {
   folderNodes.value = buildFolderTree(folders.value)
 }
 
+const selectedFolder = ref<Folder | null>(null)
+
+const onSelect = (e: any) => {
+  console.log(e)
+  selectedFolder.value = e
+  console.log(1, selectedFolder.value)
+}
+
 onMounted(initData)
 </script>
 
 <template>
   <div class="flex-b">
     <CoolPanel class="w-[300px] m-5">
-      <Tree :value="folderNodes" class="w-full"></Tree>
+      <Tree
+        :value="folderNodes"
+        class="w-full"
+        selectionMode="single"
+        @node-select="onSelect"
+      ></Tree>
     </CoolPanel>
     <CoolPanel class="w-[300px] m-5">
-      <div>мяу</div>
+      <div v-if="selectedFolder">
+        <h2 class="text-xl">{{ selectedFolder?.name }}</h2>
+        <p>{{ selectedFolder?.description }}</p>
+        <p>{{ selectedFolder?.createdAt }}</p>
+        <p>{{ selectedFolder?.defaultDisplay }}</p>
+        <p>{{ selectedFolder?.path }}</p>
+      </div>
+      <p v-else>Кликните папку, чтобы посмотреть информацию о ней.</p>
     </CoolPanel>
   </div>
 </template>
