@@ -6,7 +6,6 @@ import { useConfirm } from 'primevue/useconfirm'
 import { deleteCardByUuid, getCardByUuid, getCardsByUuid, updateCards } from '@/api'
 import type { Card, CardShortInfo, FolderShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
-import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString } from '@/utils'
 import TextViewer from './text-viewer/text-viewer.vue'
@@ -19,7 +18,6 @@ const emits = defineEmits<{
 
 const {
   isMobileView,
-  isLoading,
   setLoading,
   definitions,
   viewedCard,
@@ -174,7 +172,6 @@ const formattedDate = computed<string>(() => {
 
 <template>
   <CoolPanel>
-    <CoolSpinner v-if="isLoading" />
     <ConfirmDialog></ConfirmDialog>
     <article v-if="viewedCard" class="article">
       <div class="toolbar">

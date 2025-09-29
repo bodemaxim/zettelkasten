@@ -7,23 +7,13 @@ import { MENU_HEIGHT } from '@/components/menu-panel/menu-panel.consts'
 import MenuPanel from '@/components/menu-panel/menu-panel.vue'
 import SearchPanel from '@/components/search-panel/search-panel.vue'
 import ViewPanel from '@/components/view-panel/view-panel.vue'
-import CoolErrorDialog from '@/ui/cool-error-dialog.vue'
-import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 
 const viewedCardUuid = ref<string | null>(null)
 const modalVisible = ref<boolean>(false)
 
-const {
-  definitions,
-  setDefinitions,
-  isMobileView,
-  setScreenWidth,
-  isLoading,
-  setViewedCard,
-  errorMessage,
-  isMenuExpanded
-} = useStore()
+const { definitions, setDefinitions, isMobileView, setScreenWidth, setViewedCard, isMenuExpanded } =
+  useStore()
 
 const fetchDefinitions = async () => {
   if (!definitions.value.length) {
@@ -80,21 +70,10 @@ const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
   const { width } = entry.contentRect
   setScreenWidth(width)
 }
-
-const isError = ref<boolean>(false)
-
-watch(
-  () => errorMessage.value,
-  () => {
-    isError.value = !!errorMessage.value
-  }
-)
 </script>
 
 <template>
   <div v-resize-observer="onResizeObserver" class="main-view">
-    <CoolSpinner v-if="isLoading" />
-    <CoolErrorDialog v-model:visible="isError" />
     <EditCardModal v-model:visible="modalVisible" @saved="onCardSave" />
     <MenuPanel />
 

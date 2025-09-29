@@ -8,6 +8,7 @@ const errorMessage = ref<Error | null>(null)
 const folders = ref<Folder[]>([])
 const currentFolderUuid = ref<string | null>(null)
 const isMenuExpanded = ref(false)
+const isLoading = ref<boolean>(false)
 
 const screenWidth = ref<number>(window.innerWidth)
 const isMobileView = computed(() => {
@@ -23,10 +24,9 @@ export const useStore = () => {
     cardsShortInfo.value = newValue
   }
 
-  const isLoading = ref<boolean>(false)
-
   const setLoading = (value: boolean) => {
     isLoading.value = value
+    console.log(1, value)
   }
 
   const setScreenWidth = (newValue: number) => {

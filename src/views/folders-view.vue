@@ -6,7 +6,7 @@ import { Button, Tree } from 'primevue'
 import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
 import type { Folder } from '@/types'
-import CoolSpinner from '@/ui/cool-spinner.vue'
+import CoolPanel from '@/ui/cool-panel.vue'
 import { useFolders } from '@/use-folders'
 import { useStore } from '@/use-store'
 
@@ -39,24 +39,13 @@ onMounted(initData)
 </script>
 
 <template>
-  <div>
-    <CoolSpinner v-if="isLoading" />
-    <div class="modal" :style="containerStyles">
-      <div class="flex-b m-2 md:mx-10 mt-10">
-        <div class="text-xl">Папки</div>
-        <Button
-          type="button"
-          icon="pi pi-times"
-          size="small"
-          severity="secondary"
-          class="h-8"
-          @click="close"
-        ></Button>
-      </div>
-      <div class="flex-b m-2 md:mx-10 mt-10">
-        <Tree :value="folderNodes" class="w-full md:w-[30rem]"></Tree>
-      </div>
-    </div>
+  <div class="flex-b">
+    <CoolPanel class="w-[300px] m-5">
+      <Tree :value="folderNodes" class="w-full"></Tree>
+    </CoolPanel>
+    <CoolPanel class="w-[300px] m-5">
+      <div>мяу</div>
+    </CoolPanel>
   </div>
 </template>
 

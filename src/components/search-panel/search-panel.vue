@@ -5,7 +5,6 @@ import { Button, InputText, Paginator } from 'primevue'
 import { getCardsShortInfo } from '@/api'
 import type { CardShortInfo, CardsShortInfoRequest, Pagination } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
-import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 import ExpandMenuButton from '../menu-panel/expand-menu-button/expand-menu-button.vue'
 import BreadcrumbSelect from './breadcrumb-select/breadcrumb-select.vue'
@@ -129,7 +128,6 @@ const nextPaginationBtnDisabled = computed<boolean>(() => {
 
 <template>
   <CoolPanel>
-    <CoolSpinner v-if="isLoading" />
     <div class="toolbar">
       <InputText type="text" v-model="searchQuery" class="search-box h-8" />
       <Button

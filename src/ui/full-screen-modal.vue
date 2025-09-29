@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { type StyleValue, computed } from 'vue'
 import { Button } from 'primevue'
-import CoolSpinner from '@/ui/cool-spinner.vue'
 
 const visible = defineModel<boolean>('visible')
 
@@ -14,7 +13,6 @@ const containerStyles = computed<StyleValue>(() => ({
 
 <template>
   <div v-if="visible">
-    <CoolSpinner v-if="isLoading" />
     <div class="modal" :style="containerStyles">
       <div class="header m-2 md:mx-10 mt-10">
         <div class="text-xl">{{ title }}</div>

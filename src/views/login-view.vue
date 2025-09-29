@@ -5,9 +5,7 @@ import { createAccount, login, seeUser } from '@/api/auth'
 import { setProfileByUuid } from '@/api/profiles'
 import router from '@/router'
 import type { NewUser } from '@/types'
-import CoolErrorDialog from '@/ui/cool-error-dialog.vue'
 import CoolForm from '@/ui/cool-form.vue'
-import CoolSpinner from '@/ui/cool-spinner.vue'
 import { useStore } from '@/use-store'
 
 const isNewUser = ref(false)
@@ -19,7 +17,7 @@ const passwordConfirm = ref('')
 const firstName = ref('')
 const lastName = ref('')
 
-const { isLoading, setLoading, errorMessage } = useStore()
+const { setLoading } = useStore()
 
 const handleSignIn = async () => {
   setLoading(true)
@@ -92,22 +90,11 @@ const handleSubmit = () => {
 
 const question = computed<string>(() => (isNewUser.value ? 'Уже есть аккаунт?' : 'Впервые тут?'))
 const suggestedAction = computed<string>(() => (isNewUser.value ? 'Войти' : 'Создать аккаунт'))
-
-const isError = ref<boolean>(false)
-
-watch(
-  () => errorMessage.value,
-  () => {
-    isError.value = !!errorMessage.value
-  }
-)
 </script>
 
 <template>
   <div class="login-view">
-    <CoolErrorDialog v-model:visible="isError" />
-    <CoolSpinner v-if="isLoading" />
-    <div v-else class="form-container">
+    <div class="form-container">
       <h1 class="form-title">{{ title }}</h1>
 
       <CoolForm v-model="email" label="Эл. почта" id="email" autocomplete="email" required />
