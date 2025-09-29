@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { type StyleValue, computed, ref } from 'vue'
-import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { Button, Tree } from 'primevue'
+import { ref, onMounted } from 'vue'
+import { Tree } from 'primevue'
 import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
 import type { Folder } from '@/types'

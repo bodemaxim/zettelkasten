@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { type StyleValue, ref, onMounted, computed, watch } from 'vue'
-import { vResizeObserver } from '@vueuse/components'
+import { type StyleValue, ref, onMounted, computed } from 'vue'
 import { getAllDefinitions, getCardByUuid } from '@/api'
 import EditCardModal from '@/components/edit-card-modal/edit-card-modal.vue'
 import { MENU_HEIGHT } from '@/components/menu-panel/menu-panel.consts'
