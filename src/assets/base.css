@@ -104,6 +104,13 @@ ul {
   justify-content: center;
 }
 
+.flex-e {
+  display: flex;
+  gap: var(--x2);
+  align-items: center;
+  justify-content: end;
+}
+
 /* Утилиты основных цветов приложения из UTM */
 .utm-bg-primary {
   background-color: var(--utm-bg-primary);

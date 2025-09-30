@@ -7,6 +7,7 @@ import { logout, seeUser } from '@/api'
 import { getProfileByUuid } from '@/api/profiles'
 import type { Profile } from '@/types'
 import { useStore } from '@/use-store'
+import ExpandMenuButton from './expand-menu-button/expand-menu-button.vue'
 import { MENU_HEIGHT } from './menu-panel.consts'
 
 const router = useRouter()
@@ -118,7 +119,7 @@ onUnmounted(() => {
 
     <Divider />
 
-    <div class="flex items-center text-md ml-10">
+    <div class="flex items-center text-md my-3">
       <span class="pi pi-align-justify mr-3"></span>
       <router-link to="/"> Заметки </router-link>
     </div>
