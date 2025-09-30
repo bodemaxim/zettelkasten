@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, type StyleValue } from 'vue'
 import { Tree } from 'primevue'
 import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
+import { MENU_HEIGHT } from '@/components/menu-panel/menu-panel.consts'
+import MenuPanel from '@/components/menu-panel/menu-panel.vue'
 import type { Folder } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import { useFolders } from '@/use-folders'
+import { useStore } from '@/use-store'
 
 const { buildFolderTree } = useFolders()
+
+const { isMobileView, isMenuExpanded } = useStore()
 
 //TODO: написать обертку?
 
@@ -31,28 +36,68 @@ const onSelect = (e: any) => {
 }
 
 onMounted(initData)
+
+//TODO: понять почему нужна загадочная поправка на 20px
+const searchPanelStyles = computed<StyleValue>(() => {
+  let heightValue: string
+
+  if (isMobileView.value) {
+    heightValue = '100vh'
+  } else if (isMenuExpanded.value) {
+    heightValue = `calc(100vh - 100px - ${MENU_HEIGHT}px + 20px)`
+  } else {
+    heightValue = 'calc(100vh - 80px)'
+  }
+
+  return {
+    width: isMobileView.value ? '100%' : '300px',
+    minWidth: isMobileView.value ? undefined : '300px',
+    height: heightValue
+  }
+})
+
+//TODO: понять почему нужна загадочная поправка на 20px
+const viewPanelStyles = computed<StyleValue>(() => ({
+  height: isMenuExpanded.value
+    ? `calc(100vh - 100px - ${MENU_HEIGHT}px + 20px)`
+    : 'calc(100vh - 80px)'
+}))
 </script>
 
 <template>
-  <div class="flex-b">
-    <CoolPanel class="w-[300px] m-5">
-      <Tree
-        :value="folderNodes"
-        class="w-full"
-        selectionMode="single"
-        @node-select="onSelect"
-      ></Tree>
-    </CoolPanel>
-    <CoolPanel class="w-[300px] m-5">
-      <div v-if="selectedFolder">
+  <div class="main-view">
+    <MenuPanel />
+
+    <CoolPanel
+      v-if="isMobileView && selectedFolder"
+      :class="['view-panel', { 'mobile-panel': isMobileView }]"
+    >
+      <div>
         <h2 class="text-xl">{{ selectedFolder?.name }}</h2>
         <p>{{ selectedFolder?.description }}</p>
         <p>{{ selectedFolder?.createdAt }}</p>
         <p>{{ selectedFolder?.defaultDisplay }}</p>
         <p>{{ selectedFolder?.path }}</p>
       </div>
-      <p v-else>Кликните папку, чтобы посмотреть информацию о ней.</p>
     </CoolPanel>
+
+    <div v-show="!isMobileView || !selectedFolder" class="panels-container">
+      <CoolPanel
+        :class="['search-panel', { 'mobile-panel': isMobileView }]"
+        :style="searchPanelStyles"
+      >
+        <Tree :value="folderNodes" selectionMode="single" @node-select="onSelect"></Tree>
+      </CoolPanel>
+      <CoolPanel v-if="!isMobileView" :style="viewPanelStyles" class="view-panel">
+        <div>
+          <h2 class="text-xl">{{ selectedFolder?.name }}</h2>
+          <p>{{ selectedFolder?.description }}</p>
+          <p>{{ selectedFolder?.createdAt }}</p>
+          <p>{{ selectedFolder?.defaultDisplay }}</p>
+          <p>{{ selectedFolder?.path }}</p>
+        </div>
+      </CoolPanel>
+    </div>
   </div>
 </template>
 
@@ -75,5 +120,37 @@ onMounted(initData)
 
 :deep(.p-tree) {
   background-color: transparent;
+}
+</style>
+
+<style scoped>
+.main-view {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: hidden;
+}
+
+.panels-container {
+  display: flex;
+  flex-grow: 1;
+}
+
+.search-panel {
+  height: calc(100vh - 80px);
+  margin: 3em 0 3em 2em;
+}
+
+.view-panel {
+  position: relative;
+  flex-grow: 1;
+  height: calc(100vh - 80px);
+  margin: 3em 2em;
+}
+
+.mobile-panel {
+  height: 100vh;
+  margin: 0;
 }
 </style>

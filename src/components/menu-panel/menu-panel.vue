@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, type StyleValue } from 'vue'
+import { computed, onMounted, onUnmounted, ref, type StyleValue } from 'vue'
 import { useRouter } from 'vue-router'
 import { vOnClickOutside } from '@vueuse/components'
 import { Button, Divider } from 'primevue'
@@ -7,7 +7,6 @@ import { logout, seeUser } from '@/api'
 import { getProfileByUuid } from '@/api/profiles'
 import type { Profile } from '@/types'
 import { useStore } from '@/use-store'
-import ExpandMenuButton from './expand-menu-button/expand-menu-button.vue'
 import { MENU_HEIGHT } from './menu-panel.consts'
 
 const router = useRouter()
@@ -42,13 +41,36 @@ const exitProfile = () => {
 
   router.push('login')
 }
+
+const onHoverStart = () => {
+  setIsMenuExpanded(true)
+}
+
+const hoverTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+
+const onHoverEnd = () => {
+  if (hoverTimer.value) {
+    clearTimeout(hoverTimer.value)
+  }
+
+  hoverTimer.value = setTimeout(() => {
+    setIsMenuExpanded(false)
+    hoverTimer.value = null
+  }, 1200)
+}
+
+onUnmounted(() => {
+  if (hoverTimer.value) {
+    clearTimeout(hoverTimer.value)
+  }
+})
 </script>
 
 <template>
   <!--Десктопная-->
-  <div v-if="!isMobileView">
+  <div v-if="!isMobileView" @mouseenter="onHoverStart" @mouseleave="onHoverEnd">
     <div v-if="!isMenuExpanded" class="collapsed-menu_mobile">
-      <ExpandMenuButton class="expand-button_desktop" />
+      <span class="pi pi-angle-double-down"></span>
     </div>
     <div v-else class="expanded-menu_desktop" :style="menuStyles">
       <div class="left-block">
@@ -64,6 +86,10 @@ const exitProfile = () => {
         ></Button>
         <!--TODO: возможно использовать компонент Menu. Возможно вынести в отдельный компонент -->
         <div class="flex items-center text-md ml-10">
+          <span class="pi pi-align-justify mr-3"></span>
+          <router-link to="/"> Заметки </router-link>
+        </div>
+        <div class="flex items-center text-md ml-5">
           <span class="pi pi-folder mr-3"></span>
           <router-link to="/folders"> Папки </router-link>
         </div>
@@ -92,6 +118,10 @@ const exitProfile = () => {
 
     <Divider />
 
+    <div class="flex items-center text-md ml-10">
+      <span class="pi pi-align-justify mr-3"></span>
+      <router-link to="/"> Заметки </router-link>
+    </div>
     <div class="flex items-center text-md my-3">
       <span class="pi pi-folder mr-3"></span>
       <router-link to="/folders"> Папки </router-link>
@@ -155,7 +185,7 @@ const exitProfile = () => {
   right: 0;
   z-index: 1;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   width: 100%;
   margin-right: 4px;
   padding: 0;
