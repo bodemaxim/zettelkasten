@@ -80,7 +80,7 @@ const viewPanelStyles = computed<StyleValue>(() => ({
         :class="['search-panel', { 'mobile-panel': isMobileView }]"
         :style="searchPanelStyles"
       >
-        <div>
+        <div class="mb-5">
           <div v-if="isMobileView" class="flex-e m-2">
             <ExpandMenuButton />
           </div>
@@ -135,6 +135,7 @@ const viewPanelStyles = computed<StyleValue>(() => ({
 
 .search-panel {
   height: calc(100vh - 80px);
+  overflow-y: auto;
   margin: 3em 0 3em 2em;
 }
 
@@ -142,6 +143,7 @@ const viewPanelStyles = computed<StyleValue>(() => ({
   position: relative;
   flex-grow: 1;
   height: calc(100vh - 80px);
+  overflow-y: auto;
   margin: 3em 2em;
 }
 
