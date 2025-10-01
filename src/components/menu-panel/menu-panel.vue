@@ -26,6 +26,8 @@ const userName = computed(() => {
   return first || last ? `${first} ${last}`.trim() : 'Пользователь'
 })
 
+const activeRoute = computed(() => router.currentRoute.value.path)
+
 onMounted(async () => {
   const { data } = await seeUser()
   if (!data.session) return
@@ -65,6 +67,10 @@ onUnmounted(() => {
     clearTimeout(hoverTimer.value)
   }
 })
+
+const onLinkClick = () => {
+  setIsMenuExpanded(false)
+}
 </script>
 
 <template>
@@ -88,15 +94,17 @@ onUnmounted(() => {
         <!--TODO: возможно использовать компонент Menu. Возможно вынести в отдельный компонент -->
         <div class="flex items-center text-md ml-10">
           <span class="pi pi-align-justify mr-3"></span>
-          <router-link to="/"> Заметки </router-link>
+          <router-link to="/" :class="{ active: activeRoute === '/' }"> Заметки </router-link>
         </div>
         <div class="flex items-center text-md ml-5">
           <span class="pi pi-folder mr-3"></span>
-          <router-link to="/folders"> Папки </router-link>
+          <router-link to="/folders" :class="{ active: activeRoute === '/folders' }">
+            Папки
+          </router-link>
         </div>
         <div class="flex items-center text-md ml-5">
           <span class="pi pi-cog mr-3"></span>
-          Настройки
+          <span :class="{ active: activeRoute === '/settings' }">Настройки</span>
         </div>
       </div>
       <ExpandMenuButton class="expand-button_desktop" />
@@ -121,15 +129,24 @@ onUnmounted(() => {
 
     <div class="flex items-center text-md my-3">
       <span class="pi pi-align-justify mr-3"></span>
-      <router-link to="/"> Заметки </router-link>
+      <router-link to="/" :class="{ active: activeRoute === '/' }" @click="onLinkClick">
+        Заметки
+      </router-link>
     </div>
     <div class="flex items-center text-md my-3">
       <span class="pi pi-folder mr-3"></span>
-      <router-link to="/folders"> Папки </router-link>
+      <router-link
+        to="/folders"
+        :class="{ active: activeRoute === '/folders' }"
+        @click="onLinkClick"
+      >
+        Папки
+      </router-link>
     </div>
     <div class="flex items-center text-md my-3">
       <span class="pi pi-cog mr-3"></span>
-      Настройки
+      <span :class="{ active: activeRoute === '/settings' }" @click="onLinkClick">Настройки</span>
+      <!-- Аналогично -->
     </div>
 
     <div class="flex justify-between flex-grow items-end">
@@ -199,5 +216,11 @@ onUnmounted(() => {
   align-items: center;
   justify-content: flex-start;
   padding-left: 4px;
+}
+
+/* Стили для активного пункта меню */
+.active {
+  text-decoration: underline;
+  color: var(--accent-green);
 }
 </style>
