@@ -29,16 +29,38 @@ const getSelectedValues = (uuidsStringifiedJson: string): SelectedValues => {
   return result
 }
 
+/**
+ * Сортирует массив UUID папок от родителей к детям на основе глубины (длины path).
+ */
+const sortUuidsByHierarchy = (uuids: string[], folders: Folder[]): string[] => {
+  const folderMap = new Map(folders.map((f) => [f.uuid, f]))
+
+  const uuidsWithDepth = uuids.map((uuid) => {
+    const folder = folderMap.get(uuid)
+    return { uuid, depth: folder ? folder.path.length : 0 }
+  })
+
+  uuidsWithDepth.sort((a, b) => a.depth - b.depth)
+
+  return uuidsWithDepth.map((item) => item.uuid)
+}
+
 const initData = async () => {
   folders.value = await getAllFolders()
   nodes.value = buildFolderTree(folders.value)
-  selectedFolders.value = selectedUuidsStringifiedJSON.value
+
+  const initialSelected = selectedUuidsStringifiedJSON.value
     ? getSelectedValues(selectedUuidsStringifiedJSON.value)
     : {}
 
-  if (selectedFolders.value) {
-    previouslySelectedUuids.value = Object.keys(selectedFolders.value)
-  }
+  const sortedUuids = sortUuidsByHierarchy(Object.keys(initialSelected), folders.value)
+
+  selectedFolders.value = sortedUuids.reduce<SelectedValues>((acc, folderUuid) => {
+    acc[folderUuid] = true
+    return acc
+  }, {})
+
+  previouslySelectedUuids.value = sortedUuids
 }
 
 onMounted(initData)
@@ -75,6 +97,8 @@ const onValueChange = (e: SelectedValues) => {
   } else {
     arr = addParentFolderUuids(arr, changedValue.uuid)
   }
+
+  arr = sortUuidsByHierarchy(arr, folders.value)
 
   previouslySelectedUuids.value = [...arr]
 

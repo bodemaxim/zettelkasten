@@ -107,7 +107,6 @@ const onLinkClick = () => {
           <span :class="{ active: activeRoute === '/settings' }">Настройки</span>
         </div>
       </div>
-      <ExpandMenuButton class="expand-button_desktop" />
     </div>
   </div>
 

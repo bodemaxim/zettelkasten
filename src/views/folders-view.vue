@@ -27,7 +27,6 @@ const folderNodes = ref<TreeNode[]>([])
 
 const initData = async () => {
   folders.value = await getAllFolders()
-  console.log('folders', folders.value)
 
   folderNodes.value = buildFolderTree(folders.value)
 }
@@ -36,7 +35,6 @@ const selectedFolder = ref<Folder | null>(null)
 
 const onSelect = (e: any) => {
   selectedFolder.value = e
-  console.log(1, selectedFolder.value)
 }
 
 onMounted(initData)

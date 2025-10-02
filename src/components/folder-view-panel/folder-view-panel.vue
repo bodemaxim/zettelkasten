@@ -54,42 +54,45 @@ const onDelete = () => {
 <template>
   <CoolPanel>
     <div class="w-full p-4 pr-8">
-      <div class="flex-b mb-4">
-        <h2 class="text-xl">{{ selectedFolder?.name }}</h2>
-        <div class="flex-e">
-          <Button
-            v-tooltip="'Редактировать папку'"
-            icon="pi pi-file-edit"
-            severity="primary"
-            size="small"
-            class="h-8"
-            @click="onEdit"
-          />
-          <Button
-            v-tooltip="'Удалить папку'"
-            icon="pi pi-file-excel"
-            severity="secondary"
-            size="small"
-            class="h-8"
-            @click="onDelete"
-          />
-          <Button
-            v-if="isMobileView"
-            icon="pi pi-arrow-left"
-            severity="secondary"
-            size="small"
-            class="h-8"
-            @click="selectedFolder = null"
-          />
+      <div v-if="selectedFolder">
+        <div class="flex-b mb-4">
+          <h2 class="text-xl">{{ selectedFolder?.name }}</h2>
+          <div class="flex-e">
+            <Button
+              v-tooltip="'Редактировать папку'"
+              icon="pi pi-file-edit"
+              severity="primary"
+              size="small"
+              class="h-8"
+              @click="onEdit"
+            />
+            <Button
+              v-tooltip="'Удалить папку'"
+              icon="pi pi-file-excel"
+              severity="secondary"
+              size="small"
+              class="h-8"
+              @click="onDelete"
+            />
+            <Button
+              v-if="isMobileView"
+              icon="pi pi-arrow-left"
+              severity="secondary"
+              size="small"
+              class="h-8"
+              @click="selectedFolder = null"
+            />
+          </div>
         </div>
+        <DataTable
+          :value="tableData"
+          class="max-w-full"
+          :pt="{ root: 'rounded-lg overflow-hidden', table: 'rounded-lg' }"
+        >
+          <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" />
+        </DataTable>
       </div>
-      <DataTable
-        :value="tableData"
-        class="max-w-full"
-        :pt="{ root: 'rounded-lg overflow-hidden', table: 'rounded-lg' }"
-      >
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header" />
-      </DataTable>
+      <div v-else>Выберите папку, чтобы увидеть информацию о ней.</div>
     </div>
   </CoolPanel>
 </template>

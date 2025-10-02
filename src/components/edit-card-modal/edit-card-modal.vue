@@ -108,7 +108,6 @@ const onSave = async () => {
   updatedCard.value.createdAt = datetime.value
     ? datetime.value.toISOString()
     : new Date().toISOString()
-  console.log(updatedCard.value.createdAt)
 
   setLoading(true)
   let cardUuid = ''
