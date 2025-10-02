@@ -3,6 +3,7 @@ import { ref, onMounted, computed, type StyleValue } from 'vue'
 import { Tree } from 'primevue'
 import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
+import EditFolderModal from '@/components/edit-folder-modal/edit-folder-modal.vue'
 import FolderViewPanel from '@/components/folder-view-panel/folder-view-panel.vue'
 import ExpandMenuButton from '@/components/menu-panel/expand-menu-button/expand-menu-button.vue'
 import { MENU_HEIGHT } from '@/components/menu-panel/menu-panel.consts'
@@ -15,6 +16,8 @@ import { useStore } from '@/use-store'
 const { buildFolderTree } = useFolders()
 
 const { isMobileView, isMenuExpanded } = useStore()
+
+const modalVisible = ref<boolean>(false)
 
 //TODO: написать обертку?
 
@@ -63,16 +66,31 @@ const viewPanelStyles = computed<StyleValue>(() => ({
     ? `calc(100vh - 100px - ${MENU_HEIGHT}px + 20px)`
     : 'calc(100vh - 80px)'
 }))
+
+const onFolderSave = () => {}
+
+const onEdit = () => {
+  modalVisible.value = true
+}
+
+const onDelete = () => {}
 </script>
 
 <template>
   <div class="main-view">
+    <EditFolderModal
+      v-model:visible="modalVisible"
+      v-model:selected-folder="selectedFolder"
+      @saved="onFolderSave"
+    />
     <MenuPanel />
 
     <FolderViewPanel
       v-if="isMobileView && selectedFolder"
       v-model="selectedFolder"
       :class="['view-panel', { 'mobile-panel': isMobileView }]"
+      @edited="onEdit"
+      @deleted="onDelete"
     />
 
     <div v-show="!isMobileView || !selectedFolder" class="panels-container">
@@ -92,6 +110,8 @@ const viewPanelStyles = computed<StyleValue>(() => ({
         v-model="selectedFolder"
         :style="viewPanelStyles"
         class="view-panel"
+        @edited="onEdit"
+        @deleted="onDelete"
       />
     </div>
   </div>

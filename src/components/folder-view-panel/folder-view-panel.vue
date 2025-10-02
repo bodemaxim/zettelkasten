@@ -7,6 +7,11 @@ import CoolPanel from '@/ui/cool-panel.vue'
 import { useStore } from '@/use-store'
 import type { FolderTableRow } from './folder-view-panel.types'
 
+const emits = defineEmits<{
+  deleted: []
+  edited: []
+}>()
+
 const { isMobileView } = useStore()
 
 const selectedFolder = defineModel<Folder | null>()
@@ -37,8 +42,13 @@ const formattedDate = computed<string>(() => {
   return format(selectedFolder.value.createdAt, 'dd.MM.yy HH:mm')
 })
 
-const onEdit = () => {}
-const onDelete = () => {}
+const onEdit = () => {
+  emits('edited')
+}
+
+const onDelete = () => {
+  emits('deleted')
+}
 </script>
 
 <template>
