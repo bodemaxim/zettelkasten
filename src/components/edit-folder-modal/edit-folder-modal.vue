@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type StyleValue, ref, computed, onMounted } from 'vue'
+import { type StyleValue, ref, computed, onMounted, watch } from 'vue'
 import { Button, Select, DatePicker, IftaLabel, Textarea } from 'primevue'
 import { getAllDefinitions, getCardsShortInfo } from '@/api'
 import type { Card, CardsShortInfoRequest, Folder, FolderShortInfo } from '@/types'
@@ -29,6 +29,12 @@ const emits = defineEmits<{
 }>()
 
 type DefaultFolderDisplay = 'diary' | 'list' | 'dictionary'
+
+const displays = ref([
+  { label: 'Дневник', value: 'diary' },
+  { label: 'Список', value: 'list' },
+  { label: 'Словарь', value: 'dictionary' }
+])
 
 type FolderEditable = {
   name: string
@@ -74,13 +80,15 @@ const getPathJSON = (path: FolderShortInfo[]) => {
   return JSON.stringify(path.map((item) => item.uuid))
 }
 
-onMounted(() => {
+const initData = () => {
   updatedFolder.value = getEditableFolder(selectedFolder.value)
 
   selectedFoldersStringifiedJSON.value = selectedFolder.value?.path
     ? getPathJSON(selectedFolder.value?.path)
     : '[]'
-})
+}
+
+watch(selectedFolder, initData, { immediate: true, deep: true })
 
 const title = computed<string>(() => (viewedCard.value ? 'Редактировать папку' : 'Создать папку'))
 
@@ -168,8 +176,9 @@ const isTypeSelectOnFocus = ref(false)
             <Select
               v-model="updatedFolder.defaultDisplay"
               id="cardtype"
-              :options="cardTypes"
-              optionLabel="label"
+              :options="displays"
+              option-label="label"
+              option-value="value"
               :pt="{ label: 'type-select-label' }"
               class="h-full w-full"
               @before-show="isTypeSelectOnFocus = true"

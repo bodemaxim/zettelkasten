@@ -9,12 +9,9 @@ const { isLoading, errorMessage, setScreenWidth } = useStore()
 
 const isError = ref<boolean>(false)
 
-watch(
-  () => errorMessage.value,
-  () => {
-    isError.value = !!errorMessage.value
-  }
-)
+watch(errorMessage, () => {
+  isError.value = !!errorMessage.value
+})
 
 const onResizeObserver = (entries: readonly ResizeObserverEntry[]) => {
   const [entry] = entries

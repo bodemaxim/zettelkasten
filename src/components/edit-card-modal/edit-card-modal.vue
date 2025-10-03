@@ -179,32 +179,26 @@ const addUuidHyperLinksFromText = () => {
 const getAreDefinitionsUpdated = (cards: Card[]): boolean =>
   cards.some((card) => card.type === 'definition')
 
-watch(
-  () => viewedCard.value,
-  () => {
-    if (viewedCard.value) updatedCard.value = { ...viewedCard.value }
-    else updatedCard.value = { ...defaultCard }
-  }
-)
+watch(viewedCard, () => {
+  if (viewedCard.value) updatedCard.value = { ...viewedCard.value }
+  else updatedCard.value = { ...defaultCard }
+})
 
 const selectedType = ref<TypeOption | null>(null)
 
-watch(
-  () => viewedCard.value,
-  () => {
-    switch (viewedCard.value?.type) {
-      case 'definition':
-        selectedType.value = { ...typeOptionsList[0] }
-        break
-      case 'article':
-        selectedType.value = { ...typeOptionsList[1] }
-        break
-      default:
-        selectedType.value = { ...defaultType }
-        break
-    }
+watch(viewedCard, () => {
+  switch (viewedCard.value?.type) {
+    case 'definition':
+      selectedType.value = { ...typeOptionsList[0] }
+      break
+    case 'article':
+      selectedType.value = { ...typeOptionsList[1] }
+      break
+    default:
+      selectedType.value = { ...defaultType }
+      break
   }
-)
+})
 
 const cardTypes = ref<TypeOption[]>(typeOptionsList)
 

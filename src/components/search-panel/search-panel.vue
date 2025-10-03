@@ -84,17 +84,11 @@ const performSearch = async (): Promise<void> => {
 
 const onSearch = debounce(performSearch, 300)
 
-watch(
-  () => [searchQuery.value, cardsShortInfo.value],
-  () => onSearch()
-)
+watch([searchQuery, cardsShortInfo], onSearch)
 
 const isBreadcrumbSelectOpen = ref(false)
 
-watch(
-  () => currentFolderUuid.value,
-  () => initData()
-)
+watch(currentFolderUuid, initData)
 
 const defaultPagination: Pagination = {
   from: 0,
