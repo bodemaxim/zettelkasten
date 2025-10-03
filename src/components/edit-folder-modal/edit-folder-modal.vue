@@ -9,6 +9,7 @@ import { useStore } from '@/use-store'
 import { typeOptionsList } from '../edit-card-modal/edit-card-modal.consts'
 import { type TypeOption } from '../edit-card-modal/edit-card-modal.types'
 import FoldersTreeselect from '../edit-card-modal/folders-treeselect/folders-treeselect.vue'
+import BreadcrumbSelect from '../search-panel/breadcrumb-select/breadcrumb-select.vue'
 
 const visible = defineModel<boolean>('visible')
 const selectedFolder = defineModel<Folder | null>('selected-folder')
@@ -146,6 +147,8 @@ const defaultDatetime = new Date()
 const datetime = ref<Date | null>(defaultDatetime)
 
 const isTypeSelectOnFocus = ref(false)
+
+const isBreadcrumbSelectOpen = ref(false)
 </script>
 
 <template>
@@ -189,10 +192,11 @@ const isTypeSelectOnFocus = ref(false)
       </div>
 
       <div class="flex-b space-x-4">
-        <FoldersTreeselect
-          v-model="selectedFoldersStringifiedJSON"
-          class="w-full my-2 md:my-0 md:w-1/2 h-[60px]"
-        />
+        <div
+          class="flex-s w-1/2 h-[60px] border border-[var(--p-inputtext-border-color)] rounded-lg breadcrumb-container"
+        >
+          <BreadcrumbSelect v-model:open="isBreadcrumbSelectOpen" class="ml-4 bg-transparent" />
+        </div>
         <IftaLabel for="datetime" class="w-1/2">
           <label for="datetime" class="label">Дата</label>
           <DatePicker

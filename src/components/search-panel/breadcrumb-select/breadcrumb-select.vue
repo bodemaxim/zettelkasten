@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { vOnClickOutside } from '@vueuse/components'
 import { Breadcrumb, Button, Listbox } from 'primevue'
+import type { MenuItem } from 'primevue/menuitem'
 import { getAllFolders } from '@/api'
 import type { Folder, FolderShortInfo } from '@/types'
 import { useStore } from '@/use-store'
@@ -97,6 +98,11 @@ const initPath = () => {
 const closeSelect = () => {
   isSelectOpen.value = false
 }
+
+const hasChildren = (item: MenuItem) => {
+  if (!folders.value) return false
+  return folders.value.some((folder) => folder.path.at(-1)?.uuid === item.uuid)
+}
 </script>
 
 <template>
@@ -117,9 +123,16 @@ const closeSelect = () => {
             :pt="{ root: 'button-root' }"
             @click="onMenuItemClick(item.uuid)"
           />
-          <span v-else @click="onMenuItemClick(item.uuid)" class="clickable-item">{{
-            item.name
-          }}</span>
+          <span
+            v-else
+            :class="{
+              'clickable-item': hasChildren(item),
+              'no-children ': !hasChildren(item)
+            }"
+            @click="onMenuItemClick(item.uuid)"
+          >
+            {{ item.name }}
+          </span>
         </div>
       </template>
     </Breadcrumb>
@@ -129,6 +142,7 @@ const closeSelect = () => {
       :options="selectItems"
       optionLabel="name"
       :scroll-height="'calc(100vh - 240px)'"
+      class="absolute"
       @update:model-value="addFolderToPath"
     />
   </div>
@@ -138,13 +152,19 @@ const closeSelect = () => {
 .breadcrumb-root {
   margin: 5px 0;
   padding: 0;
-  background-color: var(--bg-dark);
+  background-color: transparent;
 }
 
 .clickable-item {
   text-decoration: underline;
   color: var(--accent-azure);
   cursor: pointer;
+}
+
+.no-children {
+  text-decoration: none;
+  color: var(--p-text-muted-color);
+  cursor: default;
 }
 
 .button-root {
