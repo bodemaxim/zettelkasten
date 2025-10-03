@@ -16,7 +16,8 @@ export async function createAccount(newUser: NewUser): Promise<AuthResponse['dat
       data: {
         first_name,
         last_name
-      }
+      },
+      emailRedirectTo: 'https://bodemaxim.github.io/zettelkasten'
     }
   })
 
