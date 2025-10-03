@@ -53,6 +53,11 @@ const setFolderFromStorage = () => {
   setCurrentFolderUuid(newValue)
 }
 
+const saveFolderUuid = (value: string | null) => {
+  setCurrentFolderUuid(value)
+  localStorage.setItem('folderUuid', JSON.stringify(value ?? ''))
+}
+
 const removeQuotes = (str: string) => {
   if (str.startsWith('"') && str.endsWith('"')) return str.slice(1, -1)
   return str
@@ -134,7 +139,12 @@ const nextPaginationBtnDisabled = computed<boolean>(() => {
       />
       <ExpandMenuButton v-if="isMobileView" />
     </div>
-    <BreadcrumbSelect v-model:open="isBreadcrumbSelectOpen" class="breadcrumb" />
+    <BreadcrumbSelect
+      v-model:open="isBreadcrumbSelectOpen"
+      :current-folder-uuid="currentFolderUuid"
+      class="breadcrumb"
+      @uuid-changed="saveFolderUuid"
+    />
     <div class="search-results-container" v-show="!isBreadcrumbSelectOpen">
       <div v-if="!isLoading && searchResults.length" class="search-results-list">
         <ul class="search-results-list">

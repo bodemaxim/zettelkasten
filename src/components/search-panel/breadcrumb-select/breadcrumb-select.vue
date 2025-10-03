@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { vOnClickOutside } from '@vueuse/components'
 import { Breadcrumb, Button, Listbox } from 'primevue'
 import type { MenuItem } from 'primevue/menuitem'
 import { getAllFolders } from '@/api'
 import type { Folder, FolderShortInfo } from '@/types'
 import { useStore } from '@/use-store'
+import { defaultPath } from './breadcrumb-select.consts'
+
+const props = defineProps<{ currentFolderUuid: string | null }>()
 
 const isSelectOpen = defineModel<boolean>('open')
 
-const defaultPath: FolderShortInfo[] = [
-  {
-    uuid: 'home',
-    name: 'root'
-  }
-]
+const emits = defineEmits<{
+  uuidChanged: [value: string | null]
+  path: [value: FolderShortInfo[]]
+}>()
 
 const folders = ref<Folder[]>()
 
-const { setFolders, currentFolderUuid, setCurrentFolderUuid } = useStore()
+const { setFolders } = useStore()
 
 onMounted(async () => {
   folders.value = await getAllFolders()
@@ -27,6 +28,10 @@ onMounted(async () => {
 })
 
 const currentPath = ref<FolderShortInfo[]>(defaultPath)
+
+watch(currentPath, () => {
+  emits('path', currentPath.value)
+})
 
 const selectItems = computed<FolderShortInfo[]>(() => {
   const lastPathItem = currentPath.value.at(-1)
@@ -44,6 +49,7 @@ const onMenuItemClick = (uuid: string) => {
     }
 
     saveFolderUuid(currentPath.value.length > 1 ? (currentPath.value.at(-1)?.uuid ?? null) : null)
+
     isSelectOpen.value = false
     return
   }
@@ -76,13 +82,12 @@ const addFolderToPath = (folder: Folder) => {
 }
 
 const saveFolderUuid = (value: string | null) => {
-  setCurrentFolderUuid(value)
-  localStorage.setItem('folderUuid', JSON.stringify(value ?? ''))
+  emits('uuidChanged', value)
 }
 
 const initPath = () => {
   const currentFolder: Folder | undefined = folders.value?.find(
-    (item) => item.uuid === currentFolderUuid.value
+    (item) => item.uuid === props.currentFolderUuid
   )
 
   if (!currentFolder) return
@@ -136,13 +141,14 @@ const hasChildren = (item: MenuItem) => {
         </div>
       </template>
     </Breadcrumb>
+
     <Listbox
       v-if="isSelectOpen"
       v-on-click-outside="closeSelect"
       :options="selectItems"
       optionLabel="name"
       :scroll-height="'calc(100vh - 240px)'"
-      class="absolute"
+      class="absolute z-10"
       @update:model-value="addFolderToPath"
     />
   </div>

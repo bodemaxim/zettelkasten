@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { type StyleValue, ref, computed, onMounted, watch } from 'vue'
+import { type StyleValue, ref, computed, watch } from 'vue'
 import { Button, Select, DatePicker, IftaLabel, Textarea } from 'primevue'
 import { getAllDefinitions, getCardsShortInfo } from '@/api'
 import type { Card, CardsShortInfoRequest, Folder, FolderShortInfo } from '@/types'
 import CoolForm from '@/ui/cool-form.vue'
 import FullScreenModal from '@/ui/full-screen-modal.vue'
 import { useStore } from '@/use-store'
-import { typeOptionsList } from '../edit-card-modal/edit-card-modal.consts'
-import { type TypeOption } from '../edit-card-modal/edit-card-modal.types'
-import FoldersTreeselect from '../edit-card-modal/folders-treeselect/folders-treeselect.vue'
 import BreadcrumbSelect from '../search-panel/breadcrumb-select/breadcrumb-select.vue'
 
 const visible = defineModel<boolean>('visible')
@@ -18,8 +15,6 @@ const {
   isLoading,
   viewedCard,
   isMobileView,
-  setLoading,
-  cardsShortInfo,
   setDefinitions,
   setCardsShortInfo,
   currentFolderUuid
@@ -140,15 +135,18 @@ const getAreDefinitionsUpdated = (cards: Card[]): boolean => {
   return true
 }
 
-const cardTypes = ref<TypeOption[]>(typeOptionsList)
-
-const defaultDatetime = new Date()
-
-const datetime = ref<Date | null>(defaultDatetime)
-
 const isTypeSelectOnFocus = ref(false)
 
 const isBreadcrumbSelectOpen = ref(false)
+
+const parentFolderUuid = computed<string>(() => {
+  return updatedFolder.value.path.at(-1)?.uuid ?? ''
+})
+
+const updateFolderPath = (e: FolderShortInfo[]) => {
+  updatedFolder.value.path = e.slice(1)
+  console.log('updatedFolder.value.path', updatedFolder.value.path)
+}
 </script>
 
 <template>
@@ -160,16 +158,16 @@ const isBreadcrumbSelectOpen = ref(false)
   >
     <div class="edit-card-modal" :style="containerStyles">
       <div>
-        <div :class="isMobileView ? '' : 'flex-b space-x-4 my-4'">
+        <div :class="{ 'flex-b space-x-4': !isMobileView }">
           <CoolForm
             id="title"
             v-model="updatedFolder.name"
             type="text"
             label="Имя папки"
-            class="w-full md:w-1/2"
+            class="w-full md:w-1/2 my-4"
           />
 
-          <div class="w-1/2 h-[60px] md:w-1/2 relative">
+          <div class="w-full md:w-1/2 h-[60px] relative my-4">
             <p
               class="text-xs absolute left-3 top-2 z-1"
               :class="isTypeSelectOnFocus ? 'text-primary-500' : 'text-muted-color'"
@@ -191,13 +189,18 @@ const isBreadcrumbSelectOpen = ref(false)
         </div>
       </div>
 
-      <div class="flex-b space-x-4">
+      <div :class="{ 'flex-b space-x-4': !isMobileView }">
         <div
-          class="flex-s w-1/2 h-[60px] border border-[var(--p-inputtext-border-color)] rounded-lg breadcrumb-container"
+          class="flex-s w-full md:w-1/2 h-[60px] border border-[var(--p-inputtext-border-color)] rounded-lg breadcrumb-container my-4"
         >
-          <BreadcrumbSelect v-model:open="isBreadcrumbSelectOpen" class="ml-4 bg-transparent" />
+          <BreadcrumbSelect
+            v-model:open="isBreadcrumbSelectOpen"
+            :current-folder-uuid="parentFolderUuid"
+            class="ml-4 bg-transparent"
+            @path="updateFolderPath"
+          />
         </div>
-        <IftaLabel for="datetime" class="w-1/2">
+        <IftaLabel for="datetime" class="w-full md:w-1/2 my-4">
           <label for="datetime" class="label">Дата</label>
           <DatePicker
             id="datetime"
@@ -210,7 +213,10 @@ const isBreadcrumbSelectOpen = ref(false)
         </IftaLabel>
       </div>
 
-      <Textarea class="w-full my-4 h-[100px]" />
+      <IftaLabel for="description" class="w-full my-4">
+        <label for="description" class="label">Описание</label>
+        <Textarea class="w-full h-[100px]" id="description" />
+      </IftaLabel>
 
       <div class="flex-e my-5">
         <Button
