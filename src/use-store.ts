@@ -43,6 +43,7 @@ export const useStore = () => {
 
   const setFolders = (newValue: Folder[]) => {
     folders.value = newValue
+    console.log('f', folders.value)
   }
 
   const setCurrentFolderUuid = (newValue: string | null) => {

@@ -37,7 +37,7 @@ const selectItems = computed<FolderShortInfo[]>(() => {
   const lastPathItem = currentPath.value.at(-1)
   if (!lastPathItem || !folders.value) return []
   if (lastPathItem.uuid === 'home') return folders.value.filter((item) => item.path.length === 0)
-  return folders.value.filter((item) => item.path.at(-1)?.uuid === lastPathItem.uuid)
+  return folders.value.filter((item) => item.path.at(-1) === lastPathItem.uuid)
 })
 
 const onMenuItemClick = (uuid: string) => {
@@ -92,12 +92,25 @@ const initPath = () => {
 
   if (!currentFolder) return
 
+  const currentFolderPath: FolderShortInfo[] = currentFolder.path.reduce(
+    (acc: FolderShortInfo[], item: string) => {
+      const folder = folders.value?.find((folder) => folder.uuid === item)
+      const folderShortInfo: FolderShortInfo = {
+        uuid: item,
+        name: folder?.name ?? ''
+      }
+      acc.push(folderShortInfo)
+      return acc
+    },
+    []
+  )
+
   const currentFolderShortInfo: FolderShortInfo = {
     uuid: currentFolder.uuid,
     name: currentFolder.name
   }
 
-  currentPath.value = [...defaultPath, ...currentFolder.path, currentFolderShortInfo]
+  currentPath.value = [...defaultPath, ...currentFolderPath, currentFolderShortInfo]
 }
 
 const closeSelect = () => {
@@ -106,7 +119,7 @@ const closeSelect = () => {
 
 const hasChildren = (item: MenuItem) => {
   if (!folders.value) return false
-  return folders.value.some((folder) => folder.path.at(-1)?.uuid === item.uuid)
+  return folders.value.some((folder) => folder.path.at(-1) === item.uuid)
 }
 </script>
 

@@ -12,7 +12,7 @@ const emits = defineEmits<{
   edited: []
 }>()
 
-const { isMobileView } = useStore()
+const { isMobileView, folders } = useStore()
 
 const selectedFolder = defineModel<Folder | null>()
 
@@ -33,9 +33,20 @@ function buildPath(items: FolderShortInfo[]): string {
   return names.length > 0 ? `root/${names.join('/')}` : 'root'
 }
 
-const pathString = computed(() =>
-  selectedFolder.value?.path ? buildPath(selectedFolder.value?.path) : ''
-)
+const pathString = computed(() => {
+  const foldersInfo: FolderShortInfo[] =
+    selectedFolder.value?.path.reduce((acc: FolderShortInfo[], item: string) => {
+      const folder = folders.value?.find((folder) => folder.uuid === item)
+      const folderShortInfo: FolderShortInfo = {
+        uuid: item,
+        name: folder?.name ?? ''
+      }
+      acc.push(folderShortInfo)
+      return acc
+    }, []) ?? []
+
+  return selectedFolder.value?.path ? buildPath(foldersInfo) : ''
+})
 
 const formattedDate = computed<string>(() => {
   if (!selectedFolder.value?.createdAt) return ''

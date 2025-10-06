@@ -144,6 +144,8 @@ const cardsInBottomList = computed<CardShortInfo[]>(() => {
 const foldersText = computed<string>(() => {
   const uuidsStr = viewedCard.value?.folders
 
+  console.log('uuidsStr', uuidsStr)
+
   if (!uuidsStr || typeof uuidsStr !== 'string') return ''
 
   try {
@@ -167,6 +169,10 @@ const foldersText = computed<string>(() => {
 const formattedDate = computed<string>(() => {
   if (!viewedCard.value?.createdAt) return ''
   return format(viewedCard.value.createdAt, 'dd.MM.yy HH:mm')
+})
+
+onMounted(() => {
+  console.log('мяяя')
 })
 </script>
 

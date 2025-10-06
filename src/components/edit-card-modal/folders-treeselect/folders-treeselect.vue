@@ -119,7 +119,7 @@ const addParentFolderUuids = (selectedUuids: string[], newUuid: string): string[
 
   if (folder.path.length) {
     folder.path.forEach((pathItem) => {
-      allUuids.add(pathItem.uuid)
+      allUuids.add(pathItem)
     })
   }
 
@@ -134,7 +134,7 @@ const getUuidsWithOddDeleted = (selectedUuids: string[], parentUuid: string): st
   const selectedFolders = folders.value.filter((folder) => selectedUuids.includes(folder.uuid))
 
   const filteredFolders = selectedFolders.filter(
-    (folder) => !folder.path.some((pathItem) => pathItem.uuid === parentUuid)
+    (folder) => !folder.path.some((pathItem) => pathItem === parentUuid)
   )
 
   return filteredFolders.map((folder) => folder.uuid)

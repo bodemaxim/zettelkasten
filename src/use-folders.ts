@@ -13,7 +13,7 @@ export const useFolders = () => {
       if (parentUuid === null) {
         return folder.path.length === 0
       } else {
-        return folder.path.length > 0 && folder.path[folder.path.length - 1].uuid === parentUuid
+        return folder.path.length > 0 && folder.path[folder.path.length - 1] === parentUuid
       }
     })
 

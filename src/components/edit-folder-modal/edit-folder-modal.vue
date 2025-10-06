@@ -37,7 +37,7 @@ type FolderEditable = {
   createdAt: Date | null
   description: string
   defaultDisplay: DefaultFolderDisplay
-  path: FolderShortInfo[]
+  path: string[]
 }
 
 const defaultFolder: FolderEditable = {
@@ -72,15 +72,11 @@ const getEditableFolder = (folder: Folder | null | undefined): FolderEditable =>
 
 const selectedFoldersStringifiedJSON = ref('[]')
 
-const getPathJSON = (path: FolderShortInfo[]) => {
-  return JSON.stringify(path.map((item) => item.uuid))
-}
-
 const initData = () => {
   updatedFolder.value = getEditableFolder(selectedFolder.value)
 
   selectedFoldersStringifiedJSON.value = selectedFolder.value?.path
-    ? getPathJSON(selectedFolder.value?.path)
+    ? JSON.stringify(selectedFolder.value?.path)
     : '[]'
 }
 
@@ -140,11 +136,11 @@ const isTypeSelectOnFocus = ref(false)
 const isBreadcrumbSelectOpen = ref(false)
 
 const parentFolderUuid = computed<string>(() => {
-  return updatedFolder.value.path.at(-1)?.uuid ?? ''
+  return updatedFolder.value.path.at(-1) ?? ''
 })
 
 const updateFolderPath = (e: FolderShortInfo[]) => {
-  updatedFolder.value.path = e.slice(1)
+  updatedFolder.value.path = e.slice(1).map((item) => item.uuid)
   console.log('updatedFolder.value.path', updatedFolder.value.path)
 }
 </script>

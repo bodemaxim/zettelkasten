@@ -22,7 +22,7 @@ export type Folder = FolderShortInfo & {
   createdAt: string
   description: string
   defaultDisplay: string
-  path: FolderShortInfo[]
+  path: string[]
 }
 
 export type ResponseWithCount<T> = {
