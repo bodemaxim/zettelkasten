@@ -29,9 +29,13 @@ onMounted(async () => {
 
 const currentPath = ref<FolderShortInfo[]>(defaultPath)
 
-watch(currentPath, () => {
-  emits('path', currentPath.value)
-})
+watch(
+  currentPath,
+  () => {
+    emits('path', currentPath.value)
+  },
+  { deep: true }
+)
 
 const selectItems = computed<FolderShortInfo[]>(() => {
   const lastPathItem = currentPath.value.at(-1)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, type StyleValue } from 'vue'
-import { Tree } from 'primevue'
+import { Button, Tree } from 'primevue'
 import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
 import EditFolderModal from '@/components/edit-folder-modal/edit-folder-modal.vue'
@@ -72,6 +72,10 @@ const onEdit = () => {
 }
 
 const onDelete = () => {}
+
+const createCard = () => {
+  modalVisible.value = true
+}
 </script>
 
 <template>
@@ -97,8 +101,16 @@ const onDelete = () => {}
         :style="searchPanelStyles"
       >
         <div class="mb-5">
-          <div v-if="isMobileView" class="flex-e m-2">
-            <ExpandMenuButton />
+          <div class="flex-e mx-2">
+            <Button
+              v-tooltip="'Создать папку'"
+              icon="pi pi-file-plus"
+              severity="primary"
+              size="small"
+              class="h-8"
+              @click="createCard"
+            />
+            <ExpandMenuButton v-if="isMobileView" />
           </div>
           <Tree :value="folderNodes" selectionMode="single" @node-select="onSelect"></Tree>
         </div>

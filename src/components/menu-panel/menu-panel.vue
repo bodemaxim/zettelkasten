@@ -59,7 +59,7 @@ const onHoverEnd = () => {
   hoverTimer.value = setTimeout(() => {
     setIsMenuExpanded(false)
     hoverTimer.value = null
-  }, 1200)
+  }, 3000)
 }
 
 onUnmounted(() => {

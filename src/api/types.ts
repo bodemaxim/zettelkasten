@@ -60,3 +60,13 @@ export type NewUser = {
   first_name: string
   last_name: string
 }
+
+export type DefaultFolderDisplay = 'diary' | 'list' | 'dictionary'
+
+export type FolderEditable = {
+  name: string
+  createdAt: Date | null
+  description: string
+  defaultDisplay: DefaultFolderDisplay
+  path: string[]
+}

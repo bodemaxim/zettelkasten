@@ -2,7 +2,15 @@
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Button, Select, DatePicker, IftaLabel, Textarea } from 'primevue'
 import { getAllDefinitions, getCardsShortInfo } from '@/api'
-import type { Card, CardsShortInfoRequest, Folder, FolderShortInfo } from '@/types'
+import { createFolder } from '@/api/folders'
+import type {
+  Card,
+  CardsShortInfoRequest,
+  DefaultFolderDisplay,
+  Folder,
+  FolderEditable,
+  FolderShortInfo
+} from '@/types'
 import CoolForm from '@/ui/cool-form.vue'
 import FullScreenModal from '@/ui/full-screen-modal.vue'
 import { useStore } from '@/use-store'
@@ -11,34 +19,17 @@ import BreadcrumbSelect from '../search-panel/breadcrumb-select/breadcrumb-selec
 const visible = defineModel<boolean>('visible')
 const selectedFolder = defineModel<Folder | null>('selected-folder')
 
-const {
-  isLoading,
-  viewedCard,
-  isMobileView,
-  setDefinitions,
-  setCardsShortInfo,
-  currentFolderUuid
-} = useStore()
+const { isLoading, isMobileView, setDefinitions, setCardsShortInfo, currentFolderUuid } = useStore()
 
 const emits = defineEmits<{
   saved: [uuid: string]
 }>()
-
-type DefaultFolderDisplay = 'diary' | 'list' | 'dictionary'
 
 const displays = ref([
   { label: 'Дневник', value: 'diary' },
   { label: 'Список', value: 'list' },
   { label: 'Словарь', value: 'dictionary' }
 ])
-
-type FolderEditable = {
-  name: string
-  createdAt: Date | null
-  description: string
-  defaultDisplay: DefaultFolderDisplay
-  path: string[]
-}
 
 const defaultFolder: FolderEditable = {
   name: '',
@@ -82,7 +73,9 @@ const initData = () => {
 
 watch(selectedFolder, initData, { immediate: true, deep: true })
 
-const title = computed<string>(() => (viewedCard.value ? 'Редактировать папку' : 'Создать папку'))
+const title = computed<string>(() =>
+  selectedFolder.value ? 'Редактировать папку' : 'Создать папку'
+)
 
 const containerStyles = computed<StyleValue>(() => ({
   padding: isMobileView.value ? '8px' : '40px'
@@ -123,13 +116,14 @@ const onSave = async () => {
     alert('Заполните название папки')
     return
   }
+  await createFolder(updatedFolder.value)
+  visible.value = false
 }
 
-const getLinkedCardsForUpdate = async () => {}
-
-const getAreDefinitionsUpdated = (cards: Card[]): boolean => {
-  return true
-}
+/**
+ * Удалять ставший ненужным uuid из поля folders карточек.
+ */
+const handleCardDelete = async () => {}
 
 const isTypeSelectOnFocus = ref(false)
 
@@ -141,7 +135,6 @@ const parentFolderUuid = computed<string>(() => {
 
 const updateFolderPath = (e: FolderShortInfo[]) => {
   updatedFolder.value.path = e.slice(1).map((item) => item.uuid)
-  console.log('updatedFolder.value.path', updatedFolder.value.path)
 }
 </script>
 
@@ -211,7 +204,7 @@ const updateFolderPath = (e: FolderShortInfo[]) => {
 
       <IftaLabel for="description" class="w-full my-4">
         <label for="description" class="label">Описание</label>
-        <Textarea class="w-full h-[100px]" id="description" />
+        <Textarea v-model="updatedFolder.description" class="w-full h-[100px]" id="description" />
       </IftaLabel>
 
       <div class="flex-e my-5">

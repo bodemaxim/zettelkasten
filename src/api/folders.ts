@@ -1,6 +1,6 @@
 import { supabase } from '@/api/supabaseClient'
 import { useStore } from '@/use-store'
-import type { Folder, FolderShortInfo } from './types'
+import type { Folder, FolderEditable, FolderShortInfo } from './types'
 
 const { setErrorMessage } = useStore()
 
@@ -30,4 +30,22 @@ export const getFoldersShortInfo = async (): Promise<FolderShortInfo[]> => {
   }
 
   return data
+}
+
+export const createFolder = async (newFolder: FolderEditable): Promise<Folder> => {
+  const { data, error } = await supabase
+    .from('folders')
+    .insert([{ ...newFolder }])
+    .select()
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка создания папки',
+      message: error.message
+    })
+
+    throw error
+  }
+
+  return data[0]
 }

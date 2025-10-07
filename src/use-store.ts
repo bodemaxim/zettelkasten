@@ -26,7 +26,6 @@ export const useStore = () => {
 
   const setLoading = (value: boolean) => {
     isLoading.value = value
-    console.log(1, value)
   }
 
   const setScreenWidth = (newValue: number) => {
@@ -43,7 +42,6 @@ export const useStore = () => {
 
   const setFolders = (newValue: Folder[]) => {
     folders.value = newValue
-    console.log('f', folders.value)
   }
 
   const setCurrentFolderUuid = (newValue: string | null) => {
