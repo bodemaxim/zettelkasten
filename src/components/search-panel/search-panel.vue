@@ -130,7 +130,7 @@ const nextPaginationBtnDisabled = computed<boolean>(() => {
     <div class="toolbar">
       <InputText type="text" v-model="searchQuery" class="search-box h-8" />
       <Button
-        v-tooltip="'Создать карточку'"
+        v-tooltip.bottom="'Создать карточку'"
         icon="pi pi-file-plus"
         severity="primary"
         size="small"

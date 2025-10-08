@@ -19,6 +19,12 @@ import BreadcrumbSelect from '../search-panel/breadcrumb-select/breadcrumb-selec
 const visible = defineModel<boolean>('visible')
 const selectedFolder = defineModel<Folder | null>('selected-folder')
 
+watch(visible, () => {
+  if (!visible.value) {
+    selectedFolder.value = null
+  }
+})
+
 const { isLoading, isMobileView, setDefinitions, setCardsShortInfo, currentFolderUuid } = useStore()
 
 const emits = defineEmits<{

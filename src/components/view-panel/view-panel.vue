@@ -27,6 +27,7 @@ const {
   setDefinitions,
   folders
 } = useStore()
+
 const confirm = useConfirm()
 
 const viewedCardUuid = defineModel<string | null>()
@@ -176,7 +177,7 @@ const formattedDate = computed<string>(() => {
     <article v-if="viewedCard" class="article">
       <div class="toolbar">
         <Button
-          v-tooltip="'Редактировать карточку'"
+          v-tooltip.bottom="'Редактировать карточку'"
           icon="pi pi-file-edit"
           severity="primary"
           size="small"
@@ -184,7 +185,7 @@ const formattedDate = computed<string>(() => {
           @click="$emit('edited')"
         />
         <Button
-          v-tooltip="'Удалить карточку'"
+          v-tooltip.bottom="'Удалить карточку'"
           icon="pi pi-file-excel"
           severity="secondary"
           size="small"

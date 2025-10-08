@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { format } from 'date-fns'
-import { Button, DataTable, Column } from 'primevue'
-import type { Folder, FolderShortInfo } from '@/types'
+import { Button, DataTable, Column, useConfirm, ConfirmDialog } from 'primevue'
+import { getCardPaths, updateCardPaths } from '@/api/cards'
+import { deleteFolderByUuid, getAllFolders, updateFolderPaths } from '@/api/folders'
+import type { CardPath, Folder, FolderShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import { useStore } from '@/use-store'
 import type { FolderTableRow } from './folder-view-panel.types'
@@ -12,7 +14,7 @@ const emits = defineEmits<{
   edited: []
 }>()
 
-const { isMobileView, folders } = useStore()
+const { isMobileView, folders, setFolders } = useStore()
 
 const selectedFolder = defineModel<Folder | null>()
 
@@ -54,23 +56,85 @@ const formattedDate = computed<string>(() => {
 })
 
 const onEdit = () => {
-  emits('edited')
+  alert('Кнопка в разработке')
+  return
+  //emits('edited')
 }
 
-const onDelete = () => {
+const confirm = useConfirm()
+
+const onDelete = async () => {
+  confirm.require({
+    message: 'Вы уверены, что хотите удалить папку? Вложенные папки и карточки не удалятся',
+    header: 'Подтверждение',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Нет',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Да'
+    },
+    accept: deleteFolderOnAccept
+  })
+}
+
+const deleteFolderOnAccept = async () => {
+  const deletedFolderUuid = selectedFolder.value?.uuid
+
+  if (!deletedFolderUuid) return
+
+  const updatedCardsRaw = await getCardPaths(deletedFolderUuid)
+
+  const updatedCards: CardPath[] = updatedCardsRaw.map((item) => {
+    const parsedFolders: string[] = JSON.parse(item.folders)
+    console.log(1, parsedFolders)
+
+    const parsedFoldersFiltered = parsedFolders.filter((uuid) => uuid !== deletedFolderUuid)
+
+    return {
+      uuid: item.uuid,
+      folders: JSON.stringify(parsedFoldersFiltered)
+    }
+  })
+
+  await updateCardPaths(updatedCards)
+
+  const foldersCopy = await getAllFolders()
+  console.log(3, foldersCopy)
+
+  const editedFolders: Folder[] = foldersCopy.reduce((acc: Folder[], folder: Folder) => {
+    const path = folder.path
+    if (!path.includes(deletedFolderUuid)) return acc
+
+    const updatedPath = folder.path.filter((uuid) => uuid !== deletedFolderUuid)
+
+    const updatedFolder = { ...folder, path: updatedPath }
+
+    acc.push(updatedFolder)
+
+    return acc
+  }, [])
+
+  await updateFolderPaths(editedFolders)
+
+  deleteFolderByUuid(deletedFolderUuid)
+
   emits('deleted')
 }
 </script>
 
 <template>
   <CoolPanel>
+    <ConfirmDialog></ConfirmDialog>
     <div class="w-full p-4 pr-8">
       <div v-if="selectedFolder">
         <div class="flex-b mb-4">
           <h2 class="text-xl">{{ selectedFolder?.name }}</h2>
           <div class="flex-e">
             <Button
-              v-tooltip="'Редактировать папку'"
+              v-tooltip.bottom="'Редактировать папку'"
               icon="pi pi-file-edit"
               severity="primary"
               size="small"
@@ -78,7 +142,7 @@ const onDelete = () => {
               @click="onEdit"
             />
             <Button
-              v-tooltip="'Удалить папку'"
+              v-tooltip.bottom="'Удалить папку'"
               icon="pi pi-file-excel"
               severity="secondary"
               size="small"

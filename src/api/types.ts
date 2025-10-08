@@ -73,5 +73,5 @@ export type FolderEditable = {
 
 export type CardPath = {
   uuid: string
-  folders: string[]
+  folders: string //json с массивом юидов
 }

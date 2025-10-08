@@ -3,6 +3,7 @@ import { ref, onMounted, computed, type StyleValue } from 'vue'
 import { Button, Tree } from 'primevue'
 import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
+import { deleteFolderByUuid } from '@/api/folders'
 import EditFolderModal from '@/components/edit-folder-modal/edit-folder-modal.vue'
 import FolderViewPanel from '@/components/folder-view-panel/folder-view-panel.vue'
 import ExpandMenuButton from '@/components/menu-panel/expand-menu-button/expand-menu-button.vue'
@@ -71,10 +72,14 @@ const onEdit = () => {
   modalVisible.value = true
 }
 
-const onDelete = () => {}
+const onDelete = async () => {
+  initData()
+  selectedFolder.value = null
+}
 
 const createCard = () => {
   modalVisible.value = true
+  selectedFolder.value = null
 }
 </script>
 
@@ -103,7 +108,7 @@ const createCard = () => {
         <div class="mb-5">
           <div class="flex-e mx-2">
             <Button
-              v-tooltip="'Создать папку'"
+              v-tooltip.bottom="'Создать папку'"
               icon="pi pi-file-plus"
               severity="primary"
               size="small"

@@ -223,7 +223,7 @@ export const getCardPaths = async (folderUuid: string): Promise<CardPath[]> => {
  * Метод изменяет поле folders у карточек.
  * Используется при редактировании папки, когда необходимо редактировать связанные карточки.
  */
-const updateCardPaths = async (cardPaths: CardPath[]) => {
+export const updateCardPaths = async (cardPaths: CardPath[]) => {
   const { error } = await supabase.rpc('update_cards_folders', { card_paths: cardPaths })
 
   if (error) {

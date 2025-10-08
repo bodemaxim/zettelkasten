@@ -50,8 +50,8 @@ export const createFolder = async (newFolder: FolderEditable): Promise<Folder> =
   return data[0]
 }
 
-export const deleteFolderByUuid = async (uuid: string): Promise<void> => {
-  const { error } = await supabase.from('folders').delete().eq('uuid', uuid)
+export const deleteFolderByUuid = async (uuid: string): Promise<number> => {
+  const { status, error } = await supabase.from('folders').delete().eq('uuid', uuid)
 
   if (error) {
     setErrorMessage({
@@ -59,4 +59,28 @@ export const deleteFolderByUuid = async (uuid: string): Promise<void> => {
       message: error.message
     })
   }
+
+  return status
+}
+
+export const updateFolderPaths = async (folders: Folder[]): Promise<void> => {
+  await Promise.all(
+    folders.map(async (folder) => {
+      const { error } = await supabase
+        .from('folders')
+        .update({
+          path: folder.path
+        })
+        .eq('uuid', folder.uuid)
+
+      if (error) {
+        setErrorMessage({
+          customText: 'Ошибка обновления путей папок',
+          message: error.message
+        })
+
+        throw error
+      }
+    })
+  )
 }
