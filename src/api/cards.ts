@@ -6,7 +6,8 @@ import type {
   CardShortInfo,
   CardEditable,
   ResponseWithCount,
-  CardsShortInfoRequest
+  CardsShortInfoRequest,
+  CardPath
 } from './types'
 
 const { setErrorMessage } = useStore()
@@ -194,5 +195,42 @@ export const deleteCardByUuid = async (uuid: string): Promise<void> => {
       customText: 'Ошибка удаления карточки',
       message: error.message
     })
+  }
+}
+
+/**
+ * Метод берет ограниченные данные карточек: uuid и path.
+ * Используется при редактировании папки, когда необходимо получить связанные карточки.
+ */
+export const getCardPaths = async (folderUuid: string): Promise<CardPath[]> => {
+  const { error, data } = await supabase
+    .from('cards')
+    .select('uuid, folders')
+    .like('folders', `%${folderUuid}%`)
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка загрузки карточек',
+      message: error.message
+    })
+    return []
+  }
+
+  return data
+}
+
+/**
+ * Метод изменяет поле folders у карточек.
+ * Используется при редактировании папки, когда необходимо редактировать связанные карточки.
+ */
+const updateCardPaths = async (cardPaths: CardPath[]) => {
+  const { error } = await supabase.rpc('update_cards_folders', { card_paths: cardPaths })
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка загрузки карточек',
+      message: error.message
+    })
+    return []
   }
 }

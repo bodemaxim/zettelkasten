@@ -49,3 +49,14 @@ export const createFolder = async (newFolder: FolderEditable): Promise<Folder> =
 
   return data[0]
 }
+
+export const deleteFolderByUuid = async (uuid: string): Promise<void> => {
+  const { error } = await supabase.from('folders').delete().eq('uuid', uuid)
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка удаления папки',
+      message: error.message
+    })
+  }
+}

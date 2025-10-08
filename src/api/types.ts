@@ -70,3 +70,8 @@ export type FolderEditable = {
   defaultDisplay: DefaultFolderDisplay
   path: string[]
 }
+
+export type CardPath = {
+  uuid: string
+  folders: string[]
+}
