@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Button, Menu } from 'primevue'
+import { Button, Checkbox, Menu } from 'primevue'
 import type { CardShortInfo } from '@/types'
 import CardsAutocomplete from '../cards-autocomplete/cards-autocomplete.vue'
 import { tables } from './text-editor.consts'
@@ -84,6 +84,19 @@ const items = ref([
 const toggle = (event: Event) => {
   menu.value.toggle(event)
 }
+
+const areSpacesAddedToBreaks = ref(true)
+
+const processTextForBreaks = () => {
+  if (!areSpacesAddedToBreaks.value || !text.value) return
+
+  const lines = text.value.split('\n')
+  const processedLines = lines.map((line) => {
+    if (line.endsWith('  ')) return line
+    return line + '  '
+  })
+  text.value = processedLines.join('\n')
+}
 </script>
 
 <template>
@@ -103,13 +116,18 @@ const toggle = (event: Event) => {
         />
         <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
       </div>
+      <Checkbox
+        v-model="areSpacesAddedToBreaks"
+        binary
+        v-tooltip.bottom="'Добавлять автоматически двойные пробелы в конце строк'"
+      />
     </div>
 
     <textarea
       ref="textareaRef"
       v-model="text"
       class="input-form"
-      @blur="saveCurrentSelection"
+      @blur="(saveCurrentSelection(), processTextForBreaks())"
     ></textarea>
   </div>
 </template>
