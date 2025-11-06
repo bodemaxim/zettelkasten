@@ -2,9 +2,11 @@
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Button, Select, DatePicker, IftaLabel, Textarea } from 'primevue'
 import { getAllDefinitions, getCardsShortInfo } from '@/api'
-import { createFolder } from '@/api/folders'
+import { getCardPaths, updateCardPaths } from '@/api/cards'
+import { createFolder, getAllFolders, updateFolderByUuid, updateFolderPaths } from '@/api/folders'
 import type {
   Card,
+  CardPath,
   CardsShortInfoRequest,
   DefaultFolderDisplay,
   Folder,
@@ -14,6 +16,7 @@ import type {
 import CoolForm from '@/ui/cool-form.vue'
 import FullScreenModal from '@/ui/full-screen-modal.vue'
 import { useStore } from '@/use-store'
+import { getAreArraysEqual } from '@/utils'
 import BreadcrumbSelect from '../search-panel/breadcrumb-select/breadcrumb-select.vue'
 
 const visible = defineModel<boolean>('visible')
@@ -110,26 +113,72 @@ const updateSearchPanel = async (areDefinitionsChanged: boolean) => {
   ])
 }
 
-/**
- * Экономично обновляет связанные карточки, редактируемую карточку и панель поиска.
- * @param targetCard - создаваемая/редактируемая карточка
- * @param isNewCard - является ли карточка новой
- */
-const updateAllNeeded = async (targetCard: Card, isNewCard: boolean) => {}
-
 const onSave = async () => {
   if (!updatedFolder.value.name) {
     alert('Заполните название папки')
     return
   }
-  await createFolder(updatedFolder.value)
+
+  if (!selectedFolder.value) {
+    await createFolder(updatedFolder.value)
+    visible.value = false
+    return
+  }
+
+  // РЕДАКТИРОВАНИЕ
+  // сохранять собственные данные отредактированной папки
+  try {
+    await updateFolderByUuid(selectedFolder.value.uuid, updatedFolder.value)
+  } catch {
+    return
+  }
+
+  if (!getAreArraysEqual(selectedFolder.value.path, updatedFolder.value.path)) {
+    // редактировать пути вложенных папок
+    const oldPath = selectedFolder.value.path
+    const newPath = updatedFolder.value.path
+    const nestedFoldersPath = [...selectedFolder.value.path, selectedFolder.value.uuid]
+
+    const foldersCopy = await getAllFolders()
+    const nestedFolders: Folder[] = foldersCopy.reduce((acc: Folder[], folder: Folder) => {
+      const path = folder.path
+      if (!arraysStartWith(path, nestedFoldersPath)) return acc
+
+      const pathEnding = path.slice(nestedFoldersPath.length)
+      const updatedPath = [...newPath, ...pathEnding]
+      const updatedFolder = { ...folder, path: updatedPath }
+      acc.push(updatedFolder)
+      return acc
+    }, [])
+    await updateFolderPaths(nestedFolders)
+
+    // редактировать пути вложенных карточек
+    const updatedCardsRaw = await getCardPaths(selectedFolder.value.uuid)
+    const updatedCards: CardPath[] = updatedCardsRaw.map((item) => {
+      const parsedFolders: string[] = JSON.parse(item.folders)
+
+      const pathEnding = parsedFolders.slice(oldPath.length)
+      const newParsedFolders = [...newPath, ...pathEnding]
+      return {
+        uuid: item.uuid,
+        folders: JSON.stringify(newParsedFolders)
+      }
+    })
+    await updateCardPaths(updatedCards)
+  }
+
   visible.value = false
 }
 
 /**
- * Удалять ставший ненужным uuid из поля folders карточек.
+ * Вспомогательная функция для проверки, начинается ли массив с заданного подмассива
  */
-const handleCardDelete = async () => {}
+const arraysStartWith = (arr: string[], prefix: string[]): boolean => {
+  if (arr.length < prefix.length) return false
+  const subArr = arr.slice(0, prefix.length)
+
+  return getAreArraysEqual(prefix, subArr)
+}
 
 const isTypeSelectOnFocus = ref(false)
 

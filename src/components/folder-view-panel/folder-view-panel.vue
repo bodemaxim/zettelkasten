@@ -56,9 +56,7 @@ const formattedDate = computed<string>(() => {
 })
 
 const onEdit = () => {
-  alert('Кнопка в разработке')
-  return
-  //emits('edited')
+  emits('edited')
 }
 
 const confirm = useConfirm()
@@ -102,7 +100,6 @@ const deleteFolderOnAccept = async () => {
   await updateCardPaths(updatedCards)
 
   const foldersCopy = await getAllFolders()
-  console.log(3, foldersCopy)
 
   const editedFolders: Folder[] = foldersCopy.reduce((acc: Folder[], folder: Folder) => {
     const path = folder.path

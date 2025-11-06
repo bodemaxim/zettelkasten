@@ -50,6 +50,28 @@ export const createFolder = async (newFolder: FolderEditable): Promise<Folder> =
   return data[0]
 }
 
+export const updateFolderByUuid = async (
+  uuid: string,
+  folderUpdates: FolderEditable
+): Promise<Folder> => {
+  const { data, error } = await supabase
+    .from('folders')
+    .update(folderUpdates)
+    .eq('uuid', uuid)
+    .select()
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка обновления папки',
+      message: error.message
+    })
+
+    throw error
+  }
+
+  return data[0]
+}
+
 export const deleteFolderByUuid = async (uuid: string): Promise<number> => {
   const { status, error } = await supabase.from('folders').delete().eq('uuid', uuid)
 
