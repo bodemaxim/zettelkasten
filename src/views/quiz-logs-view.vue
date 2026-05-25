@@ -3,7 +3,7 @@ import { computed, type StyleValue } from 'vue'
 import ExpandMenuButton from '@/components/menu-panel/expand-menu-button/expand-menu-button.vue'
 import { MENU_HEIGHT } from '@/components/menu-panel/menu-panel.consts'
 import MenuPanel from '@/components/menu-panel/menu-panel.vue'
-import QuizLogsPanel from '@/components/quiz-logs-panel/quiz-logs-panel.vue'
+import QuizLogsTable from '@/components/quiz-logs-table/quiz-logs-table.vue'
 import { useStore } from '@/use-store'
 
 const { isMobileView, isMenuExpanded } = useStore()
@@ -23,7 +23,7 @@ const contentStyles = computed<StyleValue>(() => ({
       <div v-if="isMobileView" class="mobile-header">
         <ExpandMenuButton />
       </div>
-      <QuizLogsPanel />
+      <QuizLogsTable />
     </div>
   </div>
 </template>
@@ -41,7 +41,8 @@ const contentStyles = computed<StyleValue>(() => ({
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  overflow-y: auto;
+  min-height: 0;
+  overflow-y: hidden;
   margin: 3em 2em;
 }
 

@@ -150,7 +150,7 @@ const onSubmitGrade = async () => {
     <div class="info my-5">
       <p>Тип: квиз</p>
       <p v-if="foldersText">Папки: {{ foldersText }}</p>
-      <p v-if="priorityRating !== null">Очки за работу: {{ priorityRating }}</p>
+      <p v-if="priorityRating !== null">Уровень изученности: {{ priorityRating }}</p>
       <p>{{ formattedDate }}</p>
     </div>
     <div v-if="quizTask" class="quiz-task my-5">

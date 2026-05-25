@@ -4,9 +4,9 @@ import { format } from 'date-fns'
 import { DataTable, Column } from 'primevue'
 import type { DataTablePageEvent } from 'primevue/datatable'
 import { getQuizEvents, seeUser } from '@/api'
-import QuizLogsAutocomplete from '@/components/quiz-logs-panel/quiz-logs-autocomplete.vue'
 import { QUIZ_GRADES } from '@/components/view-panel/grade-picker/grade-picker.consts'
 import type { CardShortInfo, QuizEvent, QuizGrade } from '@/types'
+import QuizLogsAutocomplete from './quiz-logs-autocomplete.vue'
 
 const ROWS_PER_PAGE = 25
 
@@ -76,54 +76,56 @@ onMounted(loadQuizEvents)
 </script>
 
 <template>
-  <div class="quiz-logs-panel">
+  <div class="quiz-logs-table">
     <h1 class="quiz-logs-panel__title">Логи квизов</h1>
 
-    <QuizLogsAutocomplete @selected="onQuizSelected" />
+    <QuizLogsAutocomplete @selected="onQuizSelected" class="my-5" />
 
-    <DataTable
-      :value="quizEvents"
-      lazy
-      paginator
-      :rows="rowsPerPage"
-      :first="first"
-      :total-records="totalRecords"
-      :loading="loading"
-      :rows-per-page-options="[10, 25, 50]"
-      class="quiz-logs-panel__table"
-      :pt="{ root: 'rounded-lg overflow-hidden', table: 'rounded-lg' }"
-      @page="onPage"
-    >
-      <Column field="card_title" header="Карточка">
-        <template #body="{ data }">
-          {{ data.card_title ?? '—' }}
-        </template>
-      </Column>
-      <Column field="created_at" header="Создано">
-        <template #body="{ data }">
-          {{ formatDateTime(data.created_at) }}
-        </template>
-      </Column>
-      <Column field="duration" header="Длительность">
-        <template #body="{ data }">
-          {{ formatDuration(data.duration) }}
-        </template>
-      </Column>
-      <Column field="grade" header="Оценка">
-        <template #body="{ data }">
-          {{ formatGrade(data.grade) }}
-        </template>
-      </Column>
-    </DataTable>
+    <div class="quiz-logs-panel__table-wrapper">
+      <DataTable
+        :value="quizEvents"
+        lazy
+        paginator
+        :rows="rowsPerPage"
+        :first="first"
+        :total-records="totalRecords"
+        :loading="loading"
+        :rows-per-page-options="[10, 25, 50]"
+        class="quiz-logs-panel__table"
+        :pt="{ root: 'rounded-lg', table: 'rounded-lg' }"
+        @page="onPage"
+      >
+        <Column field="card_title" header="Карточка">
+          <template #body="{ data }">
+            {{ data.card_title ?? '—' }}
+          </template>
+        </Column>
+        <Column field="created_at" header="Создано">
+          <template #body="{ data }">
+            {{ formatDateTime(data.created_at) }}
+          </template>
+        </Column>
+        <Column field="duration" header="Длительность">
+          <template #body="{ data }">
+            {{ formatDuration(data.duration) }}
+          </template>
+        </Column>
+        <Column field="grade" header="Оценка">
+          <template #body="{ data }">
+            {{ formatGrade(data.grade) }}
+          </template>
+        </Column>
+      </DataTable>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.quiz-logs-panel {
+.quiz-logs-table {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  flex-grow: 1;
-  gap: var(--x2);
+  height: 100%;
   min-height: 0;
 }
 
@@ -132,7 +134,9 @@ onMounted(loadQuizEvents)
   font-size: 1.5rem;
 }
 
-.quiz-logs-panel__table {
-  flex-grow: 1;
+.quiz-logs-panel__table-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 </style>
