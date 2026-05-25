@@ -79,12 +79,20 @@ export type CardPath = {
 
 export type QuizShortInfo = {
   uuid: string
+  card_id: string
   title: string
   priority_rating: number
 }
 
+export type QuizzesShortInfoRequest = {
+  pagination?: Pagination
+  sorting?: Sorting
+  folderUuid?: string
+}
+
 export type QuizEditable = CardEditable & {
   priority_rating: number
+  task: string
 }
 
 export type Quiz = {

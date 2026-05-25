@@ -4,7 +4,9 @@
   import {
     createCard,
     createQuiz,
+    getQuizByCardId,
     updateCard,
+    updateQuiz,
     getCardsByUuid,
     updateCards,
     getAllDefinitions,
@@ -44,6 +46,7 @@
   }>()
   
   const updatedCard = ref<CardEditable>({ ...defaultCard })
+  const quizTask = ref('')
   
   const title = computed<string>(() =>
     viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
@@ -56,9 +59,19 @@
   const getTypeOptionByValue = (value: TypeOption['value']): TypeOption =>
     typeOptionsList.find((o) => o.value === value) ?? defaultType
   
+  const resetQuizTask = () => {
+    quizTask.value = ''
+  }
+
+  const loadQuizTask = async (cardId: string) => {
+    const quiz = await getQuizByCardId(cardId)
+    quizTask.value = quiz?.task ?? ''
+  }
+
   const onCancel = () => {
     visible.value = false
     updatedCard.value = { ...defaultCard }
+    resetQuizTask()
     selectedType.value = getTypeOptionByValue('article')
   }
   
@@ -130,7 +143,8 @@
       if (cardType === 'quiz') {
         const quiz = await createQuiz({
           ...updatedCard.value,
-          priority_rating: defaultQuizPriorityRating
+          priority_rating: defaultQuizPriorityRating,
+          task: quizTask.value
         })
         cardUuid = quiz.card.uuid
         await updateAllNeeded(quiz.card, true)
@@ -146,11 +160,16 @@
         type: cardType
       }
       cardUuid = cardForUpdate.uuid
-  
+
+      if (cardType === 'quiz') {
+        await updateQuiz(cardUuid, { task: quizTask.value })
+      }
+
       await updateAllNeeded(cardForUpdate, false)
     }
-  
+
     updatedCard.value = { ...defaultCard }
+    resetQuizTask()
     selectedType.value = getTypeOptionByValue('article')
     visible.value = false
   
@@ -202,9 +221,21 @@
   const getAreDefinitionsUpdated = (cards: Card[]): boolean =>
     cards.some((card) => card.type === 'definition')
   
-  watch(viewedCard, () => {
-    if (viewedCard.value) updatedCard.value = { ...viewedCard.value }
-    else updatedCard.value = { ...defaultCard }
+  watch(viewedCard, async () => {
+    if (viewedCard.value) {
+      updatedCard.value = { ...viewedCard.value }
+
+      if (viewedCard.value.type === 'quiz') {
+        await loadQuizTask(viewedCard.value.uuid)
+      } else {
+        resetQuizTask()
+      }
+
+      return
+    }
+
+    updatedCard.value = { ...defaultCard }
+    resetQuizTask()
   })
   
   const selectedType = ref<TypeOption | null>(null)
@@ -286,8 +317,13 @@
               </div>
             </div>
   
+            <div v-if="isQuizType" class="my-5">
+              <p class="quiz-field-heading">Задание</p>
+              <TextEditor v-model:text="quizTask" />
+            </div>
+
             <div class="my-5">
-              <p v-if="isQuizType" class="quiz-answer-heading">Напишите правильный ответ</p>
+              <p v-if="isQuizType" class="quiz-field-heading">Правильный ответ</p>
               <TextEditor v-model:text="updatedCard.text" />
             </div>
   
@@ -327,7 +363,7 @@
   </template>
   
   <style scoped>
-  .quiz-answer-heading {
+  .quiz-field-heading {
     margin-bottom: 8px;
     font-size: 14px;
     color: var(--text-color-secondary, #6b7280);

@@ -11,5 +11,14 @@ export {
   getCardsByUuid
 } from '@/api/cards'
 export { getAllFolders, getFoldersShortInfo } from './folders'
-export { getQuizByUuid, getQuizzesShortInfo, createQuiz, getNextQuiz } from './quizzes'
+export {
+  getQuizByUuid,
+  getQuizByCardId,
+  getQuizPriorityRatingByCardId,
+  getQuizzesShortInfo,
+  createQuiz,
+  updateQuiz,
+  getNextQuiz,
+  updateQuizPriorityAfterGrade
+} from './quizzes'
 export { getQuizEvents, createQuizEvent } from './quiz-events'

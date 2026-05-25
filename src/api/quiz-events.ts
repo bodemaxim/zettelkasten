@@ -12,7 +12,7 @@ type QuizEventRow = Omit<QuizEvent, 'card_title'> & {
 const mapQuizEvents = (rows: QuizEventRow[] | null): QuizEvent[] =>
   (rows ?? []).map((row) => {
     const card = Array.isArray(row.card) ? row.card[0] : row.card
-    const { card: _card, ...event } = row
+    const { card: _card, ...event } = row //eslint-disable-line @typescript-eslint/no-unused-vars
 
     return {
       ...event,
