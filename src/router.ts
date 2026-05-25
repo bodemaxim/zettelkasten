@@ -7,6 +7,8 @@ let localUser
 const MainView = () => import('@/views/main-view.vue')
 const LoginView = () => import('@/views/login-view.vue')
 const FoldersView = () => import('@/views/folders-view.vue')
+const QuizLogsView = () => import('@/views/quiz-logs-view.vue')
+const StudyModeView = () => import('@/views/study-mode-view.vue')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +28,18 @@ const router = createRouter({
       path: '/folders',
       name: 'folders',
       component: FoldersView
+    },
+    {
+      path: '/quiz-logs',
+      name: 'quiz-logs',
+      component: QuizLogsView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/study-mode',
+      name: 'study-mode',
+      component: StudyModeView,
+      meta: { requiresAuth: true }
     }
   ]
 })

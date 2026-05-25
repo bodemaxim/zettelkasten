@@ -45,6 +45,7 @@ export type CardsShortInfoRequest = {
   pagination?: Pagination
   sorting?: Sorting
   folderUuid?: string
+  type?: Card['type']
 }
 
 export type Profile = {
@@ -90,6 +91,31 @@ export type Quiz = {
   uuid: string
   created_at: string
   card_id: string
+  task: string
   priority_rating: number
   card: Card
 }
+
+export type QuizGrade = 'poor' | 'flawed' | 'excellent'
+
+export type QuizEvent = {
+  id: string
+  created_at: string
+  start_time: string | null
+  end_time: string | null
+  duration: number | null
+  grade: QuizGrade | null
+  card_id: string | null
+  card_title: string | null
+  user_id: string | null
+}
+
+export type QuizEventEditable = Omit<QuizEvent, 'id' | 'created_at' | 'card_title'>
+
+export type QuizEventsRequest = {
+  pagination?: Pagination
+  sorting?: Sorting
+  userId?: string
+  cardId?: string
+}
+

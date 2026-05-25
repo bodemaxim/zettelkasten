@@ -19,9 +19,13 @@ export const getCardsShortInfo = async (
   let count: number | null = null
   let error: PostgrestError | null = null
 
-  const { pagination, searchQuery, sorting, folderUuid } = request
+  const { pagination, searchQuery, sorting, folderUuid, type } = request
 
   let query = supabase.from('cards').select('uuid, title', { count: 'exact', head: false })
+
+  if (type) {
+    query = query.eq('type', type)
+  }
 
   if (searchQuery) {
     query = query.ilike('title', `%${searchQuery}%`)

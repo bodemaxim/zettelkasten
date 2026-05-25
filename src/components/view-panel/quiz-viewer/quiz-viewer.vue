@@ -1,26 +1,40 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { format } from 'date-fns'
 import { Button } from 'primevue'
-import type { FolderShortInfo } from '@/types'
+import { createQuizEvent, seeUser } from '@/api'
+import type { FolderShortInfo, QuizGrade } from '@/types'
 import { useStore } from '@/use-store'
 import TextEditor from '../../edit-card-modal/text-editor/text-editor.vue'
+import GradePicker from '../grade-picker/grade-picker.vue'
 import TextViewer from '../text-viewer/text-viewer.vue'
 
 const emits = defineEmits<{
   clickOnLink: [uuid: string]
 }>()
 
-const { viewedCard, folders, isLoading } = useStore()
+const { viewedCard, folders, isLoading, setLoading } = useStore()
 
 const userAnswer = ref('')
 const isAnswerSubmitted = ref(false)
+const selectedGrade = ref<QuizGrade | null>(null)
+const openedAt = ref<Date | null>(null)
+const answerSubmittedAt = ref<Date | null>(null)
+const isGradeSubmitted = ref(false)
+
+onMounted(() => {
+  openedAt.value = new Date()
+})
 
 watch(
   () => viewedCard.value?.uuid,
   () => {
     userAnswer.value = ''
     isAnswerSubmitted.value = false
+    selectedGrade.value = null
+    openedAt.value = new Date()
+    answerSubmittedAt.value = null
+    isGradeSubmitted.value = false
   }
 )
 
@@ -54,6 +68,36 @@ const formattedDate = computed<string>(() => {
 
 const onSubmit = () => {
   isAnswerSubmitted.value = true
+  answerSubmittedAt.value = new Date()
+}
+
+const onSubmitGrade = async () => {
+  if (!selectedGrade.value || isGradeSubmitted.value) return
+
+  setLoading(true)
+
+  try {
+    const { data } = await seeUser()
+    const userId = data.session?.user?.id ?? null
+    const startTime = openedAt.value
+    const endTime = answerSubmittedAt.value
+
+    await createQuizEvent({
+      start_time: startTime?.toISOString() ?? null,
+      end_time: endTime?.toISOString() ?? null,
+      duration:
+        startTime && endTime
+          ? Math.round((endTime.getTime() - startTime.getTime()) / 1000)
+          : null,
+      grade: selectedGrade.value,
+      user_id: userId,
+      card_id: viewedCard.value?.uuid ?? null
+    })
+
+    isGradeSubmitted.value = true
+  } finally {
+    setLoading(false)
+  }
 }
 </script>
 
@@ -70,7 +114,8 @@ const onSubmit = () => {
       <Button
         type="button"
         label="Отправить"
-        :disabled="isLoading"
+        :severity="isAnswerSubmitted ? 'secondary' : undefined"
+        :disabled="isLoading || isAnswerSubmitted"
         class="w-full lg:w-40"
         @click="onSubmit"
       />
@@ -81,9 +126,19 @@ const onSubmit = () => {
         v-model="viewedCard.text"
         @click-on-link="emits('clickOnLink', $event)"
       />
-      <div  class="text-lg">Сравните свой ответ с правильным и оцените</div>
-      <div  class="text-lg">Посмотрите статистику решения этого квиза</div>
-      <div  class="text-lg">Перейдите к следующему квизу</div>  
+      <div class="text-lg">Сравните свой ответ с правильным и оцените</div>
+      <GradePicker v-model="selectedGrade" class="my-5" />
+      <div class="flex-e my-5">
+        <Button
+          type="button"
+          label="Отправить оценку"
+          :disabled="isLoading || !selectedGrade || isGradeSubmitted"
+          class="w-full lg:w-40"
+          @click="onSubmitGrade"
+        />
+      </div>
+      <p v-if="isGradeSubmitted" class="text-lg w-full text-right text-emerald-500">Оценка отправлена</p>
+      <div class="text-lg">Посмотрите статистику решения этого квиза (в разработке)</div>
     </div>
   </article>
 </template>
