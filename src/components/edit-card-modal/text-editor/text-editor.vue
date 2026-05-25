@@ -149,6 +149,7 @@ const processTextForBreaks = () => {
 .input-form {
   height: 400px;
   margin: 10px 0;
+  padding: 8px;
   font-size: 16px;
   resize: none;
 }

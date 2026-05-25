@@ -11,3 +11,4 @@ export {
   getCardsByUuid
 } from '@/api/cards'
 export { getAllFolders, getFoldersShortInfo } from './folders'
+export { getQuizByUuid, getQuizzesShortInfo, createQuiz } from './quizzes'

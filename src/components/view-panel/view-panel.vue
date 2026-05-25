@@ -8,6 +8,7 @@ import type { Card, CardShortInfo, FolderShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString } from '@/utils'
+import QuizViewer from './quiz-viewer/quiz-viewer.vue'
 import TextViewer from './text-viewer/text-viewer.vue'
 
 const emits = defineEmits<{
@@ -174,7 +175,11 @@ const formattedDate = computed<string>(() => {
 <template>
   <CoolPanel>
     <ConfirmDialog></ConfirmDialog>
-    <article v-if="viewedCard" class="article">
+    <QuizViewer
+      v-if="viewedCard?.type === 'quiz'"
+      @click-on-link="$emit('clickOnLink', $event)"
+    />
+    <article v-else-if="viewedCard" class="article">
       <div class="toolbar">
         <Button
           v-tooltip.bottom="'Редактировать карточку'"

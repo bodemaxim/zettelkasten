@@ -7,7 +7,7 @@ export type Card = CardShortInfo & {
   createdAt: string
   text: string
   links: CardShortInfo[]
-  type: 'definition' | 'article'
+  type: 'definition' | 'article' | 'quiz'
   folders: string //приходит массив JSON в формате string
 }
 
@@ -74,4 +74,22 @@ export type FolderEditable = {
 export type CardPath = {
   uuid: string
   folders: string //json с массивом юидов
+}
+
+export type QuizShortInfo = {
+  uuid: string
+  title: string
+  priority_rating: number
+}
+
+export type QuizEditable = CardEditable & {
+  priority_rating: number
+}
+
+export type Quiz = {
+  uuid: string
+  created_at: string
+  card_id: string
+  priority_rating: number
+  card: Card
 }

@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Button, Select, DatePicker, IftaLabel, Textarea } from 'primevue'
-import { getAllDefinitions, getCardsShortInfo } from '@/api'
 import { createFolder } from '@/api/folders'
 import type {
-  Card,
-  CardsShortInfoRequest,
   DefaultFolderDisplay,
   Folder,
   FolderEditable,
@@ -25,11 +22,7 @@ watch(visible, () => {
   }
 })
 
-const { isLoading, isMobileView, setDefinitions, setCardsShortInfo, currentFolderUuid } = useStore()
-
-const emits = defineEmits<{
-  saved: [uuid: string]
-}>()
+const { isLoading, isMobileView } = useStore()
 
 const displays = ref([
   { label: 'Дневник', value: 'diary' },
@@ -92,31 +85,6 @@ const onCancel = () => {
   //updatedCard.value = { ...defaultCard }
 }
 
-const updateSearchPanel = async (areDefinitionsChanged: boolean) => {
-  const request: CardsShortInfoRequest = {
-    pagination: { from: 0, to: 99 } //TODO брать актуальную пагинацию
-  }
-
-  if (currentFolderUuid.value) request.folderUuid = currentFolderUuid.value
-
-  if (!areDefinitionsChanged) {
-    setCardsShortInfo((await getCardsShortInfo(request)).data)
-    return
-  }
-
-  await Promise.all([
-    setDefinitions(await getAllDefinitions()),
-    setCardsShortInfo((await getCardsShortInfo(request)).data)
-  ])
-}
-
-/**
- * Экономично обновляет связанные карточки, редактируемую карточку и панель поиска.
- * @param targetCard - создаваемая/редактируемая карточка
- * @param isNewCard - является ли карточка новой
- */
-const updateAllNeeded = async (targetCard: Card, isNewCard: boolean) => {}
-
 const onSave = async () => {
   if (!updatedFolder.value.name) {
     alert('Заполните название папки')
@@ -125,11 +93,6 @@ const onSave = async () => {
   await createFolder(updatedFolder.value)
   visible.value = false
 }
-
-/**
- * Удалять ставший ненужным uuid из поля folders карточек.
- */
-const handleCardDelete = async () => {}
 
 const isTypeSelectOnFocus = ref(false)
 

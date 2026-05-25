@@ -14,7 +14,7 @@ const emits = defineEmits<{
   edited: []
 }>()
 
-const { isMobileView, folders, setFolders } = useStore()
+const { isMobileView, folders } = useStore()
 
 const selectedFolder = defineModel<Folder | null>()
 

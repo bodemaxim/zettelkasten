@@ -1,4 +1,4 @@
 export type TypeOption = {
-  value: 'definition' | 'article'
+  value: 'definition' | 'article' | 'quiz'
   label: string
 }

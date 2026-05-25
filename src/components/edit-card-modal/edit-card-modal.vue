@@ -3,6 +3,7 @@
   import { Button, Select, DatePicker, IftaLabel } from 'primevue'
   import {
     createCard,
+    createQuiz,
     updateCard,
     getCardsByUuid,
     updateCards,
@@ -15,7 +16,12 @@
   import { useStore } from '@/use-store'
   import { getUuidsInString, getAreArraysEqual } from '@/utils'
   import CardsMultiselect from './cards-multiselect/cards-multiselect.vue'
-  import { defaultCard, typeOptionsList, defaultType } from './edit-card-modal.consts'
+  import {
+    defaultCard,
+    typeOptionsList,
+    defaultType,
+    defaultQuizPriorityRating
+  } from './edit-card-modal.consts'
   import { type TypeOption } from './edit-card-modal.types'
   import FoldersTreeselect from './folders-treeselect/folders-treeselect.vue'
   import TextEditor from './text-editor/text-editor.vue'
@@ -121,9 +127,18 @@
     addUuidHyperLinksFromText()
   
     if (!viewedCard.value) {
-      const newCard = await createCard(updatedCard.value)
-      cardUuid = newCard.uuid
-      await updateAllNeeded(newCard, true)
+      if (cardType === 'quiz') {
+        const quiz = await createQuiz({
+          ...updatedCard.value,
+          priority_rating: defaultQuizPriorityRating
+        })
+        cardUuid = quiz.card.uuid
+        await updateAllNeeded(quiz.card, true)
+      } else {
+        const newCard = await createCard(updatedCard.value)
+        cardUuid = newCard.uuid
+        await updateAllNeeded(newCard, true)
+      }
     } else {
       const cardForUpdate: Card = {
         ...viewedCard.value,
@@ -214,6 +229,8 @@
   const datetime = ref<Date | null>(defaultDatetime)
   
   const isTypeSelectOnFocus = ref(false)
+
+  const isQuizType = computed<boolean>(() => selectedType.value?.value === 'quiz')
   </script>
   
   <template>
@@ -269,7 +286,10 @@
               </div>
             </div>
   
-            <TextEditor v-model:text="updatedCard.text" class="my-5" />
+            <div class="my-5">
+              <p v-if="isQuizType" class="quiz-answer-heading">Напишите правильный ответ</p>
+              <TextEditor v-model:text="updatedCard.text" />
+            </div>
   
             <div :class="{ 'bottom-container': !isMobileView }" class="my-5">
               <div :class="isMobileView ? 'my-2' : 'flex-b w-full'">
@@ -307,6 +327,12 @@
   </template>
   
   <style scoped>
+  .quiz-answer-heading {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--text-color-secondary, #6b7280);
+  }
+
   :deep(.type-select-label) {
     display: flex;
     align-items: flex-end;
