@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { format } from 'date-fns'
-import { Button } from 'primevue'
+import { Button, ConfirmDialog } from 'primevue'
+import { useConfirm } from 'primevue/useconfirm'
 import {
   createQuizEvent,
+  deleteCardByUuid,
+  deleteQuizByCardId,
+  getCardsByUuid,
   getQuizByCardId,
   getQuizPriorityRatingByCardId,
   seeUser,
+  updateCards,
   updateQuizPriorityAfterGrade
 } from '@/api'
-import type { FolderShortInfo, QuizGrade } from '@/types'
+import type { Card, FolderShortInfo, QuizGrade } from '@/types'
 import { useStore } from '@/use-store'
 import TextEditor from '../../edit-card-modal/text-editor/text-editor.vue'
 import GradePicker from '../grade-picker/grade-picker.vue'
@@ -17,9 +22,21 @@ import TextViewer from '../text-viewer/text-viewer.vue'
 
 const emits = defineEmits<{
   clickOnLink: [uuid: string]
+  edited: []
+  deleted: []
 }>()
 
-const { viewedCard, folders, isLoading, setLoading } = useStore()
+const {
+  viewedCard,
+  folders,
+  isLoading,
+  setLoading,
+  cardsShortInfo,
+  setCardsShortInfo,
+  setViewedCard
+} = useStore()
+
+const confirm = useConfirm()
 
 const userAnswer = ref('')
 const isAnswerSubmitted = ref(false)
@@ -33,11 +50,14 @@ const quizTask = ref('')
 const loadQuizTask = async (cardId: string | undefined) => {
   if (!cardId) {
     quizTask.value = ''
+    userAnswer.value = ''
     return
   }
 
   const quiz = await getQuizByCardId(cardId)
   quizTask.value = quiz?.task ?? ''
+  // Заполняем редактор ответа заранее, если в квизе задан предзаполненный текст
+  userAnswer.value = quiz?.prefilled_answer ?? ''
 }
 
 const loadPriorityRating = async (cardId: string | undefined) => {
@@ -103,6 +123,60 @@ const onSubmit = () => {
   answerSubmittedAt.value = new Date()
 }
 
+const onEditQuiz = () => {
+  emits('edited')
+}
+
+const deleteLinksToCard = async (card: Card): Promise<void> => {
+  if (!card.links.length) return
+
+  const cardUuids = card.links.map((link) => link.uuid)
+  const cards = await getCardsByUuid(cardUuids)
+
+  const updatedCards = cards.map<Card>((item) => ({
+    ...item,
+    links: (item.links || []).filter((link) => link.uuid !== card.uuid)
+  }))
+
+  await updateCards(updatedCards)
+}
+
+const onDeleteQuiz = () => {
+  confirm.require({
+    message: 'Вы уверены, что хотите удалить квиз?',
+    header: 'Подтверждение',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: 'Нет',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: 'Да'
+    },
+    accept: deleteQuizOnAccept
+  })
+}
+
+const deleteQuizOnAccept = async () => {
+  const card = viewedCard.value
+  if (!card) return
+
+  setLoading(true)
+
+  try {
+    await deleteQuizByCardId(card.uuid)
+    await deleteCardByUuid(card.uuid)
+    await deleteLinksToCard(card)
+
+    setCardsShortInfo(cardsShortInfo.value.filter((item) => item.uuid !== card.uuid))
+    setViewedCard(null)
+    emits('deleted')
+  } finally {
+    setLoading(false)
+  }
+}
+
 const onSubmitGrade = async () => {
   if (!selectedGrade.value || isGradeSubmitted.value) return
 
@@ -145,7 +219,26 @@ const onSubmitGrade = async () => {
 </script>
 
 <template>
+  <ConfirmDialog />
   <article v-if="viewedCard" class="article">
+    <div class="toolbar">
+      <Button
+        v-tooltip.bottom="'Редактировать квиз'"
+        icon="pi pi-file-edit"
+        severity="primary"
+        size="small"
+        class="h-8"
+        @click="onEditQuiz"
+      />
+      <Button
+        v-tooltip.bottom="'Удалить квиз'"
+        icon="pi pi-file-excel"
+        severity="secondary"
+        size="small"
+        class="h-8"
+        @click="onDeleteQuiz"
+      />
+    </div>
     <h2 class="text-xl">{{ viewedCard.title }}</h2>
     <div class="info my-5">
       <p>Тип: квиз</p>
@@ -157,7 +250,7 @@ const onSubmitGrade = async () => {
       <h3 class="text-lg">Задание</h3>
       <TextViewer v-model="quizTask" @click-on-link="emits('clickOnLink', $event)" />
     </div>
-    <TextEditor v-model="userAnswer" />
+    <TextEditor v-model:text="userAnswer" />
     <div class="flex-e my-5">
       <Button
         type="button"
@@ -203,6 +296,14 @@ const onSubmitGrade = async () => {
   .article {
     height: 100%;
   }
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  float: right;
+  background-color: var(--bg-dark);
 }
 
 .info {

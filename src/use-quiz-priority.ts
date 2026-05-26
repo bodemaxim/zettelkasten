@@ -9,22 +9,22 @@ export const MIN_PRIORITY = 1000
 /** Дефолтное значение приоритета */
 export const DEFAULT_PRIORITY = MAX_PRIORITY
 
-/** Изменение PRIORITY_RATING при получении плохой оценки */
+/** Изменение study_points при получении плохой оценки */
 export const POINTS_FOR_POOR_GRADE = -10
 
-/** Изменение PRIORITY_RATING при получении оценки с недочетами */
+/** Изменение study_points при получении оценки с недочетами */
 export const POINTS_FOR_FLAWED_GRADE = 5
 
-/** Изменение PRIORITY_RATING при получении отличной оценки */
+/** Изменение study_points при получении отличной оценки */
 export const POINTS_FOR_EXCELLENT_GRADE = 10
 
-/** Дополнитетельные очки PRIORITY_RATING за второе отличное решение подряд */
+/** Дополнитетельные очки study_points за второе отличное решение подряд */
 export const REWARD_POINTS_SECOND_EXCELLENT_IN_ROW = 10
 
-/** Дополнительные очки PRIORITY_RATING за третье отличное решение подряд */
+/** Дополнительные очки study_points за третье отличное решение подряд */
 export const REWARD_POINTS_THIRD_EXCELLENT_IN_ROW = 20
 
-/** Штрафные очки PRIORITY_RATING за плохое решение после отличного */
+/** Штрафные очки study_points за плохое решение после отличного */
 export const FINE_POINTS_WORSE_AFTER_EXCELLENT = -30
 
 export const clampPriority = (value: number): number =>
@@ -39,7 +39,7 @@ const countLeadingExcellents = (grades: QuizGrade[]): number => {
   return count
 }
 
-/** Смещение priority_rating по оценке и предыдущим оценкам (от новых к старым). */
+/** Смещение study_points по оценке и предыдущим оценкам (от новых к старым). */
 export const calculatePriorityDelta = (
   grade: QuizGrade,
   previousGrades: QuizGrade[]

@@ -47,6 +47,7 @@
   
   const updatedCard = ref<CardEditable>({ ...defaultCard })
   const quizTask = ref('')
+  const quizPrefilledText = ref('')
   
   const title = computed<string>(() =>
     viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
@@ -59,19 +60,21 @@
   const getTypeOptionByValue = (value: TypeOption['value']): TypeOption =>
     typeOptionsList.find((o) => o.value === value) ?? defaultType
   
-  const resetQuizTask = () => {
+  const resetQuizFields = () => {
     quizTask.value = ''
+    quizPrefilledText.value = ''
   }
 
-  const loadQuizTask = async (cardId: string) => {
+  const loadQuizFields = async (cardId: string) => {
     const quiz = await getQuizByCardId(cardId)
     quizTask.value = quiz?.task ?? ''
+    quizPrefilledText.value = quiz?.prefilled_answer ?? ''
   }
 
   const onCancel = () => {
     visible.value = false
     updatedCard.value = { ...defaultCard }
-    resetQuizTask()
+    resetQuizFields()
     selectedType.value = getTypeOptionByValue('article')
   }
   
@@ -143,8 +146,9 @@
       if (cardType === 'quiz') {
         const quiz = await createQuiz({
           ...updatedCard.value,
-          priority_rating: defaultQuizPriorityRating,
-          task: quizTask.value
+          study_points: defaultQuizPriorityRating,
+          task: quizTask.value,
+          prefilled_answer: quizPrefilledText.value
         })
         cardUuid = quiz.card.uuid
         await updateAllNeeded(quiz.card, true)
@@ -162,14 +166,17 @@
       cardUuid = cardForUpdate.uuid
 
       if (cardType === 'quiz') {
-        await updateQuiz(cardUuid, { task: quizTask.value })
+        await updateQuiz(cardUuid, {
+          task: quizTask.value,
+          prefilled_answer: quizPrefilledText.value
+        })
       }
 
       await updateAllNeeded(cardForUpdate, false)
     }
 
     updatedCard.value = { ...defaultCard }
-    resetQuizTask()
+    resetQuizFields()
     selectedType.value = getTypeOptionByValue('article')
     visible.value = false
   
@@ -226,16 +233,16 @@
       updatedCard.value = { ...viewedCard.value }
 
       if (viewedCard.value.type === 'quiz') {
-        await loadQuizTask(viewedCard.value.uuid)
+        await loadQuizFields(viewedCard.value.uuid)
       } else {
-        resetQuizTask()
+        resetQuizFields()
       }
 
       return
     }
 
     updatedCard.value = { ...defaultCard }
-    resetQuizTask()
+    resetQuizFields()
   })
   
   const selectedType = ref<TypeOption | null>(null)
@@ -317,13 +324,27 @@
               </div>
             </div>
   
-            <div v-if="isQuizType" class="my-5">
-              <p class="quiz-field-heading">Задание</p>
-              <TextEditor v-model:text="quizTask" />
-            </div>
+            <template v-if="isQuizType">
+              <div
+                class="quiz-editors my-5"
+                :class="{ 'quiz-editors--row': !isMobileView }"
+              >
+                <div class="quiz-editors__field">
+                  <TextEditor v-model:text="quizTask" title="Задание" />
+                </div>
+                <div class="quiz-editors__field">
+                  <TextEditor v-model:text="updatedCard.text" title="Правильный ответ" />
+                </div>
+              </div>
+              <div class="quiz-prefilled my-5">
+                <TextEditor
+                  v-model:text="quizPrefilledText"
+                  title="Предзаполненный текст"
+                />
+              </div>
+            </template>
 
-            <div class="my-5">
-              <p v-if="isQuizType" class="quiz-field-heading">Правильный ответ</p>
+            <div v-else class="my-5">
               <TextEditor v-model:text="updatedCard.text" />
             </div>
   
@@ -363,10 +384,25 @@
   </template>
   
   <style scoped>
-  .quiz-field-heading {
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: var(--text-color-secondary, #6b7280);
+  .quiz-editors {
+    display: flex;
+    flex-direction: column;
+    gap: var(--x2);
+  }
+
+  .quiz-editors--row {
+    flex-direction: row;
+    gap: var(--x4);
+    align-items: stretch;
+  }
+
+  .quiz-editors__field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .quiz-prefilled {
+    width: 100%;
   }
 
   :deep(.type-select-label) {

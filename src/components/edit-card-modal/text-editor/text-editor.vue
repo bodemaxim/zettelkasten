@@ -6,6 +6,10 @@ import CardsAutocomplete from '../cards-autocomplete/cards-autocomplete.vue'
 import { tables } from './text-editor.consts'
 import type { TableSize } from './text-editor.types'
 
+const { title } = defineProps<{
+  title?: string
+}>()
+
 const text = defineModel<string>('text')
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
@@ -101,7 +105,8 @@ const processTextForBreaks = () => {
 
 <template>
   <div class="text-editor-wrapper">
-    <div class="flex-s px-3 py-2">
+    <p v-if="title" class="text-editor-title">{{ title }}</p>
+    <div class="flex-s px-3 py-2 text-editor-toolbar">
       <CardsAutocomplete @updated="addHyperlinkToSelection($event)" class="autocomplete" />
       <div class="table-button-container">
         <Button
@@ -139,7 +144,15 @@ const processTextForBreaks = () => {
   gap: 4px;
   justify-content: left;
   width: 100%;
+  border-radius: 5px;
   background-color: var(--bg-lighter);
+}
+
+.text-editor-title {
+  margin: 0;
+  padding: 8px 12px 0;
+  font-size: 14px;
+  color: var(--p-text-muted-color, white);
 }
 
 .autocomplete {

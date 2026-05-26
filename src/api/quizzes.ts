@@ -52,9 +52,22 @@ export const getQuizByCardId = async (cardId: string): Promise<Quiz | null> => {
   return normalizeQuiz(data)
 }
 
+export const deleteQuizByCardId = async (cardId: string): Promise<void> => {
+  const { error } = await supabase.from('quizzes').delete().eq('card_id', cardId)
+
+  if (error) {
+    setErrorMessage({
+      customText: 'Ошибка удаления квиза',
+      message: error.message
+    })
+
+    throw error
+  }
+}
+
 export const updateQuiz = async (
   cardId: string,
-  fields: Pick<Quiz, 'task'>
+  fields: Pick<Quiz, 'task' | 'prefilled_answer'>
 ): Promise<void> => {
   const { error } = await supabase.from('quizzes').update(fields).eq('card_id', cardId)
 
@@ -73,7 +86,7 @@ export const getQuizPriorityRatingByCardId = async (
 ): Promise<number | null> => {
   const { data, error } = await supabase
     .from('quizzes')
-    .select('priority_rating')
+    .select('study_points')
     .eq('card_id', cardId)
     .single()
 
@@ -86,7 +99,7 @@ export const getQuizPriorityRatingByCardId = async (
     return null
   }
 
-  return data?.priority_rating ?? null
+  return data?.study_points ?? null
 }
 
 const normalizeQuiz = (quiz: Quiz & { card: Quiz['card'] | Quiz['card'][] }): Quiz => {
@@ -120,7 +133,7 @@ export const getNextQuiz = async (folderUuid?: string | null): Promise<Quiz | nu
     .from('quizzes')
     .select('*, card:cards(*)')
     .in('card_id', cardIds)
-    .order('priority_rating', { ascending: true })
+    .order('study_points', { ascending: true })
     .limit(1)
 
   if (error) {
@@ -166,7 +179,7 @@ export const getQuizzesShortInfo = async (
 
   let query = supabase
     .from('quizzes')
-    .select('uuid, priority_rating, card_id, card:cards(title)', { count: 'exact', head: false })
+    .select('uuid, study_points, card_id, card:cards(title)', { count: 'exact', head: false })
     .in('card_id', cardIds)
 
   if (sorting?.field) {
@@ -175,9 +188,9 @@ export const getQuizzesShortInfo = async (
 
   if (pagination) {
     query = query.range(pagination.from, pagination.to)
-    if (!sorting) query = query.order('priority_rating', { ascending: true })
+    if (!sorting) query = query.order('study_points', { ascending: true })
   } else if (!sorting) {
-    query = query.order('priority_rating', { ascending: true })
+    query = query.order('study_points', { ascending: true })
   }
 
   const { data, error, count } = await query
@@ -198,7 +211,7 @@ export const getQuizzesShortInfo = async (
       uuid: quiz.uuid,
       card_id: quiz.card_id,
       title: card?.title ?? '',
-      priority_rating: quiz.priority_rating
+      study_points: quiz.study_points
     }
   })
 
@@ -209,13 +222,13 @@ export const getQuizzesShortInfo = async (
 }
 
 export const createQuiz = async (newQuiz: QuizEditable): Promise<Quiz> => {
-  const { priority_rating, task, ...cardFields } = newQuiz
+  const { study_points, task, prefilled_answer, ...cardFields } = newQuiz
 
   const card = await createCard({ ...cardFields, type: 'quiz' })
 
   const { data, error } = await supabase
     .from('quizzes')
-    .insert([{ card_id: card.uuid, priority_rating, task }])
+    .insert([{ card_id: card.uuid, study_points, task, prefilled_answer }])
     .select('*, card:cards(*)')
 
   if (error) {
@@ -239,7 +252,7 @@ export const updateQuizPriorityAfterGrade = async (
 ): Promise<number | null> => {
   const { data: quiz, error: fetchError } = await supabase
     .from('quizzes')
-    .select('uuid, priority_rating')
+    .select('uuid, study_points')
     .eq('card_id', cardId)
     .single()
 
@@ -263,7 +276,7 @@ export const updateQuizPriorityAfterGrade = async (
     .map((event) => event.grade)
     .filter((eventGrade): eventGrade is QuizGrade => eventGrade !== null)
 
-  const currentRating = quiz.priority_rating ?? 0
+  const currentRating = quiz.study_points ?? 0
 
   const priorityRating = clampPriority(
     currentRating + calculatePriorityDelta(grade, previousGrades)
@@ -271,7 +284,7 @@ export const updateQuizPriorityAfterGrade = async (
 
   const { error: updateError } = await supabase
     .from('quizzes')
-    .update({ priority_rating: priorityRating })
+    .update({ study_points: priorityRating })
     .eq('uuid', quiz.uuid)
 
   if (updateError) {

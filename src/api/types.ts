@@ -81,7 +81,7 @@ export type QuizShortInfo = {
   uuid: string
   card_id: string
   title: string
-  priority_rating: number
+  study_points: number
 }
 
 export type QuizzesShortInfoRequest = {
@@ -91,16 +91,21 @@ export type QuizzesShortInfoRequest = {
 }
 
 export type QuizEditable = CardEditable & {
-  priority_rating: number
+  study_points: number
   task: string
+  prefilled_answer: string
 }
 
 export type Quiz = {
   uuid: string
   created_at: string
   card_id: string
+  /** Задание */
   task: string
-  priority_rating: number
+  /** Часть ответа на квиз, сразу вписанная за пользователя */
+  prefilled_answer: string;
+  /** Наградные очки, присуждаемые за правильное выполнение квиза */
+  study_points: number
   card: Card
 }
 

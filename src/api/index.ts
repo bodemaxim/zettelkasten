@@ -18,6 +18,7 @@ export {
   getQuizzesShortInfo,
   createQuiz,
   updateQuiz,
+  deleteQuizByCardId,
   getNextQuiz,
   updateQuizPriorityAfterGrade
 } from './quizzes'

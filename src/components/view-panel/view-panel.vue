@@ -178,6 +178,8 @@ const formattedDate = computed<string>(() => {
     <QuizViewer
       v-if="viewedCard?.type === 'quiz'"
       @click-on-link="$emit('clickOnLink', $event)"
+      @edited="$emit('edited')"
+      @deleted="$emit('deleted')"
     />
     <article v-else-if="viewedCard" class="article">
       <div class="toolbar">

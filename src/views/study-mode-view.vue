@@ -104,6 +104,12 @@ const loadNextQuiz = async () => {
   setLoading(false)
 }
 
+const onQuizDeleted = () => {
+  hasNoQuiz.value = false
+  showContentPanel.value = false
+  initQuizzesList()
+}
+
 const openQuiz = async (quiz: QuizShortInfo) => {
   setLoading(true)
 
@@ -181,7 +187,7 @@ const contentPanelStyles = computed<StyleValue>(() => ({
         />
       </div>
       <div class="quiz-panel">
-        <QuizViewer />
+        <QuizViewer @deleted="onQuizDeleted" />
         <div class="next-quiz-actions">
           <Button
             type="button"
@@ -266,7 +272,7 @@ const contentPanelStyles = computed<StyleValue>(() => ({
         class="content-panel"
       >
         <div v-if="viewedCard" class="quiz-panel">
-          <QuizViewer />
+          <QuizViewer @deleted="onQuizDeleted" />
           <div class="next-quiz-actions">
             <Button
               type="button"
