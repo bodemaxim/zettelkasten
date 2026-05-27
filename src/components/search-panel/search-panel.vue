@@ -8,12 +8,11 @@ import CoolPanel from '@/ui/cool-panel.vue'
 import { useStore } from '@/use-store'
 import ExpandMenuButton from '../menu-panel/expand-menu-button/expand-menu-button.vue'
 import BreadcrumbSelect from './breadcrumb-select/breadcrumb-select.vue'
+import type { SearchPanelEmits, SearchPanelModel } from './search-panel.types'
 
-const viewedCardUuid = defineModel<string | null>()
+const viewedCardUuid = defineModel<SearchPanelModel>()
 
-defineEmits<{
-  createCard: []
-}>()
+defineEmits<SearchPanelEmits>()
 
 const {
   cardsShortInfo,

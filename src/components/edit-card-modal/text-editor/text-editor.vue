@@ -4,13 +4,11 @@ import { Button, Checkbox, Menu } from 'primevue'
 import type { CardShortInfo } from '@/types'
 import CardsAutocomplete from '../cards-autocomplete/cards-autocomplete.vue'
 import { tables } from './text-editor.consts'
-import type { TableSize } from './text-editor.types'
+import type { TableSize, TextEditorProps, TextModel } from './text-editor.types'
 
-const { title } = defineProps<{
-  title?: string
-}>()
+const { title } = defineProps<TextEditorProps>()
 
-const text = defineModel<string>('text')
+const text = defineModel<TextModel>('text')
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const selectionRange = ref<{ start: number; end: number } | null>(null)

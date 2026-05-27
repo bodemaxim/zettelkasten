@@ -5,12 +5,11 @@ import { type AutoCompleteCompleteEvent, AutoComplete } from 'primevue'
 import { getCardsShortInfo } from '@/api'
 import type { CardShortInfo } from '@/types'
 import { useStore } from '@/use-store'
+import type { CardsAutocompleteEmits } from './cards-autocomplete.types'
 
 const { setLoading, isMobileView } = useStore()
 
-const emits = defineEmits<{
-  updated: [value: CardShortInfo]
-}>()
+const emits = defineEmits<CardsAutocompleteEmits>()
 
 const selectedCard = ref<CardShortInfo | null>()
 const options = ref<CardShortInfo[]>([])

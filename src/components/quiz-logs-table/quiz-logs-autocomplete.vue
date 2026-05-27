@@ -5,10 +5,9 @@ import { type AutoCompleteCompleteEvent, AutoComplete } from 'primevue'
 import { getCardsShortInfo } from '@/api'
 import type { CardShortInfo } from '@/types'
 import { useStore } from '@/use-store'
+import type { QuizLogsAutocompleteEmits } from './quiz-logs-autocomplete.types'
 
-const emits = defineEmits<{
-  selected: [value: CardShortInfo | null]
-}>()
+const emits = defineEmits<QuizLogsAutocompleteEmits>()
 
 const { setLoading } = useStore()
 

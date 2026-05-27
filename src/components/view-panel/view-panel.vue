@@ -10,12 +10,9 @@ import { useStore } from '@/use-store'
 import { getUuidsInString } from '@/utils'
 import QuizViewer from './quiz-viewer/quiz-viewer.vue'
 import TextViewer from './text-viewer/text-viewer.vue'
+import type { ViewPanelEmits, ViewPanelModel } from './view-panel.types'
 
-const emits = defineEmits<{
-  deleted: []
-  edited: []
-  clickOnLink: [uuid: string]
-}>()
+const emits = defineEmits<ViewPanelEmits>()
 
 const {
   isMobileView,
@@ -31,7 +28,7 @@ const {
 
 const confirm = useConfirm()
 
-const viewedCardUuid = defineModel<string | null>()
+const viewedCardUuid = defineModel<ViewPanelModel>()
 
 watch(
   () => viewedCardUuid.value,

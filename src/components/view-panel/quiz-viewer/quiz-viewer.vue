@@ -19,12 +19,9 @@ import { useStore } from '@/use-store'
 import TextEditor from '../../edit-card-modal/text-editor/text-editor.vue'
 import GradePicker from '../grade-picker/grade-picker.vue'
 import TextViewer from '../text-viewer/text-viewer.vue'
+import type { QuizViewerEmits } from './quiz-viewer.types'
 
-const emits = defineEmits<{
-  clickOnLink: [uuid: string]
-  edited: []
-  deleted: []
-}>()
+const emits = defineEmits<QuizViewerEmits>()
 
 const {
   viewedCard,

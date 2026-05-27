@@ -24,11 +24,11 @@
     defaultType,
     defaultQuizPriorityRating
   } from './edit-card-modal.consts'
-  import { type TypeOption } from './edit-card-modal.types'
+  import { type TypeOption, type VisibleModel, type EditCardModalEmits } from './edit-card-modal.types'
   import FoldersTreeselect from './folders-treeselect/folders-treeselect.vue'
   import TextEditor from './text-editor/text-editor.vue'
   
-  const visible = defineModel<boolean>('visible')
+  const visible = defineModel<VisibleModel>('visible')
   
   const {
     isLoading,
@@ -41,9 +41,7 @@
     currentFolderUuid
   } = useStore()
   
-  const emits = defineEmits<{
-    saved: [uuid: string]
-  }>()
+  const emits = defineEmits<EditCardModalEmits>()
   
   const updatedCard = ref<CardEditable>({ ...defaultCard })
   const quizTask = ref('')

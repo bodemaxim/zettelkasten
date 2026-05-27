@@ -5,14 +5,14 @@ import type { TreeNode } from 'primevue/treenode'
 import { getAllFolders } from '@/api'
 import type { Folder } from '@/types'
 import { useFolders } from '@/use-folders'
-import type { ChangedValue, SelectedValues } from './folders-treeselect.types'
+import type { ChangedValue, FoldersTreeselectModel, SelectedValues } from './folders-treeselect.types'
 
 const { buildFolderTree } = useFolders()
 
 /**
  * JSON с массивом юидов в формате строки.
  */
-const selectedUuidsStringifiedJSON = defineModel<string>()
+const selectedUuidsStringifiedJSON = defineModel<FoldersTreeselectModel>()
 
 const nodes = ref<TreeNode[]>([])
 const folders = ref<Folder[]>([])

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { RadioButton } from 'primevue'
-import type { QuizGrade } from '@/types'
 import { QUIZ_GRADES } from './grade-picker.consts'
+import type { GradePickerModel } from './grade-picker.types'
 
-const grade = defineModel<QuizGrade | null>()
+const grade = defineModel<GradePickerModel>()
 </script>
 
 <template>

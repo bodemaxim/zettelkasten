@@ -5,8 +5,9 @@ import { MultiSelect } from 'primevue'
 import { getCardsShortInfo } from '@/api'
 import type { CardShortInfo } from '@/types'
 import { useStore } from '@/use-store'
+import type { CardsMultiselectModel } from './cards-multiselect.types'
 
-const selectedCards = defineModel<CardShortInfo[]>()
+const selectedCards = defineModel<CardsMultiselectModel>()
 
 const options = ref<CardShortInfo[]>([])
 

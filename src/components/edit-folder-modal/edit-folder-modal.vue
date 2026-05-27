@@ -12,9 +12,10 @@ import CoolForm from '@/ui/cool-form.vue'
 import FullScreenModal from '@/ui/full-screen-modal.vue'
 import { useStore } from '@/use-store'
 import BreadcrumbSelect from '../search-panel/breadcrumb-select/breadcrumb-select.vue'
+import type { SelectedFolderModel, VisibleModel } from './edit-folder-modal.types'
 
-const visible = defineModel<boolean>('visible')
-const selectedFolder = defineModel<Folder | null>('selected-folder')
+const visible = defineModel<VisibleModel>('visible')
+const selectedFolder = defineModel<SelectedFolderModel>('selected-folder')
 
 watch(visible, () => {
   if (!visible.value) {

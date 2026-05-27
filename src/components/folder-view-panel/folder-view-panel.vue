@@ -7,16 +7,13 @@ import { deleteFolderByUuid, getAllFolders, updateFolderPaths } from '@/api/fold
 import type { CardPath, Folder, FolderShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import { useStore } from '@/use-store'
-import type { FolderTableRow } from './folder-view-panel.types'
+import type { FolderTableRow, FolderViewPanelEmits, FolderViewPanelModel } from './folder-view-panel.types'
 
-const emits = defineEmits<{
-  deleted: []
-  edited: []
-}>()
+const emits = defineEmits<FolderViewPanelEmits>()
 
 const { isMobileView, folders } = useStore()
 
-const selectedFolder = defineModel<Folder | null>()
+const selectedFolder = defineModel<FolderViewPanelModel>()
 
 const tableData = computed<FolderTableRow[]>(() => [
   { label: 'Описание', value: String(selectedFolder.value?.description) },
