@@ -103,15 +103,15 @@ const onLinkClick = () => {
           </router-link>
         </div>
         <div class="flex items-center text-md ml-5">
-          <span class="pi pi-history mr-3"></span>
-          <router-link to="/quiz-logs" :class="{ active: activeRoute === '/quiz-logs' }">
-            Логи квизов
-          </router-link>
-        </div>
-        <div class="flex items-center text-md ml-5">
           <span class="pi pi-book mr-3"></span>
           <router-link to="/study-mode" :class="{ active: activeRoute === '/study-mode' }">
             Режим обучения
+          </router-link>
+        </div>
+        <div class="flex items-center text-md ml-5">
+          <span class="pi pi-history mr-3"></span>
+          <router-link to="/quiz-logs" :class="{ active: activeRoute === '/quiz-logs' }">
+            Логи квизов
           </router-link>
         </div>
         <div class="flex items-center text-md ml-5">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import { type StyleValue, ref, computed, watch } from 'vue'
-  import { Button, Select, DatePicker, IftaLabel } from 'primevue'
+  import { type StyleValue, ref, computed, watch, nextTick } from 'vue'
+  import { Button, Select, DatePicker, IftaLabel, Textarea } from 'primevue'
   import {
     createCard,
     createQuiz,
@@ -12,7 +12,7 @@
     getAllDefinitions,
     getCardsShortInfo
   } from '@/api'
-  import type { Card, CardEditable, CardsShortInfoRequest } from '@/types'
+  import type { Card, CardEditable, CardShortInfo, CardsShortInfoRequest } from '@/types'
   import CoolForm from '@/ui/cool-form.vue'
   import FullScreenModal from '@/ui/full-screen-modal.vue'
   import { useStore } from '@/use-store'
@@ -46,6 +46,73 @@
   const updatedCard = ref<CardEditable>({ ...defaultCard })
   const quizTask = ref('')
   const quizPrefilledText = ref('')
+  const quizJsonText = ref('')
+  const isApplyingQuizJson = ref(false)
+
+  type QuizJsonCard = {
+    title?: string
+    createdAt?: string | null
+    type?: string
+    folders?: string
+    links?: CardShortInfo[]
+    text?: string
+    study_points?: number
+    task?: string
+    prefilled_answer?: string
+  }
+
+  const parseQuizJson = (raw: string): QuizJsonCard | null => {
+    try {
+      const parsed: unknown = JSON.parse(raw)
+      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+        return parsed as QuizJsonCard
+      }
+      // обратная совместимость: вставка старого формата-массива
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null) {
+        return parsed[0] as QuizJsonCard
+      }
+      return null
+    } catch {
+      return null
+    }
+  }
+
+  const buildQuizJsonFromForm = (): string => {
+    const item: QuizJsonCard = {
+      title: updatedCard.value.title,
+      createdAt: null,
+      type: 'quiz',
+      folders: updatedCard.value.folders || '[]',
+      links: updatedCard.value.links ?? [],
+      text: updatedCard.value.text,
+      study_points: defaultQuizPriorityRating,
+      task: quizTask.value,
+      prefilled_answer: quizPrefilledText.value
+    }
+    return JSON.stringify(item, null, 2)
+  }
+
+  const applyQuizJson = (item: QuizJsonCard) => {
+    if (item.title !== undefined) updatedCard.value.title = item.title
+    if (item.text !== undefined) updatedCard.value.text = item.text
+    if (item.folders !== undefined) updatedCard.value.folders = item.folders
+    if (item.links !== undefined) updatedCard.value.links = item.links
+    if (item.task !== undefined) quizTask.value = item.task
+    if (item.prefilled_answer !== undefined) quizPrefilledText.value = item.prefilled_answer
+    if (item.createdAt) {
+      const parsedDate = new Date(item.createdAt)
+      if (!Number.isNaN(parsedDate.getTime())) datetime.value = parsedDate
+    }
+  }
+
+  const syncQuizJsonFromForm = () => {
+    if (!isQuizType.value) return
+    const nextJson = buildQuizJsonFromForm()
+    if (nextJson === quizJsonText.value) return
+    isApplyingQuizJson.value = true
+    quizJsonText.value = nextJson
+    isApplyingQuizJson.value = false
+  }
   
   const title = computed<string>(() =>
     viewedCard.value ? 'Редактировать карточку' : 'Создать карточку'
@@ -61,12 +128,14 @@
   const resetQuizFields = () => {
     quizTask.value = ''
     quizPrefilledText.value = ''
+    quizJsonText.value = ''
   }
 
   const loadQuizFields = async (cardId: string) => {
     const quiz = await getQuizByCardId(cardId)
     quizTask.value = quiz?.task ?? ''
     quizPrefilledText.value = quiz?.prefilled_answer ?? ''
+    syncQuizJsonFromForm()
   }
 
   const onCancel = () => {
@@ -267,6 +336,29 @@
   const isTypeSelectOnFocus = ref(false)
 
   const isQuizType = computed<boolean>(() => selectedType.value?.value === 'quiz')
+
+  watch(isQuizType, (isQuiz) => {
+    if (isQuiz) syncQuizJsonFromForm()
+    else quizJsonText.value = ''
+  })
+
+  watch(
+    [quizTask, quizPrefilledText, () => updatedCard.value.title, () => updatedCard.value.text, () => updatedCard.value.folders, () => updatedCard.value.links, datetime],
+    () => {
+      if (!isQuizType.value || isApplyingQuizJson.value) return
+      syncQuizJsonFromForm()
+    }
+  )
+
+  watch(quizJsonText, async (raw) => {
+    if (isApplyingQuizJson.value) return
+    const item = parseQuizJson(raw)
+    if (!item) return
+    isApplyingQuizJson.value = true
+    applyQuizJson(item)
+    await nextTick()
+    isApplyingQuizJson.value = false
+  })
   </script>
   
   <template>
@@ -328,17 +420,33 @@
                 :class="{ 'quiz-editors--row': !isMobileView }"
               >
                 <div class="quiz-editors__field">
-                  <TextEditor v-model:text="quizTask" title="Задание" />
+                  <TextEditor v-model:text="quizTask" title="Задание" 
+                  :height="200" />
                 </div>
                 <div class="quiz-editors__field">
-                  <TextEditor v-model:text="updatedCard.text" title="Правильный ответ" />
+                  <TextEditor v-model:text="updatedCard.text" title="Правильный ответ" 
+                  :height="200" />
                 </div>
               </div>
-              <div class="quiz-prefilled my-5">
-                <TextEditor
-                  v-model:text="quizPrefilledText"
-                  title="Предзаполненный текст"
-                />
+              <div
+                class="quiz-prefilled my-5"
+                :class="{ 'quiz-prefilled--row': !isMobileView }"
+              >
+                <div class="quiz-prefilled__field">
+                  <TextEditor
+                    v-model:text="quizPrefilledText"
+                    title="Предзаполненный текст"
+                    :height="200"
+                  />
+                </div>
+                <div class="quiz-prefilled__field">
+                  <p class="quiz-json-title">Быстрое создание квиза через JSON</p>
+                  <Textarea
+                    v-model="quizJsonText"
+                    class="quiz-json-textarea w-full"
+                    :auto-resize="false"
+                  />
+                </div>
               </div>
             </template>
 
@@ -400,7 +508,35 @@
   }
 
   .quiz-prefilled {
+    display: flex;
+    flex-direction: column;
+    gap: var(--x2);
     width: 100%;
+  }
+
+  .quiz-prefilled--row {
+    flex-direction: row;
+    gap: var(--x4);
+    align-items: stretch;
+  }
+
+  .quiz-prefilled__field {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .quiz-json-title {
+    margin: 0 0 4px;
+    padding: 8px 12px 0;
+    font-size: 14px;
+    color: var(--p-text-muted-color, white);
+  }
+
+  .quiz-json-textarea {
+    height: 284px;
+    font-family: monospace;
+    font-size: 14px;
+    resize: none;
   }
 
   :deep(.type-select-label) {

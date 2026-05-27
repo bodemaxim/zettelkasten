@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Button, Checkbox, Menu } from 'primevue'
 import type { CardShortInfo } from '@/types'
 import CardsAutocomplete from '../cards-autocomplete/cards-autocomplete.vue'
 import { tables } from './text-editor.consts'
 import type { TableSize, TextEditorProps, TextModel } from './text-editor.types'
 
-const { title } = defineProps<TextEditorProps>()
+const props = withDefaults(defineProps<TextEditorProps>(), {
+  height: 400
+})
 
 const text = defineModel<TextModel>('text')
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
 const selectionRange = ref<{ start: number; end: number } | null>(null)
+
+const textareaHeight = computed<string>(() => {
+  if (typeof props.height === 'number') return `${props.height}px`
+  return props.height
+})
 
 const saveCurrentSelection = () => {
   const textarea = textareaRef.value
@@ -103,7 +110,7 @@ const processTextForBreaks = () => {
 
 <template>
   <div class="text-editor-wrapper">
-    <p v-if="title" class="text-editor-title">{{ title }}</p>
+    <p v-if="props.title" class="text-editor-title">{{ props.title }}</p>
     <div class="flex-s px-3 py-2 text-editor-toolbar">
       <CardsAutocomplete @updated="addHyperlinkToSelection($event)" class="autocomplete" />
       <div class="table-button-container">
@@ -130,6 +137,7 @@ const processTextForBreaks = () => {
       ref="textareaRef"
       v-model="text"
       class="input-form"
+      :style="{ height: textareaHeight }"
       @blur="(saveCurrentSelection(), processTextForBreaks())"
     ></textarea>
   </div>
@@ -158,7 +166,6 @@ const processTextForBreaks = () => {
 }
 
 .input-form {
-  height: 400px;
   margin: 10px 0;
   padding: 8px;
   font-size: 16px;
