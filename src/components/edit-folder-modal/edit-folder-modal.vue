@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Button, Select, DatePicker, IftaLabel, Textarea } from 'primevue'
-import { createFolder } from '@/api/folders'
+import { getCardPaths, updateCardPaths } from '@/api/cards'
+import { createFolder, getAllFolders, updateFolderByUuid, updateFolderPaths } from '@/api/folders'
 import type {
+  CardPath,
   DefaultFolderDisplay,
   Folder,
   FolderEditable,
@@ -116,7 +118,7 @@ const onSave = async () => {
     const foldersCopy = await getAllFolders()
     const nestedFolders: Folder[] = foldersCopy.reduce((acc: Folder[], folder: Folder) => {
       const path = folder.path
-      if (!arraysStartWith(path, nestedFoldersPath)) return acc
+      if (!nestedFoldersPath.every((uuid, index) => path[index] === uuid)) return acc
 
       const pathEnding = path.slice(nestedFoldersPath.length)
       const updatedPath = [...newPath, ...pathEnding]
