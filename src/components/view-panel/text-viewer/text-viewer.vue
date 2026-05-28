@@ -2,12 +2,11 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { marked } from 'marked'
 import { getIsUuid } from '@/utils'
+import type { TextViewerEmits, TextViewerModel } from './text-viewer.types'
 
-const markdownText = defineModel<string>()
+const markdownText = defineModel<TextViewerModel>()
 
-const emits = defineEmits<{
-  clickOnLink: [uuid: string]
-}>()
+const emits = defineEmits<TextViewerEmits>()
 
 const parsedMarkdown = computed<string>(() => {
   const result = marked.parse(markdownText.value ?? '')

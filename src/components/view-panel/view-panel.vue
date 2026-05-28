@@ -8,13 +8,11 @@ import type { Card, CardShortInfo, FolderShortInfo } from '@/types'
 import CoolPanel from '@/ui/cool-panel.vue'
 import { useStore } from '@/use-store'
 import { getUuidsInString } from '@/utils'
+import QuizViewer from './quiz-viewer/quiz-viewer.vue'
 import TextViewer from './text-viewer/text-viewer.vue'
+import type { ViewPanelEmits, ViewPanelModel } from './view-panel.types'
 
-const emits = defineEmits<{
-  deleted: []
-  edited: []
-  clickOnLink: [uuid: string]
-}>()
+const emits = defineEmits<ViewPanelEmits>()
 
 const {
   isMobileView,
@@ -30,7 +28,7 @@ const {
 
 const confirm = useConfirm()
 
-const viewedCardUuid = defineModel<string | null>()
+const viewedCardUuid = defineModel<ViewPanelModel>()
 
 watch(
   () => viewedCardUuid.value,
@@ -174,7 +172,13 @@ const formattedDate = computed<string>(() => {
 <template>
   <CoolPanel>
     <ConfirmDialog></ConfirmDialog>
-    <article v-if="viewedCard" class="article">
+    <QuizViewer
+      v-if="viewedCard?.type === 'quiz'"
+      @click-on-link="$emit('clickOnLink', $event)"
+      @edited="$emit('edited')"
+      @deleted="$emit('deleted')"
+    />
+    <article v-else-if="viewedCard" class="article">
       <div class="toolbar">
         <Button
           v-tooltip.bottom="'Редактировать карточку'"

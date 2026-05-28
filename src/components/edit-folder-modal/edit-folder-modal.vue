@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import { type StyleValue, ref, computed, watch } from 'vue'
 import { Button, Select, DatePicker, IftaLabel, Textarea } from 'primevue'
-import { getAllDefinitions, getCardsShortInfo } from '@/api'
-import { getCardPaths, updateCardPaths } from '@/api/cards'
-import { createFolder, getAllFolders, updateFolderByUuid, updateFolderPaths } from '@/api/folders'
+import { createFolder } from '@/api/folders'
 import type {
-  Card,
-  CardPath,
-  CardsShortInfoRequest,
   DefaultFolderDisplay,
   Folder,
   FolderEditable,
@@ -18,9 +13,10 @@ import FullScreenModal from '@/ui/full-screen-modal.vue'
 import { useStore } from '@/use-store'
 import { getAreArraysEqual } from '@/utils'
 import BreadcrumbSelect from '../search-panel/breadcrumb-select/breadcrumb-select.vue'
+import type { SelectedFolderModel, VisibleModel } from './edit-folder-modal.types'
 
-const visible = defineModel<boolean>('visible')
-const selectedFolder = defineModel<Folder | null>('selected-folder')
+const visible = defineModel<VisibleModel>('visible')
+const selectedFolder = defineModel<SelectedFolderModel>('selected-folder')
 
 watch(visible, () => {
   if (!visible.value) {
@@ -28,11 +24,7 @@ watch(visible, () => {
   }
 })
 
-const { isLoading, isMobileView, setDefinitions, setCardsShortInfo, currentFolderUuid } = useStore()
-
-const emits = defineEmits<{
-  saved: [uuid: string]
-}>()
+const { isLoading, isMobileView } = useStore()
 
 const displays = ref([
   { label: 'Дневник', value: 'diary' },
@@ -95,24 +87,6 @@ const onCancel = () => {
   //updatedCard.value = { ...defaultCard }
 }
 
-const updateSearchPanel = async (areDefinitionsChanged: boolean) => {
-  const request: CardsShortInfoRequest = {
-    pagination: { from: 0, to: 99 } //TODO брать актуальную пагинацию
-  }
-
-  if (currentFolderUuid.value) request.folderUuid = currentFolderUuid.value
-
-  if (!areDefinitionsChanged) {
-    setCardsShortInfo((await getCardsShortInfo(request)).data)
-    return
-  }
-
-  await Promise.all([
-    setDefinitions(await getAllDefinitions()),
-    setCardsShortInfo((await getCardsShortInfo(request)).data)
-  ])
-}
-
 const onSave = async () => {
   if (!updatedFolder.value.name) {
     alert('Заполните название папки')
@@ -168,16 +142,6 @@ const onSave = async () => {
   }
 
   visible.value = false
-}
-
-/**
- * Вспомогательная функция для проверки, начинается ли массив с заданного подмассива
- */
-const arraysStartWith = (arr: string[], prefix: string[]): boolean => {
-  if (arr.length < prefix.length) return false
-  const subArr = arr.slice(0, prefix.length)
-
-  return getAreArraysEqual(prefix, subArr)
 }
 
 const isTypeSelectOnFocus = ref(false)

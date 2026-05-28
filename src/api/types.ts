@@ -7,7 +7,7 @@ export type Card = CardShortInfo & {
   createdAt: string
   text: string
   links: CardShortInfo[]
-  type: 'definition' | 'article'
+  type: 'definition' | 'article' | 'quiz'
   folders: string //приходит массив JSON в формате string
 }
 
@@ -45,6 +45,7 @@ export type CardsShortInfoRequest = {
   pagination?: Pagination
   sorting?: Sorting
   folderUuid?: string
+  type?: Card['type']
 }
 
 export type Profile = {
@@ -75,3 +76,59 @@ export type CardPath = {
   uuid: string
   folders: string //json с массивом юидов
 }
+
+export type QuizShortInfo = {
+  uuid: string
+  card_id: string
+  title: string
+  study_points: number
+}
+
+export type QuizzesShortInfoRequest = {
+  pagination?: Pagination
+  sorting?: Sorting
+  folderUuid?: string
+}
+
+export type QuizEditable = CardEditable & {
+  study_points: number
+  task: string
+  prefilled_answer: string
+}
+
+export type Quiz = {
+  uuid: string
+  created_at: string
+  card_id: string
+  /** Задание */
+  task: string
+  /** Часть ответа на квиз, сразу вписанная за пользователя */
+  prefilled_answer: string;
+  /** Наградные очки, присуждаемые за правильное выполнение квиза */
+  study_points: number
+  card: Card
+}
+
+export type QuizGrade = 'poor' | 'flawed' | 'excellent'
+
+export type QuizEvent = {
+  id: string
+  created_at: string
+  start_time: string | null
+  end_time: string | null
+  duration: number | null
+  grade: QuizGrade | null
+  card_id: string | null
+  card_title: string | null
+  user_id: string | null
+}
+
+export type QuizEventEditable = Omit<QuizEvent, 'id' | 'created_at' | 'card_title'>
+
+export type QuizEventsRequest = {
+  pagination?: Pagination
+  sorting?: Sorting
+  userId?: string
+  cardId?: string
+}
+

@@ -7,15 +7,13 @@ import { getAllFolders } from '@/api'
 import type { Folder, FolderShortInfo } from '@/types'
 import { useStore } from '@/use-store'
 import { defaultPath } from './breadcrumb-select.consts'
+import type { BreadcrumbSelectEmits, BreadcrumbSelectProps, OpenModel } from './breadcrumb-select.types'
 
-const props = defineProps<{ currentFolderUuid: string | null }>()
+const props = defineProps<BreadcrumbSelectProps>()
 
-const isSelectOpen = defineModel<boolean>('open')
+const isSelectOpen = defineModel<OpenModel>('open')
 
-const emits = defineEmits<{
-  uuidChanged: [value: string | null]
-  path: [value: FolderShortInfo[]]
-}>()
+const emits = defineEmits<BreadcrumbSelectEmits>()
 
 const folders = ref<Folder[]>()
 

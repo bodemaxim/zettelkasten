@@ -103,6 +103,18 @@ const onLinkClick = () => {
           </router-link>
         </div>
         <div class="flex items-center text-md ml-5">
+          <span class="pi pi-book mr-3"></span>
+          <router-link to="/study-mode" :class="{ active: activeRoute === '/study-mode' }">
+            Режим обучения
+          </router-link>
+        </div>
+        <div class="flex items-center text-md ml-5">
+          <span class="pi pi-history mr-3"></span>
+          <router-link to="/quiz-logs" :class="{ active: activeRoute === '/quiz-logs' }">
+            Логи квизов
+          </router-link>
+        </div>
+        <div class="flex items-center text-md ml-5">
           <span class="pi pi-cog mr-3"></span>
           <span :class="{ active: activeRoute === '/settings' }">Настройки</span>
         </div>
@@ -140,6 +152,26 @@ const onLinkClick = () => {
         @click="onLinkClick"
       >
         Папки
+      </router-link>
+    </div>
+    <div class="flex items-center text-md my-3">
+      <span class="pi pi-history mr-3"></span>
+      <router-link
+        to="/quiz-logs"
+        :class="{ active: activeRoute === '/quiz-logs' }"
+        @click="onLinkClick"
+      >
+        Логи квизов
+      </router-link>
+    </div>
+    <div class="flex items-center text-md my-3">
+      <span class="pi pi-book mr-3"></span>
+      <router-link
+        to="/study-mode"
+        :class="{ active: activeRoute === '/study-mode' }"
+        @click="onLinkClick"
+      >
+        Режим обучения
       </router-link>
     </div>
     <div class="flex items-center text-md my-3">
